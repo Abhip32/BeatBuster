@@ -19,9 +19,10 @@ const Languages = () => {
 
     const languageList = [
         { id: 'english', label: 'English' },
+        { id: 'hindi', label: 'Hindi' },
+        { id: 'marathi', label: 'Marathi' },
         { id: 'haryanvi', label: 'Haryanvi' },
         { id: 'punjabi', label: 'Punjabi' },
-        { id: 'hindi', label: 'Hindi' },
         { id: 'rajasthani', label: 'Rajasthani'},
         { id: 'tamil', label: 'Tamil' },
         { id: 'telugu', label: 'Telugu' },
@@ -71,7 +72,7 @@ const Languages = () => {
             htmlFor={language.id}
             className={`${
               selectedLanguages.includes(language.id)
-                ? 'border-[#00e6e6] text-[#00e6e6]'
+                ? 'border-[#e0c3fc] text-[#e0c3fc]'
                 : 'border-white text-white'
             } cursor-pointer transition-colors text-sm min-w-[86px] text-center  border rounded-md p-2 font-semibold`}
           >

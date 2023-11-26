@@ -28,19 +28,19 @@ const Searchbar = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} autoComplete="off" className="p-2 text-gray-400 relative focus-within:text-gray-600">
+    <form onSubmit={handleSubmit} autoComplete="off" className="p-2 text-zinc-400 relative focus-within:text-zinc-600">
       <label htmlFor="search-field" className="sr-only">
         Search all files
       </label>
-      <div className="flex flex-row justify-start items-center">
-        <FiSearch aria-hidden="true" className="w-5 h-5 ml-4 text-gray-300" />
+      <div className="flex flex-row justify-start items-center bg-white rounded-lg mt-2">
+        <FiSearch aria-hidden="true" className="w-5 h-5 ml-4 text-zinc-800" />
         <input
         onFocus={handleFocus}
         onBlur={handleBlur}
           name="search-field"
           autoComplete="off"
           id="search-field"
-          className="flex-1 bg-transparent w-32 focus:border-b border-white lg:w-64 placeholder-gray-300 outline-none text-base text-white p-4"
+          className="flex-1 bg-transparent w-32 lg:w-64 placeholder-zinc-800 outline-none text-base text-zinc p-2 "
           placeholder="Search"
           type="search"
           value={searchTerm}
