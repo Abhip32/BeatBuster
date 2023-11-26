@@ -30,7 +30,7 @@ const Profile = ({setShowNav}) => {
                 {
                     status === 'unauthenticated' ? 
                     (
-                        <div className=' flex gap-2 ml-5'>
+                        <div className=' flex gap-2'>
                             <button onClick={()=>{
                                 setShowNav(false);
                                 router.push('/login');
