@@ -24,7 +24,7 @@ const Navbar = () => {
             <Link href='/'>
               <div className='flex items-center justify-center'>
                 <img onClick={() => { dispatch(setProgress(100)) }}
-                src='/images/logo.png' alt="logo" className=' lg:py-2  w-[50px] h-[60px]' />
+                src='/images/logo.png' alt="logo" className=' lg:py-2  w-[50px]' />
                 <h1 className='mx-3 text-xl'>BeatBuster</h1>
               </div>
             </Link>

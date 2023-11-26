@@ -22,7 +22,7 @@ const Sidebar = ({showNav, setShowNav}) => {
       <Link href='/'>
       <div className='flex items-center justify-center'>
                 <img onClick={() => { dispatch(setProgress(100)) }}
-                src='/images/logo.png' alt="logo" className=' lg:py-2  w-[50px] h-[60px]' />
+                src='/images/logo.png' alt="logo" className=' lg:py-2  w-[50px]' />
                 <h1 className='mx-3 text-xl'>BeatBuster</h1>
               </div>
       </Link>
@@ -34,7 +34,6 @@ const Sidebar = ({showNav, setShowNav}) => {
       <div className=' mt-7 border-b border-gray-400 w-[95%]'>
         <Languages/>
       </div>
-     <Favourites setShowNav={setShowNav} />
      <div className=' mt-7 border-b border-gray-400 w-[95%]'>
       <Playlists setShowNav={setShowNav}/>
       </div>

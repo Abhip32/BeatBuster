@@ -43,11 +43,11 @@ const Home = () => {
 
   let salutation = '';
   if (currentHour >= 5 && currentHour < 12) {
-    salutation = 'Good morning';
+    salutation = 'Good Morning';
   } else if (currentHour >= 12 && currentHour < 18) {
-    salutation = 'Good afternoon';
+    salutation = 'Good Afternoon';
   } else {
-    salutation = 'Good evening';
+    salutation = 'Good Evening';
   }
 
 
@@ -71,6 +71,13 @@ const Home = () => {
       <OnlineStatus />
       <h1 className='text-4xl font-bold mx-2 m-9 text-white flex gap-2'>"{salutation}  <GiMusicalNotes />"</h1>
 
+      {status === 'authenticated' &&  <div>
+           <div className="p-4 pt-4 rounded-lg backdrop-blur-sm bg-gradient-to-r from-black to-pink-300 p-4 w-[250px] h-[120px]">
+            <Favourites/>
+            </div>
+          </div>}
+
+  
       <ListenAgain />
 
       {/* trending */}
