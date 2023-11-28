@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { playPause, setActiveSong, setFullScreen } from "@/redux/features/playerSlice";
+import { playPause, setActiveSong, setFullScreen,deleteSong } from "@/redux/features/playerSlice";
 import { BsPlayFill } from "react-icons/bs";
 import { useDispatch } from "react-redux";
 import SongListSkeleton from './SongListSkeleton';
@@ -59,6 +59,19 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
       toast.error(res?.message)
     }
   }
+
+  const handleDeleteFromQueue = async (songId) => {
+    const storedSongHistory = localStorage?.getItem("songHistory");
+    const parsedSongHistory = storedSongHistory ? JSON.parse(storedSongHistory) : [];
+    if (parsedSongHistory?.find((song) => song?.id === songId)) {
+      const updatedHistory = parsedSongHistory.filter((song) => song?.id !== songId);
+      const songHistory = [...updatedHistory];
+      localStorage.setItem("songHistory", JSON.stringify(songHistory));
+
+      // Dispatch the deleteSong action to update Redux state
+      dispatch(deleteSong(songId));
+    }
+  };
 
   // delete song from playlist
   const handleDeleteFromPlaylist = async (playlistID, song) => {
@@ -120,6 +133,7 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
                 <div className='flex items-center gap-3'>
                   <p>{formatDuration(song?.duration)}</p>
                   <div className=' flex gap-2 items-center relative'>
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteFromQueue(song?.id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'><MdOutlineDeleteOutline size={20} color={'red'} /> </button>
                     <PiDotsThreeVerticalBold onClick={(e) => { e.stopPropagation(); setShowMenu(song?.id) }} size={25} className=' text-gray-300' />
                     {
                       showMenu === song?.id &&

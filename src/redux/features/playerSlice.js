@@ -58,11 +58,31 @@ const playerSlice = createSlice({
 
     setAutoAdd: (state, action) => {
       state.autoAdd = action.payload;
-    }
+    },
+
+    deleteSong: (state, action) => {
+      const songIdToDelete = action.payload;
+
+      // Filter out the song with the specified ID
+      state.currentSongs = state.currentSongs.filter(song => song.id !== songIdToDelete);
+
+      // If the deleted song was the active song, reset the activeSong and isActive state
+      if (state.activeSong.id === songIdToDelete) {
+        state.activeSong = {};
+        state.isActive = false;
+      }
+
+      // If the deleted song was the only song or the last song in the playlist, reset currentIndex
+      if (state.currentSongs.length === 0) {
+        state.currentIndex = 0;
+      } else if (state.currentIndex >= state.currentSongs.length) {
+        state.currentIndex = state.currentSongs.length - 1;
+      }
+    },
    
   },
 });
 
-export const { setActiveSong, nextSong, prevSong, playPause, setFullScreen, setAutoAdd } = playerSlice.actions;
+export const { setActiveSong, nextSong, prevSong, playPause, setFullScreen, setAutoAdd,deleteSong } = playerSlice.actions;
 
 export default playerSlice.reducer;

@@ -75,7 +75,7 @@ const page = () => {
                     </span>
                 </div>
             </div>
-            <div class="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0" style={{backgroundColor: "#161616"}}>
+            <div class="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0" style={{backgroundColor: "transparant"}}>
                
                 <div class="w-full py-6 z-20">
                     <h1 class="my-6 text-3xl font-bold text-[]#e0c3fc">
