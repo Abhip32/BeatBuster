@@ -85,7 +85,20 @@ const Home = () => {
      
       <OnlineStatus />
       <h1 className='text-4xl font-bold mx-2 m-9 text-white flex gap-2'>{salutation}</h1>
+      {status === 'loading' && <div>
 
+      <div className=' animate-pulse flex items-center  mt-5 cursor-pointer groupjustify-between'>
+              <div className="flex items-center gap-5">
+              <div className=" bg-gray-300 dark:bg-gray-700 mb-3 w-[300px] h-[80px]">
+                </div>
+                <div className=" bg-gray-300 dark:bg-gray-700 mb-3 w-[300px] h-[80px]">
+                </div>
+                </div>
+             
+        </div>
+        
+        </div>
+        }
       {status === 'authenticated' &&  <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
   <div className="p-4 pt-4 rounded-lg">
