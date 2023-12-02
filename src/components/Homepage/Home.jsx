@@ -87,11 +87,9 @@ const Home = () => {
       <h1 className='text-4xl font-bold mx-2 m-9 text-white flex gap-2'>{salutation}</h1>
       {status === 'loading' && <div>
 
-      <div className=' animate-pulse flex items-center  mt-5 cursor-pointer groupjustify-between'>
-              <div className="flex items-center gap-5">
-              <div className=" bg-gray-300 dark:bg-gray-700 mb-3 w-[300px] h-[80px]">
-                </div>
-                <div className=" bg-gray-300 dark:bg-gray-700 mb-3 w-[300px] h-[80px]">
+      <div className=' animate-pulse flex items-center  mt-5 cursor-pointer group justify-between '>
+              <div className="flex items-center p-2 gap-5 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup w-[24vw]">
+              <div className=" bg-gray-300 dark:bg-gray-700 w-[7vw] h-[80px]">
                 </div>
                 </div>
              
@@ -100,7 +98,7 @@ const Home = () => {
         </div>
         }
       {status === 'authenticated' &&  <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+          <div className="grid grid-cols-2 sm:md:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:p-4 text-xs lg:text-lg">
   <div className="p-4 pt-4 rounded-lg">
     <Favourites />
   </div>
@@ -109,8 +107,8 @@ const Home = () => {
     <div className="p-4 pt-4 rounded-lg" key={playlist._id}>
        <div className=' mt-1 bg-white/5 bg-opacity-80 backdrop-blur-sm rounded-lg cursor-pointer'>
         <Link href={`/myPlaylists/${playlist._id}`} className="flex items-center" onClick={() => setShowNav(false)}>
-        <BiSolidPlaylist title="Favourites" size={20} color={"white"} className={`bg-gradient-to-br from-blue-500 to-black p-4 w-[80px] h-[80px]`} />
-        <p className="font-semibold text-xl text-white mx-3">{playlist.name}</p>
+        <BiSolidPlaylist title="Favourites" color={"white"} className={`bg-gradient-to-br from-blue-500 to-black p-4 w-[80px] h-[80px]`} />
+        <p className="font-semibold text-white mx-3 max-w-[22vw] sm:max-w-[22vw] lg:max-w-[22vw] overflow-hidden overflow-ellipsis whitespace-nowrap sm:text-sm lg:text-xl line-clamp-2">{playlist.name}</p>
       </Link>
     </div>
     </div>
