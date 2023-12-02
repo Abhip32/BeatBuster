@@ -71,12 +71,12 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
       
       // Dispatch the deleteSong action to update Redux state
       dispatch(deleteSong(songId));
-      toast.success("Song deleted successfully")
+      toast.success("Song removed successfully")
     }
     else
     {
       dispatch(deleteSong(songId));
-      toast.success("Song deleted successfully")
+      toast.success("Song removed successfully")
     }
   };
 
