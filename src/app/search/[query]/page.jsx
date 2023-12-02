@@ -54,6 +54,7 @@ const page = ({params}) => {
             <h1 className="text-3xl font-bold">Search results for "{query.replaceAll("%20"," ") }"</h1>
             <div className="mt-10 text-gray-200">
         <h2 className="text-lg lg:text-4xl font-semibold">Songs</h2>
+        {searchedData?.songs?.results.length ===0 &&         <h1 className="text-xl font-bold text-center mt-20 mb-20">No Songs</h1>}
         {
             searchedData && searchedData?.songs?.results?.length > 0 ? (
                 <div className="mt-5">
@@ -96,6 +97,7 @@ const page = ({params}) => {
 
         <div className="mt-10 text-gray-200">
         <SwiperLayout title={"Albums"}>
+        {searchedData?.albums?.results.length ===0 &&         <h1 className="text-xl font-bold text-center mt-20 mb-20">No Albums</h1>}
         { searchedData && searchedData?.albums?.results?.length > 0 &&
         searchedData?.albums?.results?.map(
             (song) =>
@@ -109,6 +111,7 @@ const page = ({params}) => {
         </div>
         <div className="mt-10 text-gray-200">
         <SwiperLayout title={"Artists"}>
+        {searchedData?.artists?.results.length ===0 &&         <h1 className="text-xl font-bold text-center mt-20 mb-20">No Artists</h1>}
         { searchedData && searchedData?.artists?.results?.length > 0 &&
         searchedData?.artists?.results?.map(
             (artist) =>
@@ -134,6 +137,7 @@ const page = ({params}) => {
         </div>
         <div className="mt-10 text-gray-200">
         <SwiperLayout title={"Playlists"}>
+        {searchedData?.playlists?.results.length ===0 &&         <h1 className="text-xl font-bold text-center mt-20 mb-20">No Playlists</h1>}
         { searchedData && searchedData?.albums?.results?.length > 0 &&
         searchedData?.playlists?.results?.map(
             (song) =>

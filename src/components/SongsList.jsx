@@ -19,6 +19,7 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
   const [showMenu, setShowMenu] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const dispatch = useDispatch();
+  const fullScreenMode=useSelector(state=>state.player.fullScreen)
 
 
   const handlePlayClick = (song, index) => {
@@ -67,9 +68,15 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
       const updatedHistory = parsedSongHistory.filter((song) => song?.id !== songId);
       const songHistory = [...updatedHistory];
       localStorage.setItem("songHistory", JSON.stringify(songHistory));
-
+      
       // Dispatch the deleteSong action to update Redux state
       dispatch(deleteSong(songId));
+      toast.success("Song deleted successfully")
+    }
+    else
+    {
+      dispatch(deleteSong(songId));
+      toast.success("Song deleted successfully")
     }
   };
 
@@ -133,7 +140,7 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
                 <div className='flex items-center gap-3'>
                   <p>{formatDuration(song?.duration)}</p>
                   <div className=' flex gap-2 items-center relative'>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteFromQueue(song?.id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'><MdOutlineDeleteOutline size={20} color={'red'} /> </button>
+                  { fullScreenMode?<button onClick={(e) => { e.stopPropagation(); handleDeleteFromQueue(song?.id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'><MdOutlineDeleteOutline size={20} color={'red'} /> </button>:null}
                     <PiDotsThreeVerticalBold onClick={(e) => { e.stopPropagation(); setShowMenu(song?.id) }} size={25} className=' text-gray-300' />
                     {
                       showMenu === song?.id &&

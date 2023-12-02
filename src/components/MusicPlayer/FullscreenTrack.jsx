@@ -19,12 +19,12 @@ const FullscreenTrack = ({ fullScreen, activeSong, handlePrevSong, handleNextSon
 
 
   return (
-    <div className={`${fullScreen ? 'block' : 'hidden'} w-[100vw] flex lg:flex-row lg:w-[1000px] mx-auto flex-col  lg:justify-between mt-10`}>
+    <div className={`${fullScreen ? 'block' : 'hidden'} w-[100vw] flex lg:flex-row lg:w-[1000px] mx-auto flex-col  lg:justify-between mt-10 min-h-[60%]`}>
       <div className="flex flex-col items-center lg:w-96">
         <div
           {...handlers}
-         className=" h-80 w-80 lg:h-[500px] lg:w-[500px] sm:mt-5 mt-28 ">
-          <img src={activeSong?.image?.[2].link} alt="cover art" />
+         className=" h-80 w-80 lg:h-[400px] lg:w-[400px] sm:mt-5 mt-28 ">
+          <img src={activeSong?.image?.[2].link || '/images/MUSIC-PLAYER.jpg'} alt="cover art" />
         </div>
         <div onClick={(e) => e.stopPropagation()} className=" w-full select-none cursor-pointer text-center my-5">
           <p className="truncate text-white font-bold text-2xl mx-3 mb-1">

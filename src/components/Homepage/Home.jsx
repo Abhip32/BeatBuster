@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SwiperLayout from "./Swiper";
 import { setProgress } from "@/redux/features/loadingBarSlice";
 import SongCardSkeleton from "./SongCardSkeleton";
+import { deletePlaylist, getUserPlaylists } from '@/services/playlistApi'
 import { GiMusicalNotes } from 'react-icons/gi'
 import SongBar from "./SongBar";
 import { getUserInfo } from '@/services/dataAPI';
@@ -16,6 +17,8 @@ import ListenAgain from "./ListenAgain";
 import Favourites from "../Sidebar/Favourites";
 import { signOut, useSession } from 'next-auth/react'
 import Playlists from "../Sidebar/Playlists";
+import Link from "next/link";
+import { BiSolidPlaylist } from "react-icons/bi";
 
 const Home = () => {
   const [data, setData] = useState("");
@@ -23,6 +26,18 @@ const Home = () => {
   const dispatch = useDispatch();
   const { activeSong, isPlaying, } = useSelector((state) => state.player);
   const { languages } = useSelector((state) => state.languages);
+  const [playlists, setPlaylists] = useState([]);
+  const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+      const getPlaylists = async () => {
+          const res = await getUserPlaylists();
+          if(res?.success == true){
+              setPlaylists(res?.data?.playlists)
+          }
+      }
+      getPlaylists()
+  }, [])
 
   const {status, data1} = useSession();
 
@@ -69,12 +84,26 @@ const Home = () => {
     <div>
      
       <OnlineStatus />
-      <h1 className='text-4xl font-bold mx-2 m-9 text-white flex gap-2'>"{salutation}  <GiMusicalNotes />"</h1>
+      <h1 className='text-4xl font-bold mx-2 m-9 text-white flex gap-2'>{salutation}</h1>
 
       {status === 'authenticated' &&  <div>
-           <div className="p-4 pt-4 rounded-lg backdrop-blur-sm bg-gradient-to-r from-black to-pink-300 p-4 w-[350px] h-[120px]">
-            <Favourites/>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+  <div className="p-4 pt-4 rounded-lg">
+    <Favourites />
+  </div>
+
+  {playlists.slice(0, 5).map((playlist) => (
+    <div className="p-4 pt-4 rounded-lg" key={playlist._id}>
+       <div className=' mt-1 bg-white/5 bg-opacity-80 backdrop-blur-sm rounded-lg cursor-pointer'>
+        <Link href={`/myPlaylists/${playlist._id}`} className="flex items-center" onClick={() => setShowNav(false)}>
+        <BiSolidPlaylist title="Favourites" size={20} color={"white"} className={`bg-gradient-to-br from-blue-500 to-black p-4 w-[80px] h-[80px]`} />
+        <p className="font-semibold text-xl text-white mx-3">{playlist.name}</p>
+      </Link>
+    </div>
+    </div>
+  ))}
+</div>
+
           </div>}
 
   

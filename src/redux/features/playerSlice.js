@@ -65,6 +65,7 @@ const playerSlice = createSlice({
 
       // Filter out the song with the specified ID
       state.currentSongs = state.currentSongs.filter(song => song.id !== songIdToDelete);
+      
 
       // If the deleted song was the active song, reset the activeSong and isActive state
       if (state.activeSong.id === songIdToDelete) {

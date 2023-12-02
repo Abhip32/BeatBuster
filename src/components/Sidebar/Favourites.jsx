@@ -5,10 +5,10 @@ import { AiFillHeart } from 'react-icons/ai'
 
 const Favourites = ({setShowNav}) => {
   return (
-    <div className=' mt-7 w-[95%] '>
-    <Link href='/favourite' className='flex cursor-pointer items-center' onClick={()=>setShowNav(false)}>
-    <AiFillHeart title='Favourites' size={30} color={'pink'} className={` mb-7 `} />
-    <p className=' font-semibold text-2xl text-white mx-3 mb-7'>Favourites</p>
+    <div className=' mt-1 bg-white/5 bg-opacity-80 backdrop-blur-sm rounded-lg cursor-pointer'>
+    <Link href='/favourite' className='flex items-center' onClick={()=>setShowNav(false)}>
+    <AiFillHeart title='Favourites' size={20} color={'white'} className={` bg-gradient-to-br from-pink-500 to-black p-4 w-[80px] h-[80px]`} />
+    <p className=' font-semibold text-xl text-white mx-3'>Favourites</p>
 
     </Link>
     </div>
