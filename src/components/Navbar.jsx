@@ -20,13 +20,14 @@ const Navbar = () => {
           <MdOutlineMenu onClick={
             () => setShowNav(true)
           } className=' mx-4 text-2xl lg:text-3xl my-auto cursor-pointer' />
-          <div className=' flex justify-center items-center'>
+          <div className=' flex justify-center items-center gap-5'>
             <Link href='/'>
               <div className='flex items-center justify-center'>
                 <img onClick={() => { dispatch(setProgress(100)) }}
-                src='/images/logo.png' alt="logo" className=' lg:py-2  w-[50px]' />
+                src='/images/logo.png' alt="logo" className=' lg:py-2  w-[40px]' />
               </div>
             </Link>
+            <h1 className='sm:text-sm lg:text-lg' style={{fontFamily: "'Dancing Script', cursive", fontWeight: 'bold', fontVariant: 'small-caps', textAlign: 'center', color: 'rgb(255, 255, 255)', textShadow: 'rgb(0, 0, 0) 3px 8px 7px'}}>BeatBuster</h1>
           </div>
         </div>
         <Searchbar />
