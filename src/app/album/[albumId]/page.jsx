@@ -45,6 +45,19 @@ const page = ({ params }) => {
   };
 
 
+  function formatPlayCount(playCount) {
+    if (playCount < 1000) {
+      return playCount.toString();
+    } else if (playCount < 1000000) {
+      return (playCount / 1000).toFixed(1) + "k";
+    } else if (playCount < 1000000000) {
+      return (playCount / 1000000).toFixed(1) + "M";
+    } else {
+      return (playCount / 1000000000).toFixed(1) + "B";
+    }
+  }
+
+
   return (
     <div className="w-11/12 m-auto mt-16">
       <div className=" flex flex-col lg:flex-row items-center">
@@ -123,7 +136,7 @@ const page = ({ params }) => {
               </div>
               <div className=" hidden lg:block w-28">
                 {song?.playCount && (
-                  <p className="text-gray-400">{song?.playCount} plays</p>
+                  <p className="text-gray-400">{formatPlayCount(song?.playCount)} plays</p>
                 )}
               </div>
               <div>

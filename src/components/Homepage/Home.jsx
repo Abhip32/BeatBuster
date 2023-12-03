@@ -58,11 +58,14 @@ const Home = () => {
 
   let salutation = '';
   if (currentHour >= 5 && currentHour < 12) {
-    salutation = 'Good Morning';
+    salutation = 'Good Morning 🌅';
   } else if (currentHour >= 12 && currentHour < 18) {
-    salutation = 'Good Afternoon';
-  } else {
-    salutation = 'Good Evening';
+    salutation = 'Good Afternoon ☀️';
+  } else if  (currentHour >= 18 && currentHour < 21){
+    salutation = 'Good Evening 🌆';
+  }
+  else{
+    salutation = 'Good Night 🌙';
   }
 
 
