@@ -97,6 +97,18 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
     }
   }
 
+  function formatPlayCount(playCount) {
+    if (playCount < 1000) {
+      return playCount.toString();
+    } else if (playCount < 1000000) {
+      return (playCount / 1000).toFixed(1) + "k";
+    } else if (playCount < 1000000000) {
+      return (playCount / 1000000).toFixed(1) + "M";
+    } else {
+      return (playCount / 1000000000).toFixed(1) + "B";
+    }
+  }
+
 
   return (
     <>
@@ -134,7 +146,7 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
                 </div>
                 <div className={`hidden w-36 ${hidePlays ? 'lg:hidden' : 'lg:block'}`}>
                   {song?.playCount && (
-                    <p className="text-gray-400">{song?.playCount} plays</p>
+                    <p className="text-gray-400">{formatPlayCount(song?.playCount)} plays</p>
                   )}
                 </div>
                 <div className='flex items-center gap-3'>

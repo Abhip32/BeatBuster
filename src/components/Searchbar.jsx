@@ -32,7 +32,7 @@ const Searchbar = () => {
       <label htmlFor="search-field" className="sr-only">
         Search all files
       </label>
-      <div className="flex flex-row justify-start items-center bg-white rounded-lg mt-2">
+      <div className="flex flex-row justify-start items-center bg-white rounded-full mt-2">
         <FiSearch aria-hidden="true" className="w-5 h-5 ml-4 text-zinc-800" />
         <input
         onFocus={handleFocus}

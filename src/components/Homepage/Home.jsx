@@ -88,8 +88,8 @@ const Home = () => {
       {status === 'loading' && <div>
 
       <div className=' animate-pulse flex items-center  mt-5 cursor-pointer group justify-between '>
-              <div className="flex items-center p-2 gap-5 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup w-[24vw]">
-              <div className=" bg-gray-300 dark:bg-gray-700 w-[7vw] h-[80px]">
+              <div className="flex items-center p-2 gap-5 bg-white/5 bg-dark-300 animate-slideup w-[24vw]">
+              <div className=" bg-gray-300 dark:bg-gray-700 w-16 h-16">
                 </div>
                 </div>
              
