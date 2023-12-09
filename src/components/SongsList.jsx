@@ -147,7 +147,8 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
                   </div>
                   <div className=" w-24 md:w-64">
                     <p className="text-sm lg:text-lg font-semibold truncate">{
-                      song?.name?.replace("&#039;", "'")?.replaceAll("&amp;", "&")
+                      song?.name?.replace("&#039;", "'")?.replaceAll("&amp;", "&")||
+                      song?.title.replace("&#039;", "'")?.replaceAll("&amp;", "&")
                     }</p>
                     <p className="text-gray-400 truncate text-xs">{song?.primaryArtists}</p>
                   </div>

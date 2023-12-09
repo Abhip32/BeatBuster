@@ -8,12 +8,15 @@ import { useSelector } from 'react-redux';
 import { SwiperSlide } from 'swiper/react';
 import { BsPlayFill } from 'react-icons/bs';
 import { useDispatch } from 'react-redux';
-import { playPause, setActiveSong, setFullScreen } from '@/redux/features/playerSlice';
 import Image from 'next/image';
 import Link from 'next/link';
 import SongListSkeleton from '@/components/SongListSkeleton';
 import { setProgress } from '@/redux/features/loadingBarSlice';
-
+import { PiDotsThreeVerticalBold } from 'react-icons/pi'
+import { addSongToPlaylist, deleteSongFromPlaylist, getUserPlaylists } from '@/services/playlistApi';
+import { toast } from 'react-hot-toast';
+import { MdOutlineDeleteOutline } from 'react-icons/md'
+import { playPause, setActiveSong, setFullScreen,deleteSong,addToQueue } from "@/redux/features/playerSlice";
 
 const page = ({params}) => {
     const dispatch = useDispatch();
@@ -21,7 +24,10 @@ const page = ({params}) => {
     const [searchedData, setSearchedData] = useState(null);
     const [loading, setLoading] = useState(true);
     const {currentSongs} = useSelector(state => state.player);
-
+    const { activeSong } = useSelector((state) => state.player);
+    const [showMenu, setShowMenu] = useState(false);
+    const [playlists, setPlaylists] = useState([]);
+    const fullScreenMode=useSelector(state=>state.player.fullScreen)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -47,6 +53,41 @@ const page = ({params}) => {
         }
       };
 
+      const handleAddToQueue= async (song) => {
+        if (song?.type === "song") {
+          const Data = await getSongData(song?.id);
+          const songData = await Data?.[0]
+          dispatch(addToQueue({ song: songData}));
+          dispatch(setFullScreen(true));
+          dispatch(playPause(true));
+        }
+      }
+
+      useEffect(() => {
+        const getPlaylists = async () => {
+          const res = await getUserPlaylists();
+          if (res?.success == true) {
+            setPlaylists(res?.data?.playlists)
+          }
+        }
+        getPlaylists()
+      }, [])
+    
+      // add song to playlist
+      const handleAddToPlaylist = async (song, playlistID) => {
+        setShowMenu(false);
+        const res = await addSongToPlaylist(playlistID, song);
+        if (res?.success == true) {
+          toast.success(res?.message)
+        }
+        else {
+          toast.error(res?.message)
+        }
+      }
+
+       // delete song from playlist
+
+
   return (
     <div>
         <div className="w-11/12 m-auto mt-16">
@@ -65,7 +106,7 @@ const page = ({params}) => {
                 handlePlayClick(song);
             }}
              className="flex items-center  mt-5 cursor-pointer group border-b-[1px] border-gray-400 justify-between">
-                <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5">
               <div className=" relative">
                 <img src={song?.image?.[2]?.link} alt={song?.title} width={50} height={50} className="mb-3"
                 />
@@ -80,11 +121,35 @@ const page = ({params}) => {
                 }</p>
               </div>
               </div>
-              <div className="hidden lg:block max-w-56">
+             
+
+
+                <div className='flex gap-2 items-center relative'>
+                <div className="hidden lg:block max-w-56">
                 {song?.primaryArtists && (
                     <p className="text-gray-400 truncate">By: {song?.primaryArtists}</p>
                 )}
                 </div>
+                <PiDotsThreeVerticalBold onClick={(e) => { e.stopPropagation(); setShowMenu(song?.id) }} size={25} className='text-gray-300' />
+                {showMenu === song?.id &&
+                  <div onClick={() => { setShowMenu(false); }}
+                    className='absolute text-white top-0 right-0 bg-black/50 bg-opacity-80 backdrop-blur-sm rounded-lg p-3 w-32 flex flex-col gap-2 z-40'>
+                    {!fullScreenMode ? <button onClick={(e) => { e.stopPropagation(); handleAddToQueue(song) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>Add to Queue</button> : null}
+                    <p className='text-sm font-semibold flex gap-1 empty:hidden border-b border-white items-center'>
+                      {'Add to playlist'}
+                    </p>
+                    {
+                      playlists?.length > 0 ?
+                        playlists?.map((playlist, index) => (
+                          <button key={index} onClick={(e) => { e.stopPropagation(); handleAddToPlaylist(song?.id, playlist._id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>{playlist?.name}</button>
+                        ))
+                        :
+                        <p className='text-sm font-semibold flex gap-1 items-center'>No Playlist</p>
+                    }
+                  </div>
+                }
+              </div>
+
             </div>
                         ))
                     }
@@ -151,6 +216,10 @@ const page = ({params}) => {
         </div>
       </div>
         </div>
+          {/* overlay */}
+      {
+        showMenu && <div onClick={() => setShowMenu(false)} className='fixed top-0 left-0 w-full h-full z-30'></div>
+      }
     </div>
   )
 }

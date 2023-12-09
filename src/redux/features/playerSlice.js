@@ -82,10 +82,10 @@ const playerSlice = createSlice({
     },
     addToQueue: (state, action) => {
       const newSong = action.payload.song;
-    
+      console.log(newSong);
       // Check if the song is already in the queue
       const isSongInQueue = state.currentSongs.some(song => song.id === newSong.id);
-    
+      
       if (!isSongInQueue) {
         // If the song is not in the queue, add it
         state.currentSongs = [...state.currentSongs, newSong];
