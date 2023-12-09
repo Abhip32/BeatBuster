@@ -80,10 +80,24 @@ const playerSlice = createSlice({
         state.currentIndex = state.currentSongs.length - 1;
       }
     },
+    addToQueue: (state, action) => {
+      const newSong = action.payload.song;
+    
+      // Check if the song is already in the queue
+      const isSongInQueue = state.currentSongs.some(song => song.id === newSong.id);
+    
+      if (!isSongInQueue) {
+        // If the song is not in the queue, add it
+        state.currentSongs = [...state.currentSongs, newSong];
+        state.fullScreen = true;
+      }
+      state.fullScreen = true;
+    }
+    
    
   },
 });
 
-export const { setActiveSong, nextSong, prevSong, playPause, setFullScreen, setAutoAdd,deleteSong } = playerSlice.actions;
+export const { setActiveSong, nextSong, prevSong, playPause, setFullScreen, setAutoAdd,deleteSong,addToQueue } = playerSlice.actions;
 
 export default playerSlice.reducer;

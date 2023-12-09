@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { playPause, setActiveSong, setFullScreen,deleteSong } from "@/redux/features/playerSlice";
+import { playPause, setActiveSong, setFullScreen,deleteSong,addToQueue } from "@/redux/features/playerSlice";
 import { BsPlayFill } from "react-icons/bs";
 import { useDispatch } from "react-redux";
 import SongListSkeleton from './SongListSkeleton';
@@ -23,7 +23,15 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
 
 
   const handlePlayClick = (song, index) => {
-    dispatch(setActiveSong({ song, data: SongData, i: index }));
+    if(isUserPlaylist===true)
+    {
+      dispatch(setActiveSong({ song,data:SongData,i: index }));
+    }
+    else
+    {
+      dispatch(setActiveSong({ song,i: index }));
+    }
+  
     dispatch(setFullScreen(true));
     dispatch(playPause(true));
   };
@@ -159,6 +167,7 @@ const SongsList = ({ SongData, loading, hidePlays, isUserPlaylist, playlistID, s
                       <div
                         onClick={() => { setShowMenu(false); }}
                         className='absolute text-white top-0 right-0 bg-black/50 bg-opacity-80 backdrop-blur-sm rounded-lg p-3 w-32 flex flex-col gap-2 z-40'>
+                          {!fullScreenMode?<button onClick={(e) => { e.stopPropagation(); dispatch(addToQueue({song:song})) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>Add to Queue</button>:null}
                         <p className='text-sm font-semibold flex gap-1 empty:hidden border-b border-white items-center'>{
                           isUserPlaylist ? null : 'Add to playlist'
                         }</p>
