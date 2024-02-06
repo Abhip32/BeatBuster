@@ -11,6 +11,30 @@ This is a free music streaming web application built with Next.js and powered by
 * Minimalistic and intuitive user interface.
 
 
+## Screenshots
+
+Home page
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%201.png)
+
+Account & Languages
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%202.png)
+
+Playlist
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%203.png)
+
+Search Page
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%204.png)
+
+Favourites
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%205.png)
+
+Music Player
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%206.png)
+
+Change of background of Music Player
+![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%207.png)
+
+
 
 ***
 
