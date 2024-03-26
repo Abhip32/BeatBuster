@@ -23,7 +23,7 @@ const Controls = ({
   loading,
 }) => {
   return (
-    <div className="flex items-center justify-around md:w-80 text-lg lg:w-80 2xl:w-80 gap-4 sm:gap-0 md:mt-[-90px]">
+    <div className={`flex items-center justify-around md:w-80 text-lg lg:w-80 2xl:w-80 gap-4 ${fullScreen ? 'md:mt-[-90px]' : ''}`}>
       <FavouriteButton
         favouriteSongs={favouriteSongs}
         activeSong={activeSong}
