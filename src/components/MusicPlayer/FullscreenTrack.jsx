@@ -30,7 +30,7 @@ const FullscreenTrack = ({
       <div className="flex flex-col items-center lg:w-96">
         <div
           {...handlers}
-          className=" h-80 w-80 lg:h-[500px] lg:w-[500px] sm:mt-5 mt-28 "
+          className=" h-80 w-80 lg:h-[300px] lg:w-[300px] sm:mt-5 mt-28 "
         >
           <img src={activeSong?.image?.[2].url} alt="cover art" />
         </div>

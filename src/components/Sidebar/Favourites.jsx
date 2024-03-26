@@ -1,27 +1,18 @@
-import Link from "next/link";
-import React from "react";
-import { AiFillHeart } from "react-icons/ai";
+import Link from 'next/link'
+import React from 'react'
+import { AiFillHeart } from 'react-icons/ai'
 
-const Favourites = ({ setShowNav }) => {
+
+const Favourites = ({setShowNav}) => {
   return (
-    <div className=" pt-5 m-2 rounded-md w-[95%] hover:bg-white/5">
-      <Link
-        href="/favourite"
-        className="flex cursor-pointer items-center"
-        onClick={() => setShowNav(false)}
-      >
-        <p className=" font-semibold text-lg text-white mx-3 mb-7">
-          Favourites
-        </p>
-        <AiFillHeart
-          title="Favourites"
-          size={25}
-          color={"white"}
-          className={` mb-7 `}
-        />
-      </Link>
-    </div>
-  );
-};
+    <div className=' mt-1 bg-white/5 bg-opacity-80 backdrop-blur-sm rounded-lg cursor-pointer'>
+    <Link href='/favourite' className='flex items-center' onClick={()=>setShowNav(false)}>
+    <AiFillHeart title='Favourites' size={20} color={'white'} className={` bg-gradient-to-br from-pink-500 to-black p-4 w-[80px] h-[80px]`} />
+    <p className=' font-semibold text-xl text-white mx-3'>Favourites</p>
 
-export default Favourites;
+    </Link>
+    </div>
+  )
+}
+
+export default Favourites

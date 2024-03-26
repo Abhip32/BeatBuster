@@ -99,7 +99,7 @@ const Home = () => {
         
         </div>
         }
-      {status === 'authenticated' &&  <div>
+      <div>
           <div className="grid grid-cols-2 sm:md:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:p-4 text-xs lg:text-lg">
   <div className="p-4 pt-4 rounded-lg">
     <Favourites />
@@ -117,7 +117,7 @@ const Home = () => {
   ))}
 </div>
 
-          </div>}
+          </div>
 
   
       <ListenAgain />
