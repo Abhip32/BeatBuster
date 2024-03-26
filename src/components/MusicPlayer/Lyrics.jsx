@@ -42,8 +42,8 @@ const Lyrics = ({ activeSong }) => {
     return (
         <div onClick={(e) => { e.stopPropagation(); }} >
             <div className='flex justify-center items-center w-full'>
-                <button onClick={() => { setActiveTab('queue') }} className={`${activeTab === 'queue' ? 'border-[#e0c3fc] border-b-2' : ''} text-white text-xl m-3 mt-20 sm:mt-0 font-medium `}>Queue</button>
-                <button onClick={() => { setActiveTab('lyrics') }} className={`${activeTab === 'lyrics' ? 'border-[#e0c3fc] border-b-2' : ''} text-white text-xl m-3 mt-20 sm:mt-0  font-medium`}>Lyrics</button>
+                <button onClick={() => { setActiveTab('queue') }} className={`${activeTab === 'queue' ? 'border-[#d3abfb] border-b-2' : ''} text-white text-xl m-3 mt-20 sm:mt-0 font-medium `}>Queue</button>
+                <button onClick={() => { setActiveTab('lyrics') }} className={`${activeTab === 'lyrics' ? 'border-[#d3abfb] border-b-2' : ''} text-white text-xl m-3 mt-20 sm:mt-0  font-medium`}>Lyrics</button>
             </div>
             <div>
                 {activeTab === 'lyrics' ? (
@@ -69,7 +69,7 @@ const Lyrics = ({ activeSong }) => {
                                     }
                                 } type="checkbox" checked={autoAdd} className="sr-only peer" name='autoAddButton' id='autoAddButton' placeholder='autoAddButton' title={autoAdd ? 'on':'off'}>
                                 </input>
-                                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none ring-2  ring-gray-500 ch rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#e0c3fc]"></div>
+                                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none ring-2  ring-gray-500 ch rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#d3abfb]"></div>
                             </label>
 
                         </div>

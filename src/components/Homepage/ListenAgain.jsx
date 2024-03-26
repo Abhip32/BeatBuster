@@ -23,7 +23,7 @@ const ListenAgain = () => {
       {
         songHistory?.length > 0 && (
           <div>
-            <h2 className=" text-white mt-6 text-2xl lg:text-3xl font-semibold mb-4 ">Listen Again</h2>
+            <h2 className=" text-white mt-4 text-2xl lg:text-3xl font-semibold mb-4 ">Listen Again</h2>
             <div className=" grid grid-cols-2 lg:grid-cols-3 gap-x-10">
               {
                 songHistory?.map((song, index) => (

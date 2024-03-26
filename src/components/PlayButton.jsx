@@ -13,8 +13,8 @@ const PlayButton = ({ songList }) => {
     return (
         <div
             onClick={() => { handlePlayClick(songList?.songs?.[0], 0); }}
-            className="flex items-center gap-2 mt-5 rounded-3xl py-2 px-3 hover:border-[#e0c3fc] group w-fit cursor-pointer border border-white shadow-md shadow-[#e0c3fc] hover:bg-[white] hover:text-zinc-900">
-            <BsFillPlayFill size={25} className="text-gray-200 group-hover:text-[#e0c3fc]" />
+            className="flex items-center gap-2 mt-5 rounded-3xl py-2 px-3 hover:border-[#d3abfb] group w-fit cursor-pointer border border-white">
+            <BsFillPlayFill size={25} className="text-gray-200 group-hover:text-[#d3abfb]" />
             <p className="text-lg font-semibold">Play</p>
         </div>
     )

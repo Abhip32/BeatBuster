@@ -89,7 +89,6 @@ const Home = () => {
       <OnlineStatus />
       <h1 className='text-4xl font-bold mx-2 m-9 text-white flex gap-2'>{salutation}</h1>
       {status === 'loading' && <div>
-
       <div className=' animate-pulse flex items-center  mt-5 cursor-pointer group justify-between '>
               <div className="flex items-center p-2 gap-5 bg-white/5 bg-dark-300 animate-slideup w-[24vw]">
               <div className=" bg-gray-300 dark:bg-gray-700 w-16 h-16">

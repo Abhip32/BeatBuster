@@ -40,7 +40,7 @@ const page = () => {
       {favouriteSongs?.length <= 0 && loading === false ?
         <h1 className='text-xl font-semibold mt-10'>No Favourite Songs</h1>
         :
-        <SongsList SongData={favouriteSongs} loading={loading} isUserPlaylist={true}/>
+        <SongsList SongData={favouriteSongs} loading={loading} />
       }
     </div>
   )
