@@ -13,28 +13,33 @@ This is a free music streaming web application built with Next.js and powered by
 
 ## Screenshots
 
-Home page
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%201.png)
+### Home Page
+Dual Hindi & English trending sliders, separate albums slider, Quick Access tiles, and unified Liked Songs pill.
+![Home Page](./screenshots/Screenshot%201.png)
 
-Account & Languages
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%202.png)
+### Account, Languages & Navigation Drawer
+Slide-out sidebar with official Musify logo, multi-language preferences, playlists, and user profile.
+![Account and Navigation Drawer](./screenshots/Screenshot%202.png)
 
-Playlist
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%203.png)
+### Playlist View
+Curated playlist with bold playback controls, ZIP bulk downloader, and tracklist.
+![Playlist View](./screenshots/Screenshot%203.png)
 
-Search Page
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%204.png)
+### Search Experience
+Fast search across songs, albums, and artists.
+![Search Page](./screenshots/Screenshot%204.png)
 
-Favourites
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%205.png)
+### Liked Songs (Official Dedicated View)
+Dedicated view featuring live count badge, row-level favourite actions, and infinite scroll loading.
+![Liked Songs](./screenshots/Screenshot%205.png)
 
-Music Player
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%206.png)
+### Music Player
+Persistent bottom bar player with spinning vinyl turntable, Neon Rose active glow, synchronized heart toggle, and audio controls.
+![Music Player](./screenshots/Screenshot%206.png)
 
-Change of background of Music Player
-![App Screenshot](https://raw.githubusercontent.com/Abhip32/BeatBuster/main/screenshots/Screenshot%207.png)
-
-
+### Fullscreen Player & Ambient Canvas
+Immersive full-screen playback with dynamic album art color extraction, time-synced lyrics modal, and ambient lighting.
+![Fullscreen Music Player](./screenshots/Screenshot%207.png)
 
 ***
 
