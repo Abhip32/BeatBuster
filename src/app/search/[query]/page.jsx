@@ -91,7 +91,7 @@ const SearchResultsPage = ({ params }) => {
   return (
     <div className="w-11/12 max-w-7xl mx-auto mt-8 mb-20">
       <div className="mb-8">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#ec4899]">
+        <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
           Search Results
         </span>
         <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-1">
@@ -129,11 +129,11 @@ const SearchResultsPage = ({ params }) => {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                      <BsPlayFill size={24} className="text-[#ec4899]" />
+                      <BsPlayFill size={24} className="text-[#f43f5e]" />
                     </div>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-white truncate group-hover:text-[#ec4899] transition-colors">
+                    <p className="text-sm font-semibold text-white truncate group-hover:text-[#f43f5e] transition-colors">
                       {(song?.title || song?.name)
                         ?.replaceAll("&#039;", "'")
                         ?.replaceAll("&amp;", "&")}
@@ -189,7 +189,7 @@ const SearchResultsPage = ({ params }) => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#ec4899] transition-colors">
+                    <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
                       {(artist?.title || artist?.name)?.replaceAll("&amp;", "&")}
                     </p>
                     <span className="text-xs text-[#b3b3b3] mt-0.5">Artist</span>

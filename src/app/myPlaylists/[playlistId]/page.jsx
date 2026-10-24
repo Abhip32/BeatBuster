@@ -63,12 +63,12 @@ const UserPlaylistPage = ({ params }) => {
     <div className="w-11/12 max-w-7xl mx-auto mt-8 mb-20">
       {/* Spotify Header Banner */}
       <div className="relative rounded-3xl p-6 sm:p-8 lg:p-10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-2xl flex flex-col md:flex-row items-center md:items-end gap-6 lg:gap-10">
-        <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#ec4899] to-black flex items-center justify-center">
+        <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-[#f43f5e] to-black flex items-center justify-center">
           <MdPlaylistPlay size={80} className="text-white" />
         </div>
 
         <div className="flex flex-col text-center md:text-left text-white min-w-0 flex-1">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-[#ec4899] mb-1">
+          <span className="text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1">
             Personal Playlist
           </span>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight line-clamp-2">

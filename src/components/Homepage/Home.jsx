@@ -1,5 +1,6 @@
 "use client";
 import { homePageData, getFavourite, getSongData } from "@/services/dataAPI";
+import { setFavourites } from "@/redux/features/favouritesSlice";
 import React, { useEffect, useState } from "react";
 import { SwiperSlide } from "swiper/react";
 import SongCard from "./SongCard";
@@ -30,6 +31,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const { data: session, status } = useSession();
   const { activeSong, isPlaying } = useSelector((state) => state.player);
+  const { count: likedCount, items: favouriteItems } = useSelector((state) => state.favourites || { count: 0, items: [] });
   const { languages } = useSelector((state) => state.languages);
 
   const displayName =
@@ -93,7 +95,9 @@ const Home = () => {
                 return Array.isArray(data) ? data[0] : data || null;
               })
             );
-            setLikedSongs(resolved.filter(Boolean).reverse());
+            const list = resolved.filter(Boolean).reverse();
+            setLikedSongs(list);
+            dispatch(setFavourites(items));
           }
         } catch (err) {
           console.error("Error fetching liked songs:", err);
@@ -133,8 +137,8 @@ const Home = () => {
             Discover trending tracks, chart toppers, and your personal favorites
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-          <span className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" />
+        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-[0_0_15px_rgba(244, 63, 94,0.2)]">
+          <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
           <span>Lossless 320kbps</span>
         </div>
       </div>
@@ -152,30 +156,18 @@ const Home = () => {
           All
         </button>
 
-        <button
-          onClick={() => setActiveTab("liked")}
-          className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-            activeTab === "liked"
-              ? "glass-pill-active"
-              : "glass-pill text-gray-300 hover:text-white"
-          }`}
+        <Link
+          href="/favourite"
+          className="glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-[#f43f5e]/50 cursor-pointer"
         >
-          <AiFillHeart
-            className={activeTab === "liked" ? "text-white" : "text-[#ec4899]"}
-          />
+          <AiFillHeart className="text-[#f43f5e]" />
           <span>Liked Songs</span>
-          {likedSongs.length > 0 && (
-            <span
-              className={`text-[11px] px-1.5 py-0.2 rounded-full ${
-                activeTab === "liked"
-                  ? "bg-white/20 text-white"
-                  : "bg-pink-500/20 text-pink-300"
-              }`}
-            >
-              {likedSongs.length}
+          {(likedCount > 0 || likedSongs.length > 0) && (
+            <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-[#f43f5e]/20 text-rose-300">
+              {likedCount || likedSongs.length}
             </span>
           )}
-        </button>
+        </Link>
 
         <button
           onClick={() => setActiveTab("trending")}
@@ -206,15 +198,15 @@ const Home = () => {
           {/* Liked Songs Tile */}
           <Link
             href="/favourite"
-            className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-pink-900/40 via-pink-800/20 to-white/[0.03] hover:from-pink-800/50 hover:to-white/[0.07] backdrop-blur-md border border-pink-500/30 hover:border-pink-500/60 transition-all duration-300 shadow-md cursor-pointer"
+            className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-rose-950/30 via-rose-900/15 to-white/[0.03] hover:from-rose-900/40 hover:to-white/[0.07] backdrop-blur-md border border-[#f43f5e]/30 hover:border-[#f43f5e]/60 transition-all duration-300 shadow-md cursor-pointer"
           >
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-indigo-700 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#f43f5e] to-[#be123c] flex items-center justify-center flex-shrink-0 shadow-md shadow-[#f43f5e]/25 group-hover:scale-105 transition-transform">
               <AiFillHeart className="text-white text-2xl drop-shadow" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-white truncate">Liked Songs</h3>
-              <p className="text-xs text-pink-300/80 font-medium">
-                {likedSongs.length > 0 ? `${likedSongs.length} songs` : "Collection"}
+              <p className="text-xs text-rose-300 font-medium">
+                {(likedCount > 0 || likedSongs.length > 0) ? `${likedCount || likedSongs.length} songs` : "Collection"}
               </p>
             </div>
             <div className="w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 flex items-center justify-center shadow-md">
@@ -249,74 +241,6 @@ const Home = () => {
               </div>
             </Link>
           ))}
-        </div>
-      )}
-
-      {/* LIKED SONGS TAB VIEW */}
-      {activeTab === "liked" && (
-        <div className="mb-14 animate-fade-in">
-          {status === "unauthenticated" ? (
-            <div className="rounded-3xl p-8 sm:p-12 bg-white/[0.03] backdrop-blur-xl border border-white/10 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-pink-500/10 border border-pink-500/30 flex items-center justify-center mb-4">
-                <AiFillHeart className="text-[#ec4899] text-3xl" />
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
-                Enjoy your Liked Songs
-              </h2>
-              <p className="text-sm text-gray-400 max-w-md mb-6">
-                Log in to see all your saved tracks, download your personal
-                playlists, and listen seamlessly across all your devices.
-              </p>
-              <Link
-                href="/login"
-                className="py-2.5 px-8 rounded-full bg-[#ec4899] hover:bg-[#db2777] text-white font-bold text-sm shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all cursor-pointer"
-              >
-                Log In to Musify
-              </Link>
-            </div>
-          ) : loadingLiked ? (
-            <TracklistSkeleton count={8} />
-          ) : likedSongs.length > 0 ? (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <PlayButton songList={{ songs: likedSongs }} />
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">Your Liked Tracks</h2>
-                    <p className="text-xs text-gray-400 font-medium">
-                      {likedSongs.length} tracks saved
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  href="/favourite"
-                  className="text-xs font-semibold text-[#ec4899] hover:underline"
-                >
-                  Open Full View &rarr;
-                </Link>
-              </div>
-              <SongsList SongData={likedSongs} loading={false} />
-            </div>
-          ) : (
-            <div className="rounded-3xl p-8 sm:p-12 bg-white/[0.03] backdrop-blur-xl border border-white/10 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-pink-500/10 border border-pink-500/30 flex items-center justify-center mb-4">
-                <AiFillHeart className="text-[#ec4899] text-3xl" />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                No liked songs yet
-              </h2>
-              <p className="text-sm text-gray-400 max-w-md mb-6">
-                Tap the heart icon on any song you love to save it to your
-                personal favorites collection.
-              </p>
-              <button
-                onClick={() => setActiveTab("all")}
-                className="py-2 px-6 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/15 transition-all cursor-pointer"
-              >
-                Explore Trending Songs
-              </button>
-            </div>
-          )}
         </div>
       )}
 

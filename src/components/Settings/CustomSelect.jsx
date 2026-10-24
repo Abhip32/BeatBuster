@@ -28,13 +28,13 @@ const CustomSelect = ({ value, onChange, options }) => {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center justify-between gap-3 w-full sm:min-w-[180px] px-4 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/15 hover:border-[#ec4899]/60 rounded-xl text-sm font-medium text-white shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#ec4899]/30"
+        className="flex items-center justify-between gap-3 w-full sm:min-w-[180px] px-4 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/15 hover:border-[#f43f5e]/60 rounded-xl text-sm font-medium text-white shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#f43f5e]/30"
       >
         <span>{selectedOption?.label}</span>
         <HiChevronDown
           size={16}
           className={`text-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-[#ec4899]" : ""
+            isOpen ? "rotate-180 text-[#f43f5e]" : ""
           }`}
         />
       </button>
@@ -53,13 +53,13 @@ const CustomSelect = ({ value, onChange, options }) => {
                 }}
                 className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-all text-left cursor-pointer rounded-xl mx-auto ${
                   isSelected
-                    ? "text-[#ec4899] bg-[#ec4899]/15 font-bold"
+                    ? "text-[#f43f5e] bg-[#f43f5e]/15 font-bold"
                     : "text-gray-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 <span>{option.label}</span>
                 {isSelected && (
-                  <HiCheck size={16} className="text-[#ec4899] flex-shrink-0" />
+                  <HiCheck size={16} className="text-[#f43f5e] flex-shrink-0" />
                 )}
               </button>
             );

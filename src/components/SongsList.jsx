@@ -1,18 +1,22 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import SongListSkeleton from "./SongListSkeleton";
 import { BiHeadphone } from "react-icons/bi";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import {
   addSongToPlaylist,
   deleteSongFromPlaylist,
   getUserPlaylists,
 } from "@/services/playlistApi";
+import { addFavourite, getFavourite } from "@/services/dataAPI";
+import { setFavourites, toggleFavouriteSong, removeFavouriteSong } from "@/redux/features/favouritesSlice";
 import { toast } from "react-hot-toast";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { useSession } from "next-auth/react";
 
 const SongsList = ({
   SongData,
@@ -21,14 +25,47 @@ const SongsList = ({
   isUserPlaylist,
   playlistID,
   setSongs,
+  isFavouritePage,
 }) => {
   const { activeSong, isPlaying } = useSelector((state) => state.player);
+  const { status } = useSession();
   const [showMenu, setShowMenu] = useState(null);
   const [playlists, setPlaylists] = useState([]);
+  const { items: favouriteSongs } = useSelector((state) => state.favourites || { items: [] });
+  const [visibleCount, setVisibleCount] = useState(25);
+  const sentinelRef = useRef(null);
   const dispatch = useDispatch();
 
+  // Deduplicate songs by ID to prevent repeated tracks
+  const uniqueSongs = useMemo(() => {
+    if (!Array.isArray(SongData)) return [];
+    const seen = new Set();
+    return SongData.filter((s) => {
+      if (!s) return false;
+      const key = String(s?.id || s?.name || "");
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [SongData]);
+
+  // Scroll-based loading (Infinite scroll observer)
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 20, uniqueSongs.length));
+        }
+      },
+      { rootMargin: "250px" }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [uniqueSongs.length]);
+
   const handlePlayClick = (song, index) => {
-    dispatch(setActiveSong({ song, data: SongData, i: index }));
+    dispatch(setActiveSong({ song, data: uniqueSongs, i: index }));
     dispatch(playPause(true));
   };
 
@@ -39,17 +76,78 @@ const SongsList = ({
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  // Fetch playlists and favourites
   useEffect(() => {
-    const getPlaylists = async () => {
+    let isCancelled = false;
+    const loadUserData = async () => {
       try {
-        const res = await getUserPlaylists();
-        if (res?.success === true) {
-          setPlaylists(res?.data?.playlists || []);
+        if (status === "authenticated") {
+          const [plRes, favRes] = await Promise.all([
+            getUserPlaylists().catch(() => null),
+            getFavourite().catch(() => []),
+          ]);
+          if (!isCancelled) {
+            if (plRes?.success === true) {
+              setPlaylists(plRes?.data?.playlists || []);
+            }
+            if (Array.isArray(favRes)) {
+              dispatch(setFavourites(favRes));
+            }
+          }
         }
       } catch {}
     };
-    getPlaylists();
-  }, []);
+    loadUserData();
+    return () => {
+      isCancelled = true;
+    };
+  }, [status]);
+
+  const isSongInFavourites = (song) => {
+    if (!song) return false;
+    const songId = String(song.id || "");
+    const songName = song.name?.trim().toLowerCase() || "";
+    return (favouriteSongs || []).some((item) => {
+      const itemId = String(typeof item === "object" ? item?.id : item);
+      if (songId && itemId === songId) return true;
+      if (typeof item === "object" && item?.name && songName) {
+        return item.name.trim().toLowerCase() === songName;
+      }
+      return false;
+    });
+  };
+
+  const handleToggleFavourite = async (e, song) => {
+    e?.stopPropagation();
+    if (status === "unauthenticated") {
+      toast.error("Please log in to save favourites");
+      return;
+    }
+    const currentlyFav = isSongInFavourites(song);
+    const songId = String(song.id || "");
+    const songName = song.name?.trim().toLowerCase() || "";
+
+    // Global optimistic update
+    dispatch(toggleFavouriteSong(song));
+    if (currentlyFav) {
+      if (isFavouritePage && setSongs) {
+        setSongs((prev) => prev.filter((s) => String(s?.id || "") !== songId));
+      }
+      toast.success("Removed from Liked Songs");
+    } else {
+      toast.success("Saved to Liked Songs");
+    }
+
+    setShowMenu(null);
+    try {
+      const res = await addFavourite(song);
+      if (res?.success === true && Array.isArray(res?.data?.favourites)) {
+        dispatch(setFavourites(res.data.favourites));
+      }
+    } catch {
+      toast.error("Could not update favourites");
+    }
+  };
 
   const handleAddToPlaylist = async (song, pId) => {
     setShowMenu(null);
@@ -72,7 +170,7 @@ const SongsList = ({
       if (res?.success === true) {
         if (setSongs) {
           setSongs((prev) =>
-            prev.filter((s) => s?.id?.toString() !== song?.toString()),
+            prev.filter((s) => s?.id?.toString() !== song?.toString())
           );
         }
         toast.success(res?.message || "Removed from playlist");
@@ -88,13 +186,15 @@ const SongsList = ({
     return <SongListSkeleton />;
   }
 
-  if (!Array.isArray(SongData) || SongData.length === 0) {
+  if (uniqueSongs.length === 0) {
     return (
       <div className="py-12 text-center text-gray-400">
         No songs found in this list.
       </div>
     );
   }
+
+  const renderedSongs = uniqueSongs.slice(0, visibleCount);
 
   return (
     <>
@@ -107,13 +207,15 @@ const SongsList = ({
             <div className="hidden lg:block lg:col-span-2">Plays</div>
           )}
           <div
-            className={`${hidePlays ? "col-span-4 md:col-span-3" : "col-span-4 md:col-span-2"} text-right pr-6`}
+            className={`${
+              hidePlays ? "col-span-4 md:col-span-3" : "col-span-4 md:col-span-2"
+            } text-right pr-6`}
           >
             Duration
           </div>
         </div>
 
-        {SongData.map((song, index) => {
+        {renderedSongs.map((song, index) => {
           const isThisActive =
             activeSong?.id === song?.id ||
             (activeSong?.name && activeSong?.name === song?.name);
@@ -127,13 +229,15 @@ const SongsList = ({
             song?.primaryArtists ||
             "";
 
+          const isFav = isSongInFavourites(song);
+
           return (
             <div
               key={song?.id || index}
               onClick={() => handlePlayClick(song, index)}
               className={`group grid grid-cols-12 items-center px-3 sm:px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
                 isThisActive
-                  ? "bg-white/[0.08] border border-[#ec4899]/30 shadow-md"
+                  ? "bg-white/[0.08] border border-[var(--primary-accent,#f43f5e)]/40 shadow-md"
                   : "hover:bg-white/[0.05] border border-transparent"
               }`}
             >
@@ -143,10 +247,13 @@ const SongsList = ({
                   isPlaying ? (
                     <BiHeadphone
                       size={22}
-                      className="text-[#ec4899] animate-pulse"
+                      className="text-[var(--primary-accent,#f43f5e)] animate-pulse"
                     />
                   ) : (
-                    <BsPauseFill size={20} className="text-[#ec4899]" />
+                    <BsPauseFill
+                      size={20}
+                      className="text-[var(--primary-accent,#f43f5e)]"
+                    />
                   )
                 ) : (
                   <>
@@ -179,7 +286,7 @@ const SongsList = ({
                   <p
                     className={`text-sm font-semibold truncate transition-colors ${
                       isThisActive
-                        ? "text-[#ec4899]"
+                        ? "text-[var(--primary-accent,#f43f5e)]"
                         : "text-white group-hover:text-white"
                     }`}
                   >
@@ -202,11 +309,32 @@ const SongsList = ({
                 </div>
               )}
 
-              {/* Duration & Options Menu */}
-              <div className="col-span-3 sm:col-span-5 md:col-span-4 lg:col-span-2 flex items-center justify-end gap-2 text-xs text-gray-400">
+              {/* Actions, Heart, Duration & Options Menu */}
+              <div className="col-span-3 sm:col-span-5 md:col-span-4 lg:col-span-2 flex items-center justify-end gap-3 text-xs text-gray-400">
+                {/* Direct Heart Button on row */}
+                <button
+                  type="button"
+                  onClick={(e) => handleToggleFavourite(e, song)}
+                  title={isFav ? "Remove from Liked Songs" : "Save to Liked Songs"}
+                  className="p-1 cursor-pointer transition-transform hover:scale-125 outline-none focus:outline-none"
+                >
+                  {isFav ? (
+                    <AiFillHeart
+                      size={18}
+                      className="text-[#f43f5e] drop-shadow-[0_0_8px_rgba(244, 63, 94,0.6)]"
+                    />
+                  ) : (
+                    <AiOutlineHeart
+                      size={18}
+                      className="text-gray-400 hover:text-[#f43f5e] transition-colors"
+                    />
+                  )}
+                </button>
+
                 <span className="font-mono">
                   {formatDuration(song?.duration)}
                 </span>
+
                 <div className="relative">
                   <button
                     type="button"
@@ -222,8 +350,27 @@ const SongsList = ({
                   {showMenu === song?.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-8 z-50 w-44 rounded-xl border border-white/15 bg-[#18181f]/95 backdrop-blur-2xl p-2 shadow-2xl text-white text-xs animate-fadeIn"
+                      className="absolute right-0 top-8 z-50 w-48 rounded-xl border border-white/15 bg-[#18181f]/95 backdrop-blur-2xl p-2 shadow-2xl text-white text-xs animate-fadeIn"
                     >
+                      {/* Favourite Action in dropdown */}
+                      <button
+                        type="button"
+                        onClick={(e) => handleToggleFavourite(e, song)}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium border-b border-white/10 mb-1"
+                      >
+                        {isFav ? (
+                          <>
+                            <AiFillHeart className="text-[#f43f5e]" size={16} />
+                            <span className="text-rose-">Remove from Liked</span>
+                          </>
+                        ) : (
+                          <>
+                            <AiOutlineHeart className="text-gray-300" size={16} />
+                            <span>Save to Liked Songs</span>
+                          </>
+                        )}
+                      </button>
+
                       {isUserPlaylist ? (
                         <button
                           type="button"
@@ -237,7 +384,7 @@ const SongsList = ({
                         </button>
                       ) : (
                         <>
-                          <div className="px-3 py-1 text-[10px] text-gray-400 uppercase font-bold tracking-wider border-b border-white/10 mb-1">
+                          <div className="px-3 py-1 text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">
                             Add to Playlist
                           </div>
                           {playlists?.length > 0 ? (
@@ -267,6 +414,13 @@ const SongsList = ({
             </div>
           );
         })}
+
+        {/* Infinite Scroll Sentinel */}
+        {visibleCount < uniqueSongs.length && (
+          <div ref={sentinelRef} className="py-4 text-center text-xs text-gray-500">
+            Loading more tracks...
+          </div>
+        )}
       </div>
 
       {showMenu && (

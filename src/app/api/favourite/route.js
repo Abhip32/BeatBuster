@@ -49,6 +49,19 @@ export async function GET(req) {
         { status: 404 }
       );
     }
+
+    // Deduplicate favourites
+    const seen = new Set();
+    const uniqueFavs = [];
+    for (const item of (userData.favourites || [])) {
+      const sid = String(typeof item === "object" ? item?.id : item);
+      if (sid && !seen.has(sid)) {
+        seen.add(sid);
+        uniqueFavs.push(item);
+      }
+    }
+    userData.favourites = uniqueFavs;
+
     return NextResponse.json({
       success: true,
       message: "User Data found",
@@ -114,14 +127,32 @@ export async function POST(request) {
         { status: 404 }
       );
     }
+    // Clean and deduplicate existing favourites
+    const seen = new Set();
+    const uniqueFavs = [];
+    for (const item of (userData.favourites || [])) {
+      const sid = String(typeof item === "object" ? item?.id : item);
+      if (sid && !seen.has(sid)) {
+        seen.add(sid);
+        uniqueFavs.push(item);
+      }
+    }
+    userData.favourites = uniqueFavs;
+
     const songId = typeof id === "object" ? id?.id : id;
-    const existingIndex = (userData.favourites || []).findIndex(
-      (item) => (typeof item === "object" ? item?.id : item) === songId
+    const targetId = String(songId);
+
+    const isAlreadyFav = (userData.favourites || []).some(
+      (item) => String(typeof item === "object" ? item?.id : item) === targetId
     );
 
-    if (existingIndex !== -1) {
-      userData.favourites.splice(existingIndex, 1);
+    if (isAlreadyFav) {
+      // Remove all instances of this song (toggle off)
+      userData.favourites = userData.favourites.filter(
+        (item) => String(typeof item === "object" ? item?.id : item) !== targetId
+      );
     } else {
+      // Add it (toggle on)
       userData.favourites.push(id);
     }
     userData.markModified("favourites");
@@ -129,7 +160,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: "Favourites updated",
+      message: isAlreadyFav ? "Removed from favourites" : "Added to favourites",
       data: userData,
     });
   } catch (e) {

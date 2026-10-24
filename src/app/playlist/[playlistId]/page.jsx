@@ -29,13 +29,13 @@ const page = async ({ params }) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/5 text-gray-500">
-              <BsSpotify size={64} className="text-[#ec4899]" />
+              <BsSpotify size={64} className="text-[#f43f5e]" />
             </div>
           )}
         </div>
 
         <div className="flex flex-col text-center md:text-left text-white min-w-0 flex-1">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-[#ec4899] mb-1">
+          <span className="text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1">
             Playlist
           </span>
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight line-clamp-2">
@@ -49,7 +49,7 @@ const page = async ({ params }) => {
 
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-300 mt-4 font-semibold">
             <span className="flex items-center gap-1.5 text-white">
-              <BsSpotify className="text-[#ec4899]" /> Musify
+              <BsSpotify className="text-[#f43f5e]" /> Musify
             </span>
             {playlistData?.followerCount && (
               <>

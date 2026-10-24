@@ -33,7 +33,7 @@ const ListenAgainCard = ({ song, index, SongData }) => {
         handlePlayClick(song, index);
       }}
       className={`flex items-center p-2 rounded-xl cursor-pointer group bg-white/[0.03] hover:bg-white/[0.07] backdrop-blur-md border border-white/[0.05] hover:border-white/15 transition-all duration-200 justify-between ${
-        isCurrentActive ? "border-[#ec4899]/40 bg-[#ec4899]/10" : ""
+        isCurrentActive ? "border-[#f43f5e]/40 bg-[#f43f5e]/10" : ""
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -52,18 +52,18 @@ const ListenAgainCard = ({ song, index, SongData }) => {
           />
           {isCurrentActive ? (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-              <BiHeadphone size={24} className="text-[#ec4899] animate-pulse" />
+              <BiHeadphone size={24} className="text-[#f43f5e] animate-pulse" />
             </div>
           ) : (
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <BsPlayFill size={24} className="text-[#ec4899]" />
+              <BsPlayFill size={24} className="text-[#f43f5e]" />
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           <p
             className={`text-sm font-semibold truncate transition-colors ${
-              isCurrentActive ? "text-[#ec4899]" : "text-white group-hover:text-white"
+              isCurrentActive ? "text-[#f43f5e]" : "text-white group-hover:text-white"
             }`}
           >
             {song?.name?.replace("&#039;", "'")?.replace("&amp;", "&")}

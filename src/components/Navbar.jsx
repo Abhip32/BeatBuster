@@ -38,9 +38,9 @@ const Navbar = () => {
             <img
               src="/images/logo.png"
               alt="Musify Logo"
-              className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(168,85,247,0.45)] group-hover:scale-105 transition-transform"
+              className="w-9 h-9 object-contain drop-shadow-[0_0_12px_rgba(244, 63, 94,0.45)] group-hover:scale-105 transition-transform"
             />
-            <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-purple-400 transition-colors">
+            <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-rose-400 transition-colors">
               Musify
             </span>
           </Link>
@@ -56,7 +56,7 @@ const Navbar = () => {
           <Link
             href="/settings"
             aria-label="Settings"
-            className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80 transition-all hover:bg-white/10 hover:border-[#ec4899] hover:text-[#ec4899]"
+            className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80 transition-all hover:bg-white/10 hover:border-[#f43f5e] hover:text-[#f43f5e]"
           >
             <IoSettingsOutline className="h-5 w-5" />
           </Link>

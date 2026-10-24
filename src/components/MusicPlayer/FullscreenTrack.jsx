@@ -275,7 +275,7 @@ const FullscreenTrack = ({
                 <button
                   type="button"
                   onClick={handlePlayPause}
-                  className="p-1.5 text-[#ec4899] hover:scale-105 active:scale-95 transition-transform"
+                  className="p-1.5 text-[#f43f5e] hover:scale-105 active:scale-95 transition-transform"
                   title={isPlaying ? "Pause" : "Play"}
                 >
                   {isPlaying ? (
@@ -335,7 +335,7 @@ const FullscreenTrack = ({
             onClick={() => handleTabChange("song")}
             className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all ${
               mobileTab === "song"
-                ? "bg-[#ec4899] text-black shadow-md"
+                ? "bg-[#f43f5e] text-black shadow-md"
                 : "text-white/70 hover:text-white"
             }`}
           >
@@ -346,7 +346,7 @@ const FullscreenTrack = ({
             onClick={() => handleTabChange("lyrics")}
             className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${
               mobileTab === "lyrics"
-                ? "bg-[#ec4899] text-black shadow-md"
+                ? "bg-[#f43f5e] text-black shadow-md"
                 : "text-white/70 hover:text-white"
             }`}
           >
@@ -358,7 +358,7 @@ const FullscreenTrack = ({
             onClick={() => handleTabChange("queue")}
             className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all flex items-center gap-1.5 ${
               mobileTab === "queue"
-                ? "bg-[#ec4899] text-black shadow-md"
+                ? "bg-[#f43f5e] text-black shadow-md"
                 : "text-white/70 hover:text-white"
             }`}
           >

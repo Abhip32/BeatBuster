@@ -20,9 +20,11 @@ import { HiOutlineChevronDown } from "react-icons/hi";
 import { MdSkipNext, MdSkipPrevious } from "react-icons/md";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { addFavourite, getFavourite } from "@/services/dataAPI";
+import { setFavourites, toggleFavouriteSong } from "@/redux/features/favouritesSlice";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import FavouriteButton from "./FavouriteButton";
+import { toast } from "react-hot-toast";
 import getPixels from "get-pixels";
 import { extractColors } from "extract-colors";
 
@@ -46,7 +48,7 @@ const MusicPlayer = () => {
   const [volume, setVolume] = useState(0.8);
   const [repeat, setRepeat] = useState(false);
   const [shuffle, setShuffle] = useState(false);
-  const [favouriteSongs, setFavouriteSongs] = useState([]);
+  const { items: favouriteSongs } = useSelector((state) => state.favourites || { items: [] });
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const { status } = useSession();
@@ -127,8 +129,8 @@ const MusicPlayer = () => {
         setLoading(true);
         const res = await getFavourite();
         // console.log("favourites",res);
-        if (res) {
-          setFavouriteSongs(res);
+        if (Array.isArray(res)) {
+          dispatch(setFavourites(res));
         }
         setLoading(false);
       } catch (error) {
@@ -222,36 +224,43 @@ const MusicPlayer = () => {
     }
   };
 
-  const handleAddToFavourite = async (favsong) => {
+    const handleAddToFavourite = async (favsong) => {
+    if (!favsong) return;
+
     if (status === "unauthenticated") {
       dispatch(setFullScreen(false));
       router.push("/login");
+      return;
     }
 
-    if (favsong?.id && status === "authenticated") {
-      try {
-        setLoading(true);
-        // optimistic update
-        const songId = favsong?.id;
-        const exists = favouriteSongs?.some((s) => (typeof s === "object" ? s?.id : s) === songId);
-        if (exists) {
-          setFavouriteSongs(favouriteSongs?.filter((s) => (typeof s === "object" ? s?.id : s) !== songId));
-        } else {
-          setFavouriteSongs([...(favouriteSongs || []), favsong]);
-        }
-        const res = await addFavourite(favsong);
-        if (res?.success === true) {
-          setFavouriteSongs(res?.data?.favourites);
-        }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.log("add to fav error", error);
+    const songId = String(favsong.id || "");
+    const songName = favsong.name?.trim().toLowerCase() || "";
+
+    const exists = (favouriteSongs || []).some((s) => {
+      const sId = String(typeof s === "object" ? s?.id : s);
+      if (songId && sId === songId) return true;
+      if (typeof s === "object" && s?.name && songName) {
+        return s.name.trim().toLowerCase() === songName;
       }
-    }
-  };
+      return false;
+    });
 
-  return (
+    dispatch(toggleFavouriteSong(favsong));
+    if (exists) {
+      toast.success("Removed from Liked Songs");
+    } else {
+      toast.success("Saved to Liked Songs");
+    }
+
+    try {
+      const res = await addFavourite(favsong);
+      if (res?.success === true && Array.isArray(res?.data?.favourites)) {
+        dispatch(setFavourites(res.data.favourites));
+      }
+    } catch (error) {
+      console.error("add to fav error", error);
+    }
+  };return (
     <div
       className={`relative transition-all duration-100 flex flex-col hideScrollBar backdrop-blur-2xl ${
         fullScreen
@@ -326,7 +335,7 @@ const MusicPlayer = () => {
           {/* Top 2px Progress Bar on Mini Player */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/10 sm:hidden overflow-hidden">
             <div
-              className="h-full bg-[#ec4899] transition-all duration-150"
+              className="h-full bg-[#f43f5e] transition-all duration-150"
               style={{
                 width: `${
                   duration
@@ -415,7 +424,7 @@ const MusicPlayer = () => {
                 e.currentTarget.blur();
                 handlePrevSong(e);
               }}
-              className="p-1 text-white/90 hover:text-[#ec4899] transition-colors"
+              className="p-1 text-white/90 hover:text-[#f43f5e] transition-colors"
               title="Previous"
             >
               <MdSkipPrevious size={26} />
@@ -428,7 +437,7 @@ const MusicPlayer = () => {
                 e.currentTarget.blur();
                 handlePlayPause(e);
               }}
-              className="p-1 text-[#ec4899] hover:scale-110 active:scale-95 transition-transform"
+              className="p-1 text-[#f43f5e] hover:scale-110 active:scale-95 transition-transform"
               title={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (
@@ -445,7 +454,7 @@ const MusicPlayer = () => {
                 e.currentTarget.blur();
                 handleNextSong(e);
               }}
-              className="p-1 text-white/90 hover:text-[#ec4899] transition-colors"
+              className="p-1 text-white/90 hover:text-[#f43f5e] transition-colors"
               title="Next"
             >
               <MdSkipNext size={26} />

@@ -51,7 +51,7 @@ const LoginPage = () => {
     if (status === 'loading') {
         return (
             <div className="w-full min-h-[60vh] flex justify-center items-center">
-                <div className="w-8 h-8 border-3 border-[#ec4899] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-3 border-[#f43f5e] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -64,12 +64,12 @@ const LoginPage = () => {
         <div className="min-h-[75vh] flex items-center justify-center px-4 py-4">
             <div className="w-full max-w-[390px] bg-[#120f1e]/85 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
                 {/* Purple ambient glow */}
-                <div className="absolute -top-20 -left-20 w-40 h-40 bg-[#ec4899]/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-[#ec4899]/15 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -top-20 -left-20 w-40 h-40 bg-[#f43f5e]/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-[#f43f5e]/15 rounded-full blur-3xl pointer-events-none" />
 
                 {/* Header */}
                 <div className="text-center mb-4 relative z-10">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(168,85,247,0.35)] mb-2">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 shadow-[0_0_20px_rgba(244, 63, 94,0.35)] mb-2">
                         <img src="/images/logo.png" alt="Musify" className="w-9 h-9 object-contain" />
                     </div>
                     <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -115,7 +115,7 @@ const LoginPage = () => {
                                 onChange={onChange}
                                 placeholder="name@domain.com"
                                 required
-                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#ec4899] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
+                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#f43f5e] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -125,7 +125,7 @@ const LoginPage = () => {
                             <label className="text-[11px] font-semibold text-neutral-300 uppercase tracking-wider" htmlFor="password">
                                 Password
                             </label>
-                            <Link href="/reset-password" className="text-[11px] text-purple-400 hover:underline font-medium">
+                            <Link href="/reset-password" className="text-[11px] text-rose-400 hover:underline font-medium">
                                 Forgot password?
                             </Link>
                         </div>
@@ -139,7 +139,7 @@ const LoginPage = () => {
                                 onChange={onChange}
                                 placeholder="Enter password"
                                 required
-                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#ec4899] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
+                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#f43f5e] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -147,7 +147,7 @@ const LoginPage = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full mt-1 py-2.5 px-4 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold text-xs tracking-wide transition-all transform hover:scale-[1.01] active:scale-[0.98] shadow-lg shadow-purple-500/30 disabled:opacity-50 cursor-pointer"
+                        className="w-full mt-1 py-2.5 px-4 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs tracking-wide transition-all transform hover:scale-[1.01] active:scale-[0.98] shadow-lg shadow-rose-/30 disabled:opacity-50 cursor-pointer"
                     >
                         {loading ? 'Logging in...' : 'Log In'}
                     </button>
@@ -156,7 +156,7 @@ const LoginPage = () => {
                 {/* Footer link */}
                 <div className="mt-4 text-center text-xs text-neutral-400 relative z-10">
                     Don't have an account?{' '}
-                    <Link href="/signup" className="text-white font-semibold hover:text-purple-400 underline transition-colors">
+                    <Link href="/signup" className="text-white font-semibold hover:text-rose-400 underline transition-colors">
                         Sign up for Musify
                     </Link>
                 </div>

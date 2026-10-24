@@ -90,7 +90,7 @@ const PlaylistModal = ({ show, setShow }) => {
               onBlur={handleBlur}
               placeholder="My Spotify Vibes..."
               autoFocus
-              className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ec4899] focus:ring-2 focus:ring-[#ec4899]/20 transition-all font-medium"
+              className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f43f5e] focus:ring-2 focus:ring-[#f43f5e]/20 transition-all font-medium"
             />
           </div>
 
@@ -105,7 +105,7 @@ const PlaylistModal = ({ show, setShow }) => {
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 text-xs font-bold rounded-full bg-[#ec4899] text-black hover:bg-[#f472b6] hover:shadow-[0_0_18px_rgba(168, 85, 247,0.45)] transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="px-5 py-2 text-xs font-bold rounded-full bg-[#f43f5e] text-black hover:bg-[#fb7185] hover:shadow-[0_0_18px_rgba(244, 63, 94,0.45)] transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
             >
               {loading ? (
                 <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />

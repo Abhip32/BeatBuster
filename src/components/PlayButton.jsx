@@ -20,7 +20,7 @@ const PlayButton = ({ songList }) => {
         onClick={() => {
           handlePlayClick(songList?.songs?.[0], 0);
         }}
-        className="group relative flex h-13 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 px-7 py-3 text-white font-extrabold text-base tracking-wide shadow-[0_8px_24px_rgba(168,85,247,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+        className="group relative flex h-13 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-500 hover:to-rose-600 px-7 py-3 text-white font-extrabold text-base tracking-wide shadow-[0_8px_24px_rgba(244, 63, 94,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
       >
         <BsFillPlayFill
           size={24}

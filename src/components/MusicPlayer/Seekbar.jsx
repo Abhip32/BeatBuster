@@ -32,11 +32,11 @@ const Seekbar = ({
         }}
         className={`${
           !fullScreen ? "hidden lg:block lg:mr-3" : "hidden sm:flex mr-2"
-        } text-white hover:text-[#ec4899] transition-colors flex-shrink-0 outline-none focus:outline-none focus:ring-0`}
+        } text-white hover:text-[#f43f5e] transition-colors flex-shrink-0 outline-none focus:outline-none focus:ring-0`}
       >
         <GiFastBackwardButton
           size={fullScreen ? 24 : 20}
-          className="text-gray-300 hover:text-[#ec4899]"
+          className="text-gray-300 hover:text-[#f43f5e]"
         />
       </button>
       <p
@@ -56,10 +56,10 @@ const Seekbar = ({
         min={min}
         max={max}
         onInput={onInput}
-        style={{ background: `linear-gradient(to right, #ec4899 ${max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0}%, rgba(255, 255, 255, 0.2) ${max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0}%)` }}
+        style={{ background: `linear-gradient(to right, #f43f5e ${max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0}%, rgba(255, 255, 255, 0.2) ${max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0}%)` }}
         className={`w-full flex-1 min-w-0 ${
           fullScreen ? "h-1.5 sm:h-2 mx-2 sm:mx-4" : "h-1.5 mx-2 sm:mx-4"
-        } rounded-lg accent-[#ec4899] cursor-pointer transition-all outline-none focus:outline-none focus:ring-0`}
+        } rounded-lg accent-[#f43f5e] cursor-pointer transition-all outline-none focus:outline-none focus:ring-0`}
       />
       <p
         className={`text-white ${
@@ -78,11 +78,11 @@ const Seekbar = ({
         }}
         className={`${
           !fullScreen ? "hidden lg:block lg:ml-3" : "hidden sm:flex ml-2"
-        } text-white hover:text-[#ec4899] transition-colors flex-shrink-0 outline-none focus:outline-none focus:ring-0`}
+        } text-white hover:text-[#f43f5e] transition-colors flex-shrink-0 outline-none focus:outline-none focus:ring-0`}
       >
         <GiFastForwardButton
           size={fullScreen ? 24 : 20}
-          className="text-gray-300 hover:text-[#ec4899]"
+          className="text-gray-300 hover:text-[#f43f5e]"
         />
       </button>
     </div>

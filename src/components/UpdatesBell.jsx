@@ -79,11 +79,11 @@ const UpdatesBell = ({ mobileSearchOpen }) => {
         type="button"
         onClick={toggleOpen}
         aria-label="View recent updates"
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80 transition-all hover:bg-white/10 hover:border-[#ec4899] hover:text-[#ec4899]"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80 transition-all hover:bg-white/10 hover:border-[#f43f5e] hover:text-[#f43f5e]"
       >
         <HiOutlineBell className="h-5 w-5" />
         {hasUnread && (
-          <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-[#ec4899] shadow-[0_0_8px_#ec4899]" />
+          <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-[#f43f5e] shadow-[0_0_8px_#f43f5e]" />
         )}
       </button>
 
@@ -96,7 +96,7 @@ const UpdatesBell = ({ mobileSearchOpen }) => {
             <div>
               <p className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
                 What&apos;s New
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#ec4899] bg-[#ec4899]/15 px-2 py-0.5 rounded-full border border-[#ec4899]/30">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#f43f5e] bg-[#f43f5e]/15 px-2 py-0.5 rounded-full border border-[#f43f5e]/30">
                   Updates
                 </span>
               </p>

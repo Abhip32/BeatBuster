@@ -43,7 +43,7 @@ const Languages = () => {
         </span>
         <HiChevronDown
           className={`text-sm text-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-[#ec4899]" : ""
+            isOpen ? "rotate-180 text-[#f43f5e]" : ""
           }`}
         />
       </div>
@@ -59,7 +59,7 @@ const Languages = () => {
                 onClick={() => handleLanguageToggle(lang.id)}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium ${
                   isSelected
-                    ? "bg-[#ec4899] text-black border-[#ec4899] font-bold shadow-[0_0_12px_rgba(168, 85, 247,0.4)]"
+                    ? "bg-[#f43f5e] text-black border-[#f43f5e] font-bold shadow-[0_0_12px_rgba(244, 63, 94,0.4)]"
                     : "border-white/10 text-gray-300 hover:text-white hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.08]"
                 }`}
               >

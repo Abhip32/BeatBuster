@@ -16,10 +16,10 @@ module.exports = {
     extend: {
       colors: {
         musify: {
-          primary: "#ec4899",
-          hover: "#db2777",
-          light: "#f472b6",
-          dark: "#be185d",
+          primary: "#f43f5e",
+          hover: "#e11d48",
+          light: "#fb7185",
+          dark: "#be123c",
           black: "#0d0811",
           card: "#17101a",
           cardhover: "#261a2b",
@@ -27,9 +27,9 @@ module.exports = {
           border: "rgba(255, 255, 255, 0.08)",
         },
         spotify: {
-          green: "#ec4899",
-          lightgreen: "#f472b6",
-          darkgreen: "#be185d",
+          green: "#f43f5e",
+          lightgreen: "#fb7185",
+          darkgreen: "#be123c",
           black: "#0d0811",
           dark: "#08050c",
           card: "#17101a",
@@ -40,15 +40,15 @@ module.exports = {
       },
       backgroundImage: {
         "musify-gradient":
-          "radial-gradient(circle at 50% 0%, rgba(236, 72, 153, 0.22) 0%, rgba(13, 8, 17, 0) 70%), linear-gradient(180deg, #110915 0%, #08050c 100%)",
+          "radial-gradient(circle at 50% 0%, rgba(244, 63, 94, 0.22) 0%, rgba(13, 8, 17, 0) 70%), linear-gradient(180deg, #110915 0%, #08050c 100%)",
         "glass-gradient":
           "linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%)",
       },
       boxShadow: {
         glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
-        "glass-glow": "0 0 25px rgba(236, 72, 153, 0.35)",
-        "musify-btn": "0 8px 24px rgba(236, 72, 153, 0.45)",
-        "spotify-btn": "0 8px 24px rgba(236, 72, 153, 0.45)",
+        "glass-glow": "0 0 25px rgba(244, 63, 94, 0.35)",
+        "musify-btn": "0 8px 24px rgba(244, 63, 94, 0.45)",
+        "spotify-btn": "0 8px 24px rgba(244, 63, 94, 0.45)",
       },
       animation: {
         slideup: "slideup 0.4s ease-in-out",

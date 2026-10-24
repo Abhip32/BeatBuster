@@ -31,10 +31,14 @@ const Sidebar = ({ showNav, setShowNav }) => {
           }}
           className="flex items-center gap-2.5 group"
         >
-          <div className="w-8 h-8 rounded-full bg-[#ec4899] flex items-center justify-center shadow-[0_0_12px_rgba(168, 85, 247,0.4)] group-hover:scale-105 transition-transform">
-            <BsSpotify className="text-black text-xl" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-white group-hover:text-[#ec4899] transition-colors">
+          <img
+            src="/images/logo.png"
+            alt="Musify"
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full object-cover shadow-[0_0_12px_rgba(244, 63, 94,0.35)] group-hover:scale-105 transition-transform"
+          />
+          <span className="text-lg font-bold tracking-tight text-white group-hover:text-[var(--primary-accent,#f43f5e)] transition-colors">
             Musify
           </span>
         </Link>
@@ -74,7 +78,7 @@ const Sidebar = ({ showNav, setShowNav }) => {
             DMCA
           </Link>
           <a
-            href="https://github.com/Abhip32/Musify"
+            href="https://github.com/Abhip32/BeatBuster"
             target="_blank"
             rel="noreferrer"
             className="hover:text-white transition-colors flex items-center gap-1.5"

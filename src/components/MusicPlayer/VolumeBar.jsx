@@ -69,7 +69,7 @@ const VolumeBar = ({
               }}
               title="Lyrics"
               className={`p-2 transition-colors cursor-pointer rounded-full hover:bg-white/10 outline-none focus:outline-none focus:ring-0 ${
-                isLyricsOpen ? "text-[#ec4899]" : "text-white hover:text-[#ec4899]"
+                isLyricsOpen ? "text-[#f43f5e]" : "text-white hover:text-[#f43f5e]"
               }`}
             >
               <TbMicrophone2 size={24} />
@@ -90,7 +90,7 @@ const VolumeBar = ({
             }}
             title="Add to Playlist"
             className={`p-2 transition-colors cursor-pointer rounded-full hover:bg-white/10 outline-none focus:outline-none focus:ring-0 ${
-              showMenu ? "text-[#ec4899]" : "text-white hover:text-[#ec4899]"
+              showMenu ? "text-[#f43f5e]" : "text-white hover:text-[#f43f5e]"
             }`}
           >
             <BiAddToQueue size={24} />
@@ -131,7 +131,7 @@ const VolumeBar = ({
                           e.stopPropagation();
                           handleAddToPlaylist(activeSong?.id, playlist._id);
                         }}
-                        className="text-sm text-gray-200 hover:text-[#ec4899] hover:bg-white/10 px-2.5 py-1.5 rounded-lg text-left transition-colors truncate"
+                        className="text-sm text-gray-200 hover:text-[#f43f5e] hover:bg-white/10 px-2.5 py-1.5 rounded-lg text-left transition-colors truncate"
                       >
                         {playlist?.name}
                       </button>
@@ -152,7 +152,7 @@ const VolumeBar = ({
           <BsFillVolumeUpFill
             size={25}
             color="#FFF"
-            className="cursor-pointer hover:text-[#ec4899] transition-colors ml-2"
+            className="cursor-pointer hover:text-[#f43f5e] transition-colors ml-2"
             onClick={(e) => {
               e.stopPropagation();
               setVolume(0);
@@ -162,7 +162,7 @@ const VolumeBar = ({
         {value <= 0.5 && value > 0 && (
           <BsVolumeDownFill
             size={25}
-            className="cursor-pointer hover:text-[#ec4899] transition-colors ml-2"
+            className="cursor-pointer hover:text-[#f43f5e] transition-colors ml-2"
             color="#FFF"
             onClick={(e) => {
               e.stopPropagation();
@@ -174,7 +174,7 @@ const VolumeBar = ({
           <BsFillVolumeMuteFill
             size={25}
             color="#FFF"
-            className="cursor-pointer hover:text-[#ec4899] transition-colors ml-2"
+            className="cursor-pointer hover:text-[#f43f5e] transition-colors ml-2"
             onClick={(e) => {
               e.stopPropagation();
               setVolume(1);
@@ -191,7 +191,7 @@ const VolumeBar = ({
           min={min}
           max={max}
           onChange={onChange}
-          style={{ background: `linear-gradient(to right, #ec4899 ${Math.min(Math.max(((value - min) / ((max - min) || 1)) * 100, 0), 100)}%, rgba(255, 255, 255, 0.2) ${Math.min(Math.max(((value - min) / ((max - min) || 1)) * 100, 0), 100)}%)` }} className="w-16 sm:w-20 md:w-24 h-1 ml-2 accent-[#ec4899] cursor-pointer outline-none focus:outline-none focus:ring-0"
+          style={{ background: `linear-gradient(to right, #f43f5e ${Math.min(Math.max(((value - min) / ((max - min) || 1)) * 100, 0), 100)}%, rgba(255, 255, 255, 0.2) ${Math.min(Math.max(((value - min) / ((max - min) || 1)) * 100, 0), 100)}%)` }} className="w-16 sm:w-20 md:w-24 h-1 ml-2 accent-[#f43f5e] cursor-pointer outline-none focus:outline-none focus:ring-0"
         />
       </div>
 
