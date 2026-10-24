@@ -50,7 +50,7 @@ const Playlists = ({ setShowNav }) => {
         <button
           type="button"
           onClick={() => setShow(true)}
-          className="text-xs text-[#a855f7] hover:text-[#c084fc] transition-colors flex items-center gap-1.5 cursor-pointer font-semibold py-1 px-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10"
+          className="text-xs text-[#ec4899] hover:text-[#f472b6] transition-colors flex items-center gap-1.5 cursor-pointer font-semibold py-1 px-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10"
           title="Create Playlist"
         >
           <FaPlus size={10} />
@@ -70,8 +70,8 @@ const Playlists = ({ setShowNav }) => {
                 onClick={() => setShowNav(false)}
                 className="flex items-center gap-2.5 min-w-0 flex-1 mr-2"
               >
-                <div className="w-7 h-7 rounded-md bg-[#242428] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a855f7]/20">
-                  <MdPlaylistPlay size={18} className="text-[#a855f7] flex-shrink-0" />
+                <div className="w-7 h-7 rounded-md bg-[#242428] flex items-center justify-center flex-shrink-0 group-hover:bg-[#ec4899]/20">
+                  <MdPlaylistPlay size={18} className="text-[#ec4899] flex-shrink-0" />
                 </div>
                 <span className="text-sm font-medium truncate">{playlist.name}</span>
               </Link>
@@ -91,7 +91,7 @@ const Playlists = ({ setShowNav }) => {
             <button
               type="button"
               onClick={() => setShow(true)}
-              className="text-xs text-[#a855f7] hover:underline cursor-pointer font-semibold"
+              className="text-xs text-[#ec4899] hover:underline cursor-pointer font-semibold"
             >
               + Create your first playlist
             </button>

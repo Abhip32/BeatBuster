@@ -122,7 +122,7 @@ const MiniLyricsModal = ({
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0 pr-2">
-            <TbMicrophone2 className="text-[#a855f7] text-xl flex-shrink-0" />
+            <TbMicrophone2 className="text-[#ec4899] text-xl flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-white font-semibold text-sm truncate">
                 {activeSong?.name || "Lyrics"}
@@ -150,12 +150,12 @@ const MiniLyricsModal = ({
         <div className="w-full flex-1 min-h-0 overflow-y-auto hideScrollBar flex flex-col">
           {loading ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 py-12">
-              <div className="w-7 h-7 border-2 border-[#a855f7] border-t-transparent rounded-full animate-spin" />
+              <div className="w-7 h-7 border-2 border-[#ec4899] border-t-transparent rounded-full animate-spin" />
               <p className="text-xs">Loading lyrics...</p>
             </div>
           ) : lyricsData?.instrumental ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-300 gap-3 p-6 text-center">
-              <IoMusicalNotesOutline className="text-4xl text-[#a855f7] animate-pulse" />
+              <IoMusicalNotesOutline className="text-4xl text-[#ec4899] animate-pulse" />
               <p className="text-base font-semibold text-white">
                 Instrumental Track
               </p>

@@ -40,7 +40,7 @@ const Searchbar = ({ mobileSearchOpen, setMobileSearchOpen }) => {
       <button
         type="button"
         onClick={() => setMobileSearchOpen(true)}
-        className={`mr-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white transition-all hover:bg-white/10 hover:border-[#a855f7] hover:text-[#a855f7] md:hidden ${
+        className={`mr-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white transition-all hover:bg-white/10 hover:border-[#ec4899] hover:text-[#ec4899] md:hidden ${
           mobileSearchOpen ? "hidden" : ""
         }`}
         aria-label="Open search"
@@ -60,8 +60,8 @@ const Searchbar = ({ mobileSearchOpen, setMobileSearchOpen }) => {
         <div
           className={`flex items-center transition-all duration-300 ${
             mobileSearchOpen
-              ? "w-full gap-3 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-4 py-2.5 focus-within:border-[#a855f7] focus-within:ring-2 focus-within:ring-[#a855f7]/20"
-              : "gap-2.5 rounded-full border border-white/10 bg-[#242428]/70 backdrop-blur-md px-4 py-2 md:w-[15rem] lg:w-[18rem] focus-within:w-[18rem] lg:focus-within:w-[22rem] hover:bg-[#2a2a30]/80 hover:border-white/20 focus-within:border-[#a855f7] focus-within:ring-2 focus-within:ring-[#a855f7]/25 shadow-inner"
+              ? "w-full gap-3 rounded-full border border-white/15 bg-white/10 backdrop-blur-md px-4 py-2.5 focus-within:border-[#ec4899] focus-within:ring-2 focus-within:ring-[#ec4899]/20"
+              : "gap-2.5 rounded-full border border-white/10 bg-[#242428]/70 backdrop-blur-md px-4 py-2 md:w-[15rem] lg:w-[18rem] focus-within:w-[18rem] lg:focus-within:w-[22rem] hover:bg-[#2a2a30]/80 hover:border-white/20 focus-within:border-[#ec4899] focus-within:ring-2 focus-within:ring-[#ec4899]/25 shadow-inner"
           }`}
         >
           <FiSearch

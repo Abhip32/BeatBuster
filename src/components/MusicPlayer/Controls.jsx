@@ -55,7 +55,7 @@ const Controls = ({
         <TbRepeatOnce
           title="Repeat Once"
           size={fullScreen ? 28 : 25}
-          color={repeat ? "#a855f7" : "white"}
+          color={repeat ? "#ec4899" : "white"}
           onClick={(e) => {
             e.stopPropagation();
             setRepeat((prev) => !prev);
@@ -78,14 +78,14 @@ const Controls = ({
       {isPlaying ? (
         <BsFillPauseFill
           size={fullScreen ? 58 : 45}
-          color="#a855f7"
+          color="#ec4899"
           onClick={handlePlayPause}
           className="cursor-pointer hover:scale-110 transition-transform"
         />
       ) : (
         <BsFillPlayFill
           size={fullScreen ? 58 : 45}
-          color="#a855f7"
+          color="#ec4899"
           onClick={handlePlayPause}
           className="cursor-pointer hover:scale-110 transition-transform"
         />
@@ -102,7 +102,7 @@ const Controls = ({
       <TbArrowsShuffle
         title="Shuffle"
         size={fullScreen ? 28 : 25}
-        color={shuffle ? "#a855f7" : "white"}
+        color={shuffle ? "#ec4899" : "white"}
         onClick={(e) => {
           e.stopPropagation();
           setShuffle((prev) => !prev);

@@ -43,7 +43,7 @@ const Profile = ({ setShowNav }) => {
             setShowNav(false);
             router.push("/login");
           }}
-          className="flex-1 py-2 px-3 text-xs font-bold rounded-full bg-[#a855f7] text-black hover:bg-[#c084fc] hover:shadow-[0_0_15px_rgba(168, 85, 247,0.35)] transition-all text-center cursor-pointer"
+          className="flex-1 py-2 px-3 text-xs font-bold rounded-full bg-[#ec4899] text-black hover:bg-[#f472b6] hover:shadow-[0_0_15px_rgba(168, 85, 247,0.35)] transition-all text-center cursor-pointer"
         >
           Log In
         </button>
@@ -71,14 +71,14 @@ const Profile = ({ setShowNav }) => {
           <img
             src={displayImage}
             alt={displayName}
-            className="w-8 h-8 rounded-full object-cover border border-[#a855f7]/50 shadow-[0_0_10px_rgba(168, 85, 247,0.2)]"
+            className="w-8 h-8 rounded-full object-cover border border-[#ec4899]/50 shadow-[0_0_10px_rgba(168, 85, 247,0.2)]"
           />
         ) : (
           <FaUserCircle className="w-8 h-8 text-gray-400" />
         )}
         <div className="min-w-0">
           <p className="text-xs font-bold text-white truncate">{displayName}</p>
-          <span className="text-[10px] font-semibold text-[#a855f7] bg-[#a855f7]/10 px-1.5 py-0.2 rounded border border-[#a855f7]/30">
+          <span className="text-[10px] font-semibold text-[#ec4899] bg-[#ec4899]/10 px-1.5 py-0.2 rounded border border-[#ec4899]/30">
             Free Plan
           </span>
         </div>

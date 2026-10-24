@@ -31,10 +31,10 @@ const Sidebar = ({ showNav, setShowNav }) => {
           }}
           className="flex items-center gap-2.5 group"
         >
-          <div className="w-8 h-8 rounded-full bg-[#a855f7] flex items-center justify-center shadow-[0_0_12px_rgba(168, 85, 247,0.4)] group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-full bg-[#ec4899] flex items-center justify-center shadow-[0_0_12px_rgba(168, 85, 247,0.4)] group-hover:scale-105 transition-transform">
             <BsSpotify className="text-black text-xl" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-white group-hover:text-[#a855f7] transition-colors">
+          <span className="text-lg font-bold tracking-tight text-white group-hover:text-[#ec4899] transition-colors">
             Musify
           </span>
         </Link>

@@ -72,7 +72,7 @@ const SignUpPage = () => {
     if (status === 'loading') {
         return (
             <div className="w-full min-h-[60vh] flex justify-center items-center">
-                <div className="w-8 h-8 border-3 border-[#a855f7] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-3 border-[#ec4899] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -85,8 +85,8 @@ const SignUpPage = () => {
         <div className="min-h-[75vh] flex items-center justify-center px-4 py-4">
             <div className="w-full max-w-[390px] bg-[#120f1e]/85 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
                 {/* Purple ambient glow */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#a855f7]/20 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#a855f7]/15 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#ec4899]/20 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#ec4899]/15 rounded-full blur-3xl pointer-events-none" />
 
                 {/* Header */}
                 <div className="text-center mb-4 relative z-10">
@@ -136,7 +136,7 @@ const SignUpPage = () => {
                                 onChange={onChange}
                                 placeholder="Enter your name"
                                 required
-                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#a855f7] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
+                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#ec4899] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -155,7 +155,7 @@ const SignUpPage = () => {
                                 onChange={onChange}
                                 placeholder="name@domain.com"
                                 required
-                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#a855f7] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
+                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#ec4899] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -174,7 +174,7 @@ const SignUpPage = () => {
                                 onChange={onChange}
                                 placeholder="Create a password"
                                 required
-                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#a855f7] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
+                                className="w-full pl-10 pr-3.5 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-[#ec4899] focus:bg-white/10 text-white placeholder-neutral-500 text-xs outline-none transition-all"
                             />
                         </div>
                     </div>

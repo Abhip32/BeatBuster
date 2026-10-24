@@ -5,27 +5,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Ubuntu:wght@400;500;700&display=swap");
 
 :root {
-  --primary-purple: #a855f7;
-  --primary-purple-hover: #9333ea;
-  --primary-purple-light: #c084fc;
-  --bg-main: #0d0b14;
-  --bg-card: rgba(21, 18, 30, 0.65);
+  --primary-accent: #ec4899;
+  --primary-accent-hover: #db2777;
+  --primary-accent-light: #f472b6;
+  --primary-purple: #ec4899;
+  --primary-purple-hover: #db2777;
+  --primary-purple-light: #f472b6;
+  --bg-main: #0c0810;
+  --bg-card: rgba(24, 15, 26, 0.65);
 }
 
 html {
   font-family: "Plus Jakarta Sans", "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #0b0910;
+  background-color: #09050d;
   color: #ffffff;
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #0c0a13;
+  background-color: #0c0810;
   background-image: 
-    radial-gradient(circle at 20% -10%, rgba(168, 85, 247, 0.22) 0%, transparent 45%),
-    radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
-    linear-gradient(180deg, #0e0b17 0%, #07050b 100%);
+    radial-gradient(circle at 20% -10%, rgba(236, 72, 153, 0.22) 0%, transparent 45%),
+    radial-gradient(circle at 80% 20%, rgba(219, 39, 119, 0.14) 0%, transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #0e0913 0%, #08050c 100%);
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
@@ -33,9 +36,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Musify Purple Glassmorphism Classes */
+/* Musify Pink Glassmorphism Classes */
 .glass-panel {
-  background: rgba(18, 15, 28, 0.68);
+  background: rgba(22, 14, 25, 0.7);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -53,23 +56,23 @@ body {
 
 .glass-card:hover {
   background: rgba(255, 255, 255, 0.075);
-  border-color: rgba(168, 85, 247, 0.45);
+  border-color: rgba(236, 72, 153, 0.45);
   transform: translateY(-3px);
-  box-shadow: 0 10px 28px -5px rgba(0, 0, 0, 0.5), 0 0 24px rgba(168, 85, 247, 0.22);
+  box-shadow: 0 10px 28px -5px rgba(0, 0, 0, 0.5), 0 0 24px rgba(236, 72, 153, 0.22);
 }
 
 .glass-nav {
-  background: rgba(14, 11, 22, 0.82);
+  background: rgba(16, 10, 19, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .glass-player {
-  background: rgba(16, 13, 25, 0.9);
+  background: rgba(18, 11, 22, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(168, 85, 247, 0.15);
+  border-top: 1px solid rgba(236, 72, 153, 0.18);
   box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.65);
 }
 
@@ -83,36 +86,36 @@ body {
 
 .glass-pill:hover {
   background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(168, 85, 247, 0.5);
+  border-color: rgba(236, 72, 153, 0.5);
 }
 
 .glass-pill-active {
-  background: #a855f7 !important;
+  background: #ec4899 !important;
   color: #ffffff !important;
   font-weight: 600;
-  border-color: #c084fc !important;
-  box-shadow: 0 0 18px rgba(168, 85, 247, 0.55);
+  border-color: #f472b6 !important;
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.55);
 }
 
-/* Play Buttons (Purple Glass Glow) */
+/* Play Buttons (Pink Glass Glow) */
 .musify-play-btn,
 .spotify-play-btn {
-  background: #a855f7;
+  background: #ec4899;
   color: #ffffff;
   border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.45);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.45);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .musify-play-btn:hover,
 .spotify-play-btn:hover {
-  background: #9333ea;
+  background: #db2777;
   color: #ffffff;
   transform: scale(1.06);
-  box-shadow: 0 10px 26px rgba(168, 85, 247, 0.6);
+  box-shadow: 0 10px 26px rgba(236, 72, 153, 0.6);
 }
 
 .musify-play-btn:active,
@@ -136,7 +139,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.5);
+  background: rgba(236, 72, 153, 0.5);
 }
 
 /* Custom range input (Seekbar & Volume slider) */
@@ -147,7 +150,7 @@ input[type="range"] {
   height: 4px;
   cursor: pointer;
   transition: all 0.2s;
-  accent-color: #a855f7;
+  accent-color: #ec4899;
 }
 
 input[type="range"]:hover {
@@ -161,7 +164,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #ffffff;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.6);
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.6);
   opacity: 0;
   transition: opacity 0.15s, transform 0.15s;
 }
@@ -171,16 +174,16 @@ input[type="range"]:hover::-webkit-slider-thumb {
   transform: scale(1.15);
 }
 
-/* Swiper custom overrides for purple glass theme */
+/* Swiper custom overrides for pink glass theme */
 .swiper-button-next,
 .swiper-button-prev {
-  color: #c084fc !important;
-  background: rgba(20, 16, 32, 0.85) !important;
+  color: #f472b6 !important;
+  background: rgba(26, 16, 28, 0.85) !important;
   backdrop-filter: blur(10px) !important;
   width: 36px !important;
   height: 36px !important;
   border-radius: 50% !important;
-  border: 1px solid rgba(168, 85, 247, 0.25) !important;
+  border: 1px solid rgba(236, 72, 153, 0.3) !important;
 }
 
 .swiper-button-next:after,
@@ -194,7 +197,7 @@ input[type="range"]:hover::-webkit-slider-thumb {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: conic-gradient(#0000 10%, #a855f7);
+  background: conic-gradient(#0000 10%, #ec4899);
   -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 6px), #000 0);
   animation: s3 0.9s infinite linear;
 }
@@ -219,9 +222,9 @@ input[type="range"]:hover::-webkit-slider-thumb {
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.03) 0%,
-    rgba(168, 85, 247, 0.12) 35%,
+    rgba(236, 72, 153, 0.14) 35%,
     rgba(255, 255, 255, 0.07) 50%,
-    rgba(168, 85, 247, 0.12) 65%,
+    rgba(236, 72, 153, 0.14) 65%,
     rgba(255, 255, 255, 0.03) 100%
   );
   background-size: 200% 100%;
@@ -232,9 +235,9 @@ input[type="range"]:hover::-webkit-slider-thumb {
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.02) 0%,
-    rgba(168, 85, 247, 0.08) 35%,
+    rgba(236, 72, 153, 0.08) 35%,
     rgba(255, 255, 255, 0.04) 50%,
-    rgba(168, 85, 247, 0.08) 65%,
+    rgba(236, 72, 153, 0.08) 65%,
     rgba(255, 255, 255, 0.02) 100%
   );
   background-size: 200% 100%;

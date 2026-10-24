@@ -232,12 +232,12 @@ const MusicPlayer = () => {
       try {
         setLoading(true);
         // optimistic update
-        if (favouriteSongs?.find((song) => song === favsong?.id)) {
-          setFavouriteSongs(
-            favouriteSongs?.filter((song) => song !== favsong?.id),
-          );
+        const songId = favsong?.id;
+        const exists = favouriteSongs?.some((s) => (typeof s === "object" ? s?.id : s) === songId);
+        if (exists) {
+          setFavouriteSongs(favouriteSongs?.filter((s) => (typeof s === "object" ? s?.id : s) !== songId));
         } else {
-          setFavouriteSongs([...favouriteSongs, favsong?.id]);
+          setFavouriteSongs([...(favouriteSongs || []), favsong]);
         }
         const res = await addFavourite(favsong);
         if (res?.success === true) {
@@ -326,7 +326,7 @@ const MusicPlayer = () => {
           {/* Top 2px Progress Bar on Mini Player */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/10 sm:hidden overflow-hidden">
             <div
-              className="h-full bg-[#a855f7] transition-all duration-150"
+              className="h-full bg-[#ec4899] transition-all duration-150"
               style={{
                 width: `${
                   duration
@@ -415,7 +415,7 @@ const MusicPlayer = () => {
                 e.currentTarget.blur();
                 handlePrevSong(e);
               }}
-              className="p-1 text-white/90 hover:text-[#a855f7] transition-colors"
+              className="p-1 text-white/90 hover:text-[#ec4899] transition-colors"
               title="Previous"
             >
               <MdSkipPrevious size={26} />
@@ -428,7 +428,7 @@ const MusicPlayer = () => {
                 e.currentTarget.blur();
                 handlePlayPause(e);
               }}
-              className="p-1 text-[#a855f7] hover:scale-110 active:scale-95 transition-transform"
+              className="p-1 text-[#ec4899] hover:scale-110 active:scale-95 transition-transform"
               title={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (
@@ -445,7 +445,7 @@ const MusicPlayer = () => {
                 e.currentTarget.blur();
                 handleNextSong(e);
               }}
-              className="p-1 text-white/90 hover:text-[#a855f7] transition-colors"
+              className="p-1 text-white/90 hover:text-[#ec4899] transition-colors"
               title="Next"
             >
               <MdSkipNext size={26} />

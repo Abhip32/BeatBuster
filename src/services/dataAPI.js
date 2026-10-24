@@ -183,8 +183,15 @@ export async function homePageData(language) {
 // get song data
 export async function getSongData(id) {
   try {
+    if (typeof id === "object" && id !== null && (id.name || id.title)) {
+      return id;
+    }
+    const rawId = typeof id === "object" ? id?.id : id;
+    if (!rawId || typeof rawId !== "string" || rawId === "[object Object]") {
+      return null;
+    }
     const base = getApiBase();
-    const response = await fetch(`${base}/api/songs/${id}`);
+    const response = await fetch(`${base}/api/songs/${rawId}`);
     if (!response.ok) return null;
     const data = await response.json();
     if (Array.isArray(data?.data)) {

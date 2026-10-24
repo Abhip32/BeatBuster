@@ -62,13 +62,13 @@ const AlbumPage = ({ params }) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/5 text-gray-500">
-              <BsSpotify size={64} className="text-[#a855f7]" />
+              <BsSpotify size={64} className="text-[#ec4899]" />
             </div>
           )}
         </div>
 
         <div className="flex flex-col text-center md:text-left text-white min-w-0 flex-1">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-[#a855f7] mb-1">
+          <span className="text-xs uppercase font-extrabold tracking-widest text-[#ec4899] mb-1">
             Album
           </span>
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight line-clamp-2">
@@ -82,7 +82,7 @@ const AlbumPage = ({ params }) => {
                 <React.Fragment key={artist?.id || idx}>
                   <Link
                     href={`/artist/${artist?.id}`}
-                    className="hover:text-[#a855f7] hover:underline transition-colors"
+                    className="hover:text-[#ec4899] hover:underline transition-colors"
                   >
                     {artist?.name?.replaceAll("&amp;", "&")}
                   </Link>

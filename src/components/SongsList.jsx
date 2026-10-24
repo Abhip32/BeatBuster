@@ -133,7 +133,7 @@ const SongsList = ({
               onClick={() => handlePlayClick(song, index)}
               className={`group grid grid-cols-12 items-center px-3 sm:px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
                 isThisActive
-                  ? "bg-white/[0.08] border border-[#a855f7]/30 shadow-md"
+                  ? "bg-white/[0.08] border border-[#ec4899]/30 shadow-md"
                   : "hover:bg-white/[0.05] border border-transparent"
               }`}
             >
@@ -143,10 +143,10 @@ const SongsList = ({
                   isPlaying ? (
                     <BiHeadphone
                       size={22}
-                      className="text-[#a855f7] animate-pulse"
+                      className="text-[#ec4899] animate-pulse"
                     />
                   ) : (
-                    <BsPauseFill size={20} className="text-[#a855f7]" />
+                    <BsPauseFill size={20} className="text-[#ec4899]" />
                   )
                 ) : (
                   <>
@@ -179,7 +179,7 @@ const SongsList = ({
                   <p
                     className={`text-sm font-semibold truncate transition-colors ${
                       isThisActive
-                        ? "text-[#a855f7]"
+                        ? "text-[#ec4899]"
                         : "text-white group-hover:text-white"
                     }`}
                   >

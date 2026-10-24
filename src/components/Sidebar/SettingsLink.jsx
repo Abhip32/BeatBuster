@@ -10,8 +10,8 @@ const SettingsLink = ({ setShowNav }) => {
       onClick={() => setShowNav(false)}
       className="flex items-center gap-3 px-3 py-2.5 text-gray-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all cursor-pointer group"
     >
-      <IoSettingsOutline size={20} className="text-gray-400 group-hover:text-[#a855f7] transition-colors" />
-      <span className="text-sm font-semibold tracking-wide group-hover:text-[#a855f7] transition-colors">
+      <IoSettingsOutline size={20} className="text-gray-400 group-hover:text-[#ec4899] transition-colors" />
+      <span className="text-sm font-semibold tracking-wide group-hover:text-[#ec4899] transition-colors">
         Settings
       </span>
     </Link>

@@ -56,7 +56,7 @@ const Navbar = () => {
           <Link
             href="/settings"
             aria-label="Settings"
-            className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80 transition-all hover:bg-white/10 hover:border-[#a855f7] hover:text-[#a855f7]"
+            className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/80 transition-all hover:bg-white/10 hover:border-[#ec4899] hover:text-[#ec4899]"
           >
             <IoSettingsOutline className="h-5 w-5" />
           </Link>

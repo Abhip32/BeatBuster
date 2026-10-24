@@ -134,7 +134,7 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
         </div>
 
         <div className="flex flex-col min-w-0">
-          <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#a855f7] transition-colors">
+          <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#ec4899] transition-colors">
             {song?.name?.replaceAll("&#039;", "'")?.replaceAll("&amp;", "&") ||
               song?.title}
           </p>

@@ -64,7 +64,7 @@ const SongBar = ({ playlist, i }) => {
             className="w-14 h-14 rounded-xl object-cover shadow-md flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm lg:text-base text-white truncate group-hover:text-[#a855f7] transition-colors">
+            <p className="font-bold text-sm lg:text-base text-white truncate group-hover:text-[#ec4899] transition-colors">
               {playlist?.title || playlist?.name}
             </p>
             <p className="text-xs text-[#b3b3b3] mt-0.5 capitalize truncate">
@@ -72,7 +72,7 @@ const SongBar = ({ playlist, i }) => {
             </p>
           </div>
         </div>
-        <div className="w-10 h-10 rounded-full bg-[#a855f7] text-black flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-lg transform translate-x-1 group-hover:translate-x-0 transition-all duration-300 mr-2">
+        <div className="w-10 h-10 rounded-full bg-[#ec4899] text-black flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-lg transform translate-x-1 group-hover:translate-x-0 transition-all duration-300 mr-2">
           <BsFillPlayFill size={20} className="ml-0.5" />
         </div>
       </div>

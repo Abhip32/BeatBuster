@@ -250,16 +250,16 @@ const BulkDownloadButton = ({ songList }) => {
           downloading
             ? "cursor-not-allowed bg-white/10 border-white/20"
             : completed
-            ? "bg-[#a855f7]/20 border-[#a855f7] text-[#a855f7] shadow-[0_0_20px_rgba(168, 85, 247,0.3)]"
-            : "bg-white/[0.08] hover:bg-white/[0.14] border-white/15 hover:border-[#a855f7]/60 hover:shadow-[0_0_20px_rgba(168, 85, 247,0.2)]"
+            ? "bg-[#ec4899]/20 border-[#ec4899] text-[#ec4899] shadow-[0_0_20px_rgba(168, 85, 247,0.3)]"
+            : "bg-white/[0.08] hover:bg-white/[0.14] border-white/15 hover:border-[#ec4899]/60 hover:shadow-[0_0_20px_rgba(168, 85, 247,0.2)]"
         }`}
       >
         <div
           className={`absolute inset-y-0 left-0 transition-[width,background-color] duration-150 ease-out ${
             downloading
-              ? "bg-[#a855f7]/30"
+              ? "bg-[#ec4899]/30"
               : completed
-              ? "bg-[#a855f7]/40"
+              ? "bg-[#ec4899]/40"
               : "bg-transparent"
           }`}
           style={{ width: `${Math.min(progress, 100)}%` }}
@@ -268,19 +268,19 @@ const BulkDownloadButton = ({ songList }) => {
         <div className="relative z-10 flex items-center justify-center gap-2 pointer-events-none">
           {downloading ? (
             <>
-              <MdOutlineAutorenew size={20} className="animate-spin text-[#a855f7]" />
+              <MdOutlineAutorenew size={20} className="animate-spin text-[#ec4899]" />
               <span>Downloading... {progress}%</span>
             </>
           ) : completed ? (
             <>
-              <MdCheckCircleOutline size={20} className="text-[#a855f7]" />
+              <MdCheckCircleOutline size={20} className="text-[#ec4899]" />
               <span>Downloaded</span>
             </>
           ) : (
             <>
               <MdDownloadForOffline
                 size={22}
-                className="text-gray-300 group-hover:text-[#a855f7] transition-colors"
+                className="text-gray-300 group-hover:text-[#ec4899] transition-colors"
               />
               <span>Download ZIP</span>
             </>
@@ -308,7 +308,7 @@ const BulkDownloadButton = ({ songList }) => {
                 <button
                   key={quality.index}
                   onClick={() => handleBulkDownload(quality)}
-                  className="w-full text-left px-3 py-2 text-xs font-semibold text-gray-200 hover:text-black hover:bg-[#a855f7] rounded-xl transition-all flex items-center justify-between gap-2"
+                  className="w-full text-left px-3 py-2 text-xs font-semibold text-gray-200 hover:text-black hover:bg-[#ec4899] rounded-xl transition-all flex items-center justify-between gap-2"
                 >
                   <span>{quality.label}</span>
                   {quality.index === 4 && (

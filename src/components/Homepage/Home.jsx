@@ -80,11 +80,20 @@ const Home = () => {
       const fetchFavs = async () => {
         setLoadingLiked(true);
         try {
-          const ids = await getFavourite();
-          if (Array.isArray(ids) && ids.length > 0) {
-            const promises = ids.slice(0, 30).map((id) => getSongData(id));
-            const results = await Promise.all(promises);
-            setLikedSongs(results.filter(Boolean).reverse());
+          const items = await getFavourite();
+          if (Array.isArray(items) && items.length > 0) {
+            const resolved = await Promise.all(
+              items.slice(0, 30).map(async (item) => {
+                if (item && typeof item === "object" && (item.name || item.title)) {
+                  return item;
+                }
+                const songId = typeof item === "object" ? item?.id : item;
+                if (!songId || typeof songId !== "string") return null;
+                const data = await getSongData(songId);
+                return Array.isArray(data) ? data[0] : data || null;
+              })
+            );
+            setLikedSongs(resolved.filter(Boolean).reverse());
           }
         } catch (err) {
           console.error("Error fetching liked songs:", err);
@@ -124,8 +133,8 @@ const Home = () => {
             Discover trending tracks, chart toppers, and your personal favorites
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+          <span className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" />
           <span>Lossless 320kbps</span>
         </div>
       </div>
@@ -152,7 +161,7 @@ const Home = () => {
           }`}
         >
           <AiFillHeart
-            className={activeTab === "liked" ? "text-white" : "text-[#a855f7]"}
+            className={activeTab === "liked" ? "text-white" : "text-[#ec4899]"}
           />
           <span>Liked Songs</span>
           {likedSongs.length > 0 && (
@@ -160,7 +169,7 @@ const Home = () => {
               className={`text-[11px] px-1.5 py-0.2 rounded-full ${
                 activeTab === "liked"
                   ? "bg-white/20 text-white"
-                  : "bg-purple-500/20 text-purple-300"
+                  : "bg-pink-500/20 text-pink-300"
               }`}
             >
               {likedSongs.length}
@@ -197,14 +206,14 @@ const Home = () => {
           {/* Liked Songs Tile */}
           <Link
             href="/favourite"
-            className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-purple-900/40 via-purple-800/20 to-white/[0.03] hover:from-purple-800/50 hover:to-white/[0.07] backdrop-blur-md border border-purple-500/30 hover:border-purple-500/60 transition-all duration-300 shadow-md cursor-pointer"
+            className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-pink-900/40 via-pink-800/20 to-white/[0.03] hover:from-pink-800/50 hover:to-white/[0.07] backdrop-blur-md border border-pink-500/30 hover:border-pink-500/60 transition-all duration-300 shadow-md cursor-pointer"
           >
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-700 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-indigo-700 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
               <AiFillHeart className="text-white text-2xl drop-shadow" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-white truncate">Liked Songs</h3>
-              <p className="text-xs text-purple-300/80 font-medium">
+              <p className="text-xs text-pink-300/80 font-medium">
                 {likedSongs.length > 0 ? `${likedSongs.length} songs` : "Collection"}
               </p>
             </div>
@@ -248,8 +257,8 @@ const Home = () => {
         <div className="mb-14 animate-fade-in">
           {status === "unauthenticated" ? (
             <div className="rounded-3xl p-8 sm:p-12 bg-white/[0.03] backdrop-blur-xl border border-white/10 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mb-4">
-                <AiFillHeart className="text-[#a855f7] text-3xl" />
+              <div className="w-16 h-16 rounded-full bg-pink-500/10 border border-pink-500/30 flex items-center justify-center mb-4">
+                <AiFillHeart className="text-[#ec4899] text-3xl" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
                 Enjoy your Liked Songs
@@ -260,7 +269,7 @@ const Home = () => {
               </p>
               <Link
                 href="/login"
-                className="py-2.5 px-8 rounded-full bg-[#a855f7] hover:bg-[#9333ea] text-white font-bold text-sm shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all cursor-pointer"
+                className="py-2.5 px-8 rounded-full bg-[#ec4899] hover:bg-[#db2777] text-white font-bold text-sm shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all cursor-pointer"
               >
                 Log In to Musify
               </Link>
@@ -281,7 +290,7 @@ const Home = () => {
                 </div>
                 <Link
                   href="/favourite"
-                  className="text-xs font-semibold text-[#a855f7] hover:underline"
+                  className="text-xs font-semibold text-[#ec4899] hover:underline"
                 >
                   Open Full View &rarr;
                 </Link>
@@ -290,8 +299,8 @@ const Home = () => {
             </div>
           ) : (
             <div className="rounded-3xl p-8 sm:p-12 bg-white/[0.03] backdrop-blur-xl border border-white/10 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mb-4">
-                <AiFillHeart className="text-[#a855f7] text-3xl" />
+              <div className="w-16 h-16 rounded-full bg-pink-500/10 border border-pink-500/30 flex items-center justify-center mb-4">
+                <AiFillHeart className="text-[#ec4899] text-3xl" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">
                 No liked songs yet

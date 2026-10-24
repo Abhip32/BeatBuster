@@ -10,7 +10,7 @@ const TopProgressBar = () => {
 
   return (
     <LoadingBar
-      color="#a855f7"
+      color="#ec4899"
       height={2.5}
       shadow={true}
       progress={progress}

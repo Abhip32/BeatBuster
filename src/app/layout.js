@@ -152,7 +152,7 @@ export default function RootLayout({ children }) {
   gtag('config', 'G-Z4FJ5T627Q');
   `}
       </Script>
-      <body className={`${jakarta.className} bg-[#0c0c0e] text-[#ffffff] min-h-screen selection:bg-[#a855f7] selection:text-black`}>
+      <body className={`${jakarta.className} bg-[#0c0c0e] text-[#ffffff] min-h-screen selection:bg-[#ec4899] selection:text-black`}>
         <Providers>
           <AuthProvider>
             <TopProgressBar />

@@ -85,8 +85,8 @@ const ArtistPage = ({ params }) => {
         </div>
 
         <div className="flex flex-col text-center md:text-left text-white min-w-0 flex-1">
-          <div className="flex items-center justify-center md:justify-start gap-1.5 text-xs uppercase font-extrabold tracking-widest text-[#a855f7] mb-1">
-            <MdVerified className="text-[#a855f7] text-base" />
+          <div className="flex items-center justify-center md:justify-start gap-1.5 text-xs uppercase font-extrabold tracking-widest text-[#ec4899] mb-1">
+            <MdVerified className="text-[#ec4899] text-base" />
             <span>Verified Artist</span>
           </div>
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight line-clamp-2">

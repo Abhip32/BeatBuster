@@ -10,9 +10,9 @@ const ToggleSwitch = ({ checked, onChange, id, label }) => {
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a855f7] ${
+      className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899] ${
         checked
-          ? "bg-[#a855f7] shadow-[0_0_14px_rgba(168, 85, 247,0.4)]"
+          ? "bg-[#ec4899] shadow-[0_0_14px_rgba(168, 85, 247,0.4)]"
           : "bg-white/20 hover:bg-white/30"
       }`}
     >

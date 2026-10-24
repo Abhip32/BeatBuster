@@ -73,7 +73,7 @@ const Track = ({ isPlaying, isActive, activeSong, fullScreen }) => {
               strokeWidth="0.8"
             />
             {/* Stylus Needle Tip Accent */}
-            <circle cx="4.5" cy="38.5" r="0.9" fill="#a855f7" />
+            <circle cx="4.5" cy="38.5" r="0.9" fill="#ec4899" />
           </svg>
         </div>
 

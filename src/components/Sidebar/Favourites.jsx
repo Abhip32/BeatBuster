@@ -12,7 +12,7 @@ const Favourites = ({ setShowNav }) => {
       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-700 flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.35)] group-hover:scale-105 transition-transform">
         <AiFillHeart size={16} className="text-white" />
       </div>
-      <span className="text-sm font-semibold tracking-wide group-hover:text-[#a855f7] transition-colors">
+      <span className="text-sm font-semibold tracking-wide group-hover:text-[#ec4899] transition-colors">
         Liked Songs
       </span>
     </Link>

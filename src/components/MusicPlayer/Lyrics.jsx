@@ -169,7 +169,7 @@ const Lyrics = ({
             onClick={() => handleTabChange("queue")}
             className={`${
               activeTab === "queue"
-                ? "border-[#a855f7] border-b-2 text-white"
+                ? "border-[#ec4899] border-b-2 text-white"
                 : "text-gray-400 hover:text-white"
             } text-xl mx-4 pb-1 font-semibold transition-colors`}
           >
@@ -179,13 +179,13 @@ const Lyrics = ({
             onClick={() => handleTabChange("lyrics")}
             className={`${
               activeTab === "lyrics"
-                ? "border-[#a855f7] border-b-2 text-white"
+                ? "border-[#ec4899] border-b-2 text-white"
                 : "text-gray-400 hover:text-white"
             } text-xl mx-4 pb-1 font-semibold transition-colors flex items-center gap-1.5`}
           >
             Lyrics
             {parsedLyrics.length > 0 && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#a855f7] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ec4899] inline-block" />
             )}
           </button>
         </div>
@@ -196,12 +196,12 @@ const Lyrics = ({
         {activeTab === "lyrics" ? (
           loading ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-3 py-12">
-              <div className="w-8 h-8 border-2 border-[#a855f7] border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-[#ec4899] border-t-transparent rounded-full animate-spin" />
               <p className="text-sm">Loading lyrics...</p>
             </div>
           ) : lyricsData?.instrumental ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-300 gap-4 py-16 text-center">
-              <IoMusicalNotesOutline className="text-5xl text-[#a855f7] animate-pulse" />
+              <IoMusicalNotesOutline className="text-5xl text-[#ec4899] animate-pulse" />
               <p className="text-lg sm:text-xl font-semibold text-white">
                 Instrumental Track
               </p>
@@ -286,7 +286,7 @@ const Lyrics = ({
                   placeholder="autoAddButton"
                   title={autoAdd ? "on" : "off"}
                 />
-                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none ring-2 ring-gray-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#a855f7]" />
+                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none ring-2 ring-gray-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#ec4899]" />
               </label>
             </div>
             {currentSongs?.length > 0 ? (

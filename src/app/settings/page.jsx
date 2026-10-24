@@ -64,7 +64,7 @@ const SettingsPage = () => {
       {/* Page Title */}
       <div className="mb-8 flex items-center justify-between pb-3 border-b border-white/10">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#a855f7]">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#ec4899]">
             Preferences
           </span>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
@@ -74,7 +74,7 @@ const SettingsPage = () => {
             Configure Spotify-style audio quality, downloads, and lyrics
           </p>
         </div>
-        <div className="w-10 h-10 rounded-full bg-[#a855f7] flex items-center justify-center shadow-[0_0_15px_rgba(168, 85, 247,0.35)]">
+        <div className="w-10 h-10 rounded-full bg-[#ec4899] flex items-center justify-center shadow-[0_0_15px_rgba(168, 85, 247,0.35)]">
           <BsSpotify className="text-black text-2xl" />
         </div>
       </div>

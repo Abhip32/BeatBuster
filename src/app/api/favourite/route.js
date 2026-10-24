@@ -114,16 +114,23 @@ export async function POST(request) {
         { status: 404 }
       );
     }
-    if (userData.favourites.includes(id)) {
-      await userData.updateOne({ $pull: { favourites: id } });
+    const songId = typeof id === "object" ? id?.id : id;
+    const existingIndex = (userData.favourites || []).findIndex(
+      (item) => (typeof item === "object" ? item?.id : item) === songId
+    );
+
+    if (existingIndex !== -1) {
+      userData.favourites.splice(existingIndex, 1);
     } else {
-      await userData.updateOne({ $push: { favourites: id } });
+      userData.favourites.push(id);
     }
-    const favourites = await UserData.findById(user.userData);
+    userData.markModified("favourites");
+    await userData.save();
+
     return NextResponse.json({
       success: true,
       message: "Favourites updated",
-      data: favourites,
+      data: userData,
     });
   } catch (e) {
     console.log("add to favourites error", e);
