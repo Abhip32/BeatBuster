@@ -1,4 +1,5 @@
 "use client";
+import { BiHeadphone } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import SwiperLayout from "@/components/Homepage/Swiper";
 import SongCard from "@/components/Homepage/SongCard";
@@ -99,7 +100,20 @@ const SearchResultsPage = ({ params }) => {
         </h1>
       </div>
 
-      {/* Songs Section */}
+      {songResults.length === 0 && albumResults.length === 0 && artistResults.length === 0 && playlistResults.length === 0 && (
+        <div className="py-20 text-center flex flex-col items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center mb-4 text-gray-400">
+            <BiHeadphone size={32} className="text-[#f43f5e]" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-1">No results found for &ldquo;{decodedTitle}&rdquo;</h3>
+          <p className="text-sm text-gray-400 max-w-md">
+            Please check your spelling or search for another track, artist, or album.
+          </p>
+        </div>
+      )}
+
+      {songResults.length > 0 && (
+      /* Songs Section */
       <div className="mt-8">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
           Songs
@@ -153,6 +167,8 @@ const SearchResultsPage = ({ params }) => {
           <p className="text-gray-400 text-sm">No songs found.</p>
         )}
       </div>
+
+      )}
 
       {/* Albums Section */}
       {albumResults.length > 0 && (

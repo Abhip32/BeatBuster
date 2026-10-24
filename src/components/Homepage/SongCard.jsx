@@ -107,8 +107,11 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
               song?.image?.[2]?.url ||
               song?.image?.[1]?.url ||
               song?.image?.[0]?.url ||
-              ""
+              "/images/vinyl.png"
             }
+            onError={(e) => {
+              e.currentTarget.src = "/images/vinyl.png";
+            }}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
 

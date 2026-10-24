@@ -8,8 +8,12 @@ import BulkDownloadButton from "./BulkDownloadButton";
 
 const PlayButton = ({ songList }) => {
   const dispatch = useDispatch();
+  const songs = Array.isArray(songList?.songs) ? songList.songs : [];
+
+  if (songs.length === 0) return null;
+
   const handlePlayClick = (song, index) => {
-    dispatch(setActiveSong({ song, data: songList?.songs, i: index }));
+    dispatch(setActiveSong({ song, data: songs, i: index }));
     dispatch(playPause(true));
   };
 

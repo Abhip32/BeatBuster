@@ -122,10 +122,9 @@ const FullscreenTrack = ({
               src={
                 activeSong?.image?.[2]?.url ||
                 activeSong?.image?.[1]?.url ||
-                activeSong?.image?.[0]?.url ||
-                ""
-              }
+                activeSong?.image?.[0]?.url || "/images/vinyl.png"}
               alt="cover art"
+              onError={(e) => { e.currentTarget.src = "/images/vinyl.png"; }}
               className="w-full h-full object-cover rounded-2xl select-none"
             />
           </div>

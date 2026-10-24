@@ -19,11 +19,19 @@ const Player = ({
 }) => {
   const ref = useRef(null);
 
-  const audioSource =
-    activeSong?.downloadUrl?.[4]?.url ||
-    activeSong?.downloadUrl?.[3]?.url ||
-    activeSong?.downloadUrl?.[2]?.url ||
-    null;
+  const audioSource = useMemo(() => {
+    if (!activeSong) return null;
+    if (typeof activeSong.downloadUrl === "string") return activeSong.downloadUrl;
+    if (Array.isArray(activeSong.downloadUrl) && activeSong.downloadUrl.length > 0) {
+      // Find highest quality available in reverse order
+      for (let i = activeSong.downloadUrl.length - 1; i >= 0; i--) {
+        const entry = activeSong.downloadUrl[i];
+        const link = typeof entry === "string" ? entry : entry?.url || entry?.link;
+        if (link) return link;
+      }
+    }
+    return activeSong.media_url || activeSong.url || null;
+  }, [activeSong]);
 
   useEffect(() => {
     const audio = ref.current;
@@ -110,6 +118,9 @@ const Player = ({
       onEnded={onEnded}
       onTimeUpdate={onTimeUpdate}
       onLoadedData={onLoadedData}
+      onError={() => {
+        console.warn("Audio stream failed to load or is unavailable");
+      }}
     />
   );
 };

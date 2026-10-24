@@ -43,9 +43,12 @@ const ListenAgainCard = ({ song, index, SongData }) => {
               song?.image?.[2]?.url ||
               song?.image?.[1]?.url ||
               song?.image?.[2]?.link ||
-              ""
+              "/images/vinyl.png"
             }
             alt={song?.name || "cover"}
+            onError={(e) => {
+              e.currentTarget.src = "/images/vinyl.png";
+            }}
             width={48}
             height={48}
             className="object-cover w-full h-full"

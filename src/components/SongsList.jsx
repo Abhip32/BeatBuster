@@ -275,9 +275,12 @@ const SongsList = ({
                     song?.image?.[2]?.url ||
                     song?.image?.[1]?.url ||
                     song?.image?.[0]?.url ||
-                    ""
+                    "/images/vinyl.png"
                   }
                   alt={song?.name || "cover"}
+                  onError={(e) => {
+                    e.currentTarget.src = "/images/vinyl.png";
+                  }}
                   width={40}
                   height={40}
                   className="w-10 h-10 rounded-lg object-cover flex-shrink-0 bg-[#18181f] shadow-sm"

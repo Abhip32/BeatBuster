@@ -32,6 +32,26 @@ const AlbumPage = ({ params }) => {
     return <PlaylistSkeleton type="album" count={8} />;
   }
 
+  if (!albumData) {
+    return (
+      <div className="w-11/12 max-w-7xl mx-auto py-24 text-center flex flex-col items-center justify-center">
+        <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center mb-4">
+          <img src="/images/logo.png" alt="Musify" className="w-10 h-10 rounded-full opacity-60" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Album Not Found</h2>
+        <p className="text-sm text-gray-400 max-w-md mb-6">
+          The requested album could not be loaded or may no longer be available.
+        </p>
+        <Link
+          href="/"
+          className="px-6 py-2.5 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold text-sm shadow-lg shadow-rose-500/25 transition-all"
+        >
+          Explore Music
+        </Link>
+      </div>
+    );
+  }
+
   const coverUrl =
     albumData?.image?.[2]?.url ||
     albumData?.image?.[1]?.url ||

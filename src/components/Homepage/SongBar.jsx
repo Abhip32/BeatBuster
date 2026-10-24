@@ -59,8 +59,11 @@ const SongBar = ({ playlist, i }) => {
               playlist?.image?.[1]?.link ||
               playlist?.image?.[2]?.url ||
               playlist?.image?.[0]?.url ||
-              ""
+              "/images/vinyl.png"
             }
+            onError={(e) => {
+              e.currentTarget.src = "/images/vinyl.png";
+            }}
             className="w-14 h-14 rounded-xl object-cover shadow-md flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
