@@ -1,70 +1,101 @@
-'use client'
-import React from 'react'
-import { signOut, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation';
-import { getUserInfo } from '@/services/dataAPI';
-import { MdLogout } from 'react-icons/md';
-import { useState } from 'react';
-import { useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { getUserInfo } from "@/services/dataAPI";
+import { MdLogout } from "react-icons/md";
+import { FaUserCircle } from "react-icons/fa";
 
+const Profile = ({ setShowNav }) => {
+  const router = useRouter();
+  const { status, data } = useSession();
+  const [user, setUser] = useState(null);
 
-const Profile = ({setShowNav}) => {
-    const router = useRouter();
-    const {status, data} = useSession();
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUserInfo();
+        setUser(res);
+      } catch {
+        setUser(null);
+      }
+    };
+    if (status === "authenticated") {
+      fetchUser();
+    }
+  }, [status]);
 
-    
-    const [user, setUser] = useState(null);
-    useEffect(() => {
-        const fetchUser = async () => {
-            const res = await getUserInfo();
-            // console.log('user',res);
-            setUser(res);
-        }
-        fetchUser();
-    }, [status]);
+  if (status === "loading") {
+    return (
+      <div className="px-3 py-3 border-b border-white/[0.08] flex items-center gap-3 animate-pulse">
+        <div className="w-9 h-9 rounded-full bg-white/10" />
+        <div className="h-3 bg-white/10 rounded w-24" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="px-3 py-3 border-b border-white/[0.08] flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setShowNav(false);
+            router.push("/login");
+          }}
+          className="flex-1 py-2 px-3 text-xs font-bold rounded-full bg-[#a855f7] text-black hover:bg-[#c084fc] hover:shadow-[0_0_15px_rgba(168, 85, 247,0.35)] transition-all text-center cursor-pointer"
+        >
+          Log In
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowNav(false);
+            router.push("/signup");
+          }}
+          className="flex-1 py-2 px-3 text-xs font-semibold rounded-full border border-white/20 text-white hover:bg-white/10 transition-all text-center cursor-pointer"
+        >
+          Sign Up
+        </button>
+      </div>
+    );
+  }
+
+  const displayName = user?.userName || data?.user?.name || "Music Lover";
+  const displayImage = user?.imageUrl || data?.user?.image;
+
   return (
-    <div className=' text-white'>
-        {
-        status === 'loading' ? <div className=' ml-16'> <span className="loading"></span> </div> :
-            <div>
-                {
-                    status === 'unauthenticated' ? 
-                    (
-                        <div className=' flex gap-2 ml-5'>
-                            <button onClick={()=>{
-                                setShowNav(false);
-                                router.push('/login');
-                            }} className=' border-2 border- px-3 py-1 m-2 rounded text-lg  border-[#d3abfb]'>
-                            Login&nbsp;
-                            </button>
-                            <button onClick={()=>{
-                                setShowNav(false);
-                                router.push('/signup');
-                            }} className=' border-2 border- px-3 py-1 m-2 rounded text-lg  border-[#d3abfb]'>
-                            Signup
-                            </button>
-                        </div>
-                    ):
-                    (
-                        <div className=' flex gap-4 ml-1'>
-                            <img src={data?.imageUrl || user?.imageUrl} alt='user' width={50} height={50} className='rounded-full' />
-                            <div className='flex flex-col gap-1 w-full truncate'>
-                                <div className='flex justify-between items-center'>
-                            <h1 className='text-lg font-semibold'>{data?.userName || user?.userName}</h1>
-                            <MdLogout size={20} onClick={()=>{
-                                setShowNav(false);
-                                signOut();
-                            }} className='cursor-pointer text-white hover:text-[#d3abfb]' />
-                            </div>
-                            <h2 className='text-[10px] truncate'>{data?.user?.email || user?.email }</h2>
-                            </div>
-                        </div>
-                    )
-                }
-            </div>
-        }
+    <div className="px-3 py-3 border-b border-white/[0.08] flex items-center justify-between">
+      <div className="flex items-center gap-2.5 min-w-0">
+        {displayImage ? (
+          <img
+            src={displayImage}
+            alt={displayName}
+            className="w-8 h-8 rounded-full object-cover border border-[#a855f7]/50 shadow-[0_0_10px_rgba(168, 85, 247,0.2)]"
+          />
+        ) : (
+          <FaUserCircle className="w-8 h-8 text-gray-400" />
+        )}
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-white truncate">{displayName}</p>
+          <span className="text-[10px] font-semibold text-[#a855f7] bg-[#a855f7]/10 px-1.5 py-0.2 rounded border border-[#a855f7]/30">
+            Free Plan
+          </span>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          signOut();
+          setShowNav(false);
+        }}
+        title="Log out"
+        className="p-1.5 rounded-full text-gray-400 hover:text-red-400 hover:bg-white/10 transition-colors"
+      >
+        <MdLogout size={18} />
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

@@ -1,10 +1,6 @@
+import React from "react";
+import PlaylistSkeleton from "@/components/Skeletons/PlaylistSkeleton";
 
-const loading = () => {
-  return (
-    <div className=' w-screen h-screen flex justify-center items-center'>
-        <span class="loader"></span>
-    </div>
-  )
+export default function Loading() {
+  return <PlaylistSkeleton type="album" count={8} />;
 }
-
-export default loading

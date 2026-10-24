@@ -8,6 +8,7 @@ const initialState = {
   activeSong: {},
   fullScreen: false,
   autoAdd: false,
+  openedByClick: false,
 };
 
 const playerSlice = createSlice({
@@ -34,28 +35,28 @@ const playerSlice = createSlice({
       state.currentSongs = action.payload.data;
       }
 
-      if(action.payload.i){
+      if(action.payload.i !== undefined){
       state.currentIndex = action.payload.i;
       }
       state.isActive = true;
+      state.openedByClick = true;
     },
 
     nextSong: (state, action) => {
-
       if(state.currentSongs.length>0){
-      state.activeSong = state.currentSongs[action.payload];
-    
-      state.currentIndex = action.payload;
-      state.isActive = true;
+        state.activeSong = state.currentSongs[action.payload];
+        state.currentIndex = action.payload;
+        state.isActive = true;
+        state.openedByClick = false;
       }
     },
 
     prevSong: (state, action) => {
-
       if(state.currentSongs.length>0){
-      state.activeSong = state.currentSongs[action.payload];
-      state.currentIndex = action.payload;
-      state.isActive = true;
+        state.activeSong = state.currentSongs[action.payload];
+        state.currentIndex = action.payload;
+        state.isActive = true;
+        state.openedByClick = false;
       }
     },
 
@@ -71,20 +72,20 @@ const playerSlice = createSlice({
       state.autoAdd = action.payload;
     },
 
+    resetOpenedByClick: (state) => {
+      state.openedByClick = false;
+    },
+
     deleteSong: (state, action) => {
       const songIdToDelete = action.payload;
 
-      // Filter out the song with the specified ID
       state.currentSongs = state.currentSongs.filter(song => song.id !== songIdToDelete);
-      
 
-      // If the deleted song was the active song, reset the activeSong and isActive state
       if (state.activeSong === songIdToDelete) {
         state.activeSong = {};
         state.isActive = false;
       }
 
-      // If the deleted song was the only song or the last song in the playlist, reset currentIndex
       if (state.currentSongs.length === 0) {
         state.currentIndex = 0;
       } else if (state.currentIndex >= state.currentSongs.length) {
@@ -93,22 +94,26 @@ const playerSlice = createSlice({
     },
     addToQueue: (state, action) => {
       const newSong = action.payload.song;
-      console.log(newSong);
-      // Check if the song is already in the queue
       const isSongInQueue = state.currentSongs.some(song => song.id === newSong.id);
       
       if (!isSongInQueue) {
-        // If the song is not in the queue, add it
         state.currentSongs = [...state.currentSongs, newSong];
-        state.fullScreen = true;
       }
       state.fullScreen = true;
     }
-    
-   
   },
 });
 
-export const { setActiveSong, nextSong, prevSong, playPause, setFullScreen, setAutoAdd,deleteSong,addToQueue } = playerSlice.actions;
+export const {
+  setActiveSong,
+  nextSong,
+  prevSong,
+  playPause,
+  setFullScreen,
+  setAutoAdd,
+  resetOpenedByClick,
+  deleteSong,
+  addToQueue
+} = playerSlice.actions;
 
 export default playerSlice.reducer;

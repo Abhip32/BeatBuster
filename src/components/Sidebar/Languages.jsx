@@ -1,87 +1,74 @@
 "use client";
-import React, { use } from "react";
-import { FaChevronDown } from "react-icons/fa";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setLanguages } from "@/redux/features/languagesSlice";
-import { useEffect } from "react";
+import { HiChevronDown } from "react-icons/hi2";
 
 const Languages = () => {
   const dispatch = useDispatch();
   const { languages } = useSelector((state) => state.languages);
   const [selectedLanguages, setSelectedLanguages] = useState([...languages]);
-
-  useEffect(() => {
-    const lang = localStorage?.getItem("languages")
-      ? JSON.parse(localStorage.getItem("languages"))
-      : [...languages];
-    setSelectedLanguages(lang);
-  }, []);
+  const [isOpen, setIsOpen] = useState(false);
 
   const languageList = [
     { id: "english", label: "English" },
-    { id: "haryanvi", label: "Haryanvi" },
-    { id: "punjabi", label: "Punjabi" },
     { id: "hindi", label: "Hindi" },
+    { id: "punjabi", label: "Punjabi" },
+    { id: "haryanvi", label: "Haryanvi" },
     { id: "rajasthani", label: "Rajasthani" },
     { id: "tamil", label: "Tamil" },
     { id: "telugu", label: "Telugu" },
-    { id: "odia", label: "Odia" },
-    // Add more languages as needed
+    { id: "bhojpuri", label: "Bhojpuri" },
   ];
 
-  const handleLanguageChange = (event) => {
-    const { value, checked } = event.target;
+  const handleLanguageToggle = (id) => {
     let updatedLanguages;
-
-    if (checked) {
-      updatedLanguages = [...selectedLanguages, value];
+    if (selectedLanguages.includes(id)) {
+      updatedLanguages = selectedLanguages.filter((lang) => lang !== id);
     } else {
-      updatedLanguages = selectedLanguages.filter((lang) => lang !== value);
+      updatedLanguages = [...selectedLanguages, id];
     }
-
     setSelectedLanguages(updatedLanguages);
     dispatch(setLanguages(updatedLanguages));
-    localStorage.setItem("languages", JSON.stringify(updatedLanguages));
   };
 
   return (
-    <div className=" text-white pt-5 m-2 rounded-md w-[95%] hover:bg-white/5">
-      <details className="text-white detailanimatation">
-        <summary className=" flex cursor-pointer gap-3 items-baseline mx-2">
-          <FaChevronDown className="arrow " />
-          <div>
-            <p className=" font-semibold text-lg">Languages</p>
-            <p className=" text-[9px] mb-7">Pick which you like to listen</p>
-          </div>
-        </summary>
-        <form className=" grid grid-cols-2 mb-1 h-28 overflow-y-scroll overflow-x-hidden hideScrollBar">
-          {languageList.map((language) => (
-            <div key={language.id} className="flex items-center mb-3 mx-2 ml-5">
-              <input
-                type="checkbox"
-                id={language.id}
-                name="language"
-                value={language.id}
-                checked={selectedLanguages.includes(language.id)}
-                onChange={handleLanguageChange}
-                className="hidden"
-              />
-              <label
-                htmlFor={language.id}
-                className={`${
-                  selectedLanguages.includes(language.id)
-                    ? "border-[#d3abfb] text-[#d3abfb]"
-                    : "border-white text-white"
-                } cursor-pointer transition-colors text-sm min-w-[86px] text-center  border rounded-md p-2 font-semibold`}
+    <div className="py-2 border-t border-white/[0.08]">
+      <div
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex items-center justify-between px-3 py-2 cursor-pointer text-gray-300 hover:text-white transition-colors select-none rounded-lg hover:bg-white/[0.04]"
+      >
+        <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+          Languages ({selectedLanguages.length})
+        </span>
+        <HiChevronDown
+          className={`text-sm text-gray-400 transition-transform duration-200 ${
+            isOpen ? "rotate-180 text-[#a855f7]" : ""
+          }`}
+        />
+      </div>
+
+      {isOpen && (
+        <div className="px-2 py-2 flex flex-wrap gap-1.5 animate-in fade-in duration-150">
+          {languageList.map((lang) => {
+            const isSelected = selectedLanguages.includes(lang.id);
+            return (
+              <button
+                type="button"
+                key={lang.id}
+                onClick={() => handleLanguageToggle(lang.id)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium ${
+                  isSelected
+                    ? "bg-[#a855f7] text-black border-[#a855f7] font-bold shadow-[0_0_12px_rgba(168, 85, 247,0.4)]"
+                    : "border-white/10 text-gray-300 hover:text-white hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.08]"
+                }`}
               >
-                {language.label}
-              </label>
-            </div>
-          ))}
-        </form>
-      </details>
+                {lang.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

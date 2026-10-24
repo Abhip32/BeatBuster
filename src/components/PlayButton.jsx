@@ -1,23 +1,37 @@
-'use client'
-import React from 'react'
-import { useDispatch } from 'react-redux';
-import { BsFillPlayFill } from 'react-icons/bs';
+"use client";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { BsFillPlayFill } from "react-icons/bs";
 
 import { playPause, setActiveSong } from "@/redux/features/playerSlice";
-const PlayButton = ({ songList }) => {
-    const dispatch = useDispatch();
-    const handlePlayClick = (song, index) => {
-        dispatch(setActiveSong({ song, data: songList?.songs, i: index }));
-        dispatch(playPause(true));
-    };
-    return (
-        <div
-            onClick={() => { handlePlayClick(songList?.songs?.[0], 0); }}
-            className="flex items-center gap-2 mt-5 rounded-3xl py-2 px-3 hover:border-[#d3abfb] group w-fit cursor-pointer border border-white">
-            <BsFillPlayFill size={25} className="text-gray-200 group-hover:text-[#d3abfb]" />
-            <p className="text-lg font-semibold">Play</p>
-        </div>
-    )
-}
+import BulkDownloadButton from "./BulkDownloadButton";
 
-export default PlayButton
+const PlayButton = ({ songList }) => {
+  const dispatch = useDispatch();
+  const handlePlayClick = (song, index) => {
+    dispatch(setActiveSong({ song, data: songList?.songs, i: index }));
+    dispatch(playPause(true));
+  };
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 mt-6">
+      <button
+        type="button"
+        onClick={() => {
+          handlePlayClick(songList?.songs?.[0], 0);
+        }}
+        className="group relative flex h-13 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 px-7 py-3 text-white font-extrabold text-base tracking-wide shadow-[0_8px_24px_rgba(168,85,247,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+      >
+        <BsFillPlayFill
+          size={24}
+          className="text-white transition-transform duration-200 group-hover:scale-110"
+        />
+        <span>Play</span>
+      </button>
+
+      <BulkDownloadButton songList={songList} />
+    </div>
+  );
+};
+
+export default PlayButton;

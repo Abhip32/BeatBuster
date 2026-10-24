@@ -1,12 +1,12 @@
 {
-    "theme_color": "#000",
-    "background_color": "#000",
+    "theme_color": "#0d0b14",
+    "background_color": "#0d0b14",
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "BeatBuster",
+    "name": "Musify",
     "description": "Music streaming and downloading platform.",
-    "short_name": "BeatBuster",
+    "short_name": "Musify",
     "icons": [
         {
             "src": "/icon-192x192.png",

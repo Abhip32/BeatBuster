@@ -1,11 +1,6 @@
-import React from 'react'
+import React from "react";
+import AuthSkeleton from "@/components/Skeletons/AuthSkeleton";
 
-const loading = () => {
-  return (
-    <div className=' w-screen h-screen flex justify-center items-center'>
-        <span className="loader"></span>
-    </div>
-  )
+export default function Loading() {
+  return <AuthSkeleton />;
 }
-
-export default loading

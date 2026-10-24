@@ -1,11 +1,6 @@
-import React from 'react'
+import React from "react";
+import ArtistSkeleton from "@/components/Skeletons/ArtistSkeleton";
 
-const loading = () => {
-  return (
-    <div className=' w-screen h-screen flex justify-center items-center'>
-        <span className="loader"></span>
-    </div>
-  )
+export default function Loading() {
+  return <ArtistSkeleton />;
 }
-
-export default loading

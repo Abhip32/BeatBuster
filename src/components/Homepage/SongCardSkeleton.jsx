@@ -1,23 +1,22 @@
-import React from 'react'
+import React from "react";
 
 const SongCardSkeleton = () => {
   return (
-    <div className=' flex gap-3 lg:gap-6 overflow-hidden'>{
-    Array(6).fill().map((_, i) => (
-    <div key={i} className="flex flex-col lg:w-[205px] p-2 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup rounded-lg cursor-pointer">
-    <div role="status" className="animate-pulse">
-      <div className="flex items-center justify-center h-24  md:h-[180px] rounded-lg dark:bg-gray-800">
-       
-      </div>
-      <div className="w-full mt-3">
-        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-16 mb-2"></div>
-        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-800 w-28"></div>
-      </div>
+    <div className="flex gap-4 lg:gap-6 overflow-hidden w-full">
+      {Array(6)
+        .fill(0)
+        .map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col flex-shrink-0 w-36 sm:w-44 lg:w-[200px] p-3 rounded-2xl bg-white/[0.03] backdrop-blur-md border border-white/[0.06] shadow-lg"
+          >
+            <div className="w-full aspect-square rounded-xl shimmer mb-3" />
+            <div className="h-4 w-4/5 rounded-md shimmer mb-2" />
+            <div className="h-3 w-1/2 rounded-md shimmer-dark" />
+          </div>
+        ))}
     </div>
-  </div>
-    ))
-    }</div>
-  )
-}
+  );
+};
 
-export default SongCardSkeleton
+export default SongCardSkeleton;

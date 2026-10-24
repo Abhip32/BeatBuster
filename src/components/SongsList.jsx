@@ -1,15 +1,16 @@
 "use client";
-import React from "react";
-import { playPause, setActiveSong, setFullScreen,deleteSong,addToQueue } from "@/redux/features/playerSlice";
-import { BsPlayFill } from "react-icons/bs";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { playPause, setActiveSong } from "@/redux/features/playerSlice";
+import { BsPlayFill, BsPauseFill } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
 import SongListSkeleton from "./SongListSkeleton";
 import { BiHeadphone } from "react-icons/bi";
-import { useSelector } from "react-redux";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
-import { useState } from "react";
-import { addSongToPlaylist, deleteSongFromPlaylist, getUserPlaylists } from '@/services/playlistApi';
-import { useEffect } from "react";
+import {
+  addSongToPlaylist,
+  deleteSongFromPlaylist,
+  getUserPlaylists,
+} from "@/services/playlistApi";
 import { toast } from "react-hot-toast";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 
@@ -21,195 +22,258 @@ const SongsList = ({
   playlistID,
   setSongs,
 }) => {
-  console.log("SongData", SongData);
-  const { activeSong } = useSelector((state) => state.player);
-  const [showMenu, setShowMenu] = useState(false);
+  const { activeSong, isPlaying } = useSelector((state) => state.player);
+  const [showMenu, setShowMenu] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const dispatch = useDispatch();
-  const fullScreenMode=useSelector(state=>state.player.fullScreen)
 
   const handlePlayClick = (song, index) => {
-    if(isUserPlaylist===true)
-    {
-      dispatch(setActiveSong({ song,data:SongData,i: index }));
-    }
-    else
-    {
-      dispatch(setActiveSong({ song,i: index }));
-    }
-  
-    dispatch(setFullScreen(true));
+    dispatch(setActiveSong({ song, data: SongData, i: index }));
     dispatch(playPause(true));
   };
 
-  function formatDuration(durationInSeconds) {
+  const formatDuration = (durationInSeconds) => {
+    if (!durationInSeconds) return "0:00";
     const minutes = Math.floor(durationInSeconds / 60);
     const seconds = Math.round(durationInSeconds % 60);
-
-    if (minutes > 0) {
-      return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-    } else {
-      return `${seconds}`;
-    }
-  }
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     const getPlaylists = async () => {
-      const res = await getUserPlaylists();
-      if (res?.success == true) {
-        setPlaylists(res?.data?.playlists);
-      }
+      try {
+        const res = await getUserPlaylists();
+        if (res?.success === true) {
+          setPlaylists(res?.data?.playlists || []);
+        }
+      } catch {}
     };
     getPlaylists();
   }, []);
 
-  // add song to playlist
-   // add song to playlist
-   const handleAddToPlaylist = async (song, playlistID) => {
-    setShowMenu(false);
-    const res = await addSongToPlaylist(playlistID, song);
-    if (res?.success == true) {
-      toast.success(res?.message)
-    }
-    else {
-      toast.error(res?.message)
-    }
-  }
-
-  const handleDeleteFromQueue = async (songId) => {
-    const storedSongHistory = localStorage?.getItem("songHistory");
-    const parsedSongHistory = storedSongHistory ? JSON.parse(storedSongHistory) : [];
-    if (parsedSongHistory?.find((song) => song?.id === songId)) {
-      const updatedHistory = parsedSongHistory.filter((song) => song?.id !== songId);
-      const songHistory = [...updatedHistory];
-      localStorage.setItem("songHistory", JSON.stringify(songHistory));
-      
-      // Dispatch the deleteSong action to update Redux state
-      dispatch(deleteSong(songId));
-      toast.success("Song removed successfully")
-    }
-    else
-    {
-      dispatch(deleteSong(songId));
-      toast.success("Song removed successfully")
+  const handleAddToPlaylist = async (song, pId) => {
+    setShowMenu(null);
+    try {
+      const res = await addSongToPlaylist(pId, song);
+      if (res?.success === true) {
+        toast.success(res?.message || "Added to playlist");
+      } else {
+        toast.error(res?.message || "Could not add");
+      }
+    } catch {
+      toast.error("An error occurred");
     }
   };
 
-  // delete song from playlist
-  const handleDeleteFromPlaylist = async (playlistID, song) => {
-    setShowMenu(false);
-    const res = await deleteSongFromPlaylist(playlistID, song);
-    if (res?.success == true) {
-      setSongs(
-        (prev) => {
-          return prev.filter((s) => s?.id?.toString() !== song.toString())
+  const handleDeleteFromPlaylist = async (pId, song) => {
+    setShowMenu(null);
+    try {
+      const res = await deleteSongFromPlaylist(pId, song);
+      if (res?.success === true) {
+        if (setSongs) {
+          setSongs((prev) =>
+            prev.filter((s) => s?.id?.toString() !== song?.toString()),
+          );
         }
-      )
-      toast.success(res?.message)
+        toast.success(res?.message || "Removed from playlist");
+      } else {
+        toast.error(res?.message || "Could not remove");
+      }
+    } catch {
+      toast.error("An error occurred");
     }
-    else {
-      toast.error(res?.message)
-    }
+  };
+
+  if (loading) {
+    return <SongListSkeleton />;
+  }
+
+  if (!Array.isArray(SongData) || SongData.length === 0) {
+    return (
+      <div className="py-12 text-center text-gray-400">
+        No songs found in this list.
+      </div>
+    );
   }
 
   return (
     <>
-      <div className="mt-5">
-        {!loading && SongData?.length > 0 ? (
-          SongData?.map((song, index) => (
+      <div className="mt-4 flex flex-col gap-1">
+        {/* Spotify Table Header */}
+        <div className="hidden sm:grid grid-cols-12 px-4 py-2 border-b border-white/[0.08] text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+          <div className="col-span-1 text-center">#</div>
+          <div className="col-span-6 md:col-span-7">Title</div>
+          {!hidePlays && (
+            <div className="hidden lg:block lg:col-span-2">Plays</div>
+          )}
+          <div
+            className={`${hidePlays ? "col-span-4 md:col-span-3" : "col-span-4 md:col-span-2"} text-right pr-6`}
+          >
+            Duration
+          </div>
+        </div>
+
+        {SongData.map((song, index) => {
+          const isThisActive =
+            activeSong?.id === song?.id ||
+            (activeSong?.name && activeSong?.name === song?.name);
+
+          const artistName =
+            (Array.isArray(song?.artists?.primary) &&
+              song.artists.primary.map((a) => a?.name).join(", ")) ||
+            (Array.isArray(song?.artists) &&
+              song.artists.map((a) => a?.name).join(", ")) ||
+            (typeof song?.artists === "string" ? song.artists : "") ||
+            song?.primaryArtists ||
+            "";
+
+          return (
             <div
-              key={song?.id}
-              onClick={() => {
-                handlePlayClick(song, index);
-              }}
-              className={`flex items-center mt-5 cursor-pointer group border-b-[1px] border-gray-400 justify-between ${
-                activeSong?.id === song?.id && " text-[#d3abfb]"
+              key={song?.id || index}
+              onClick={() => handlePlayClick(song, index)}
+              className={`group grid grid-cols-12 items-center px-3 sm:px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+                isThisActive
+                  ? "bg-white/[0.08] border border-[#a855f7]/30 shadow-md"
+                  : "hover:bg-white/[0.05] border border-transparent"
               }`}
             >
-              <div className="flex items-center gap-5">
-                <div className=" relative mb-3">
-                  <img
-                    src={song?.image?.[2]?.url}
-                    alt={song?.name}
-                    width={50}
-                    height={50}
-                    className=""
-                  />
-                  {activeSong?.id === song?.id ? (
+              {/* Index / Play indicator */}
+              <div className="col-span-2 sm:col-span-1 flex items-center justify-center">
+                {isThisActive ? (
+                  isPlaying ? (
                     <BiHeadphone
-                      size={27}
-                      className=" absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#d3abfb]"
+                      size={22}
+                      className="text-[#a855f7] animate-pulse"
                     />
                   ) : (
+                    <BsPauseFill size={20} className="text-[#a855f7]" />
+                  )
+                ) : (
+                  <>
+                    <span className="group-hover:hidden text-xs font-bold text-gray-400">
+                      {index + 1}
+                    </span>
                     <BsPlayFill
-                      size={25}
-                      className=" group-hover:block hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-200"
+                      size={20}
+                      className="hidden group-hover:block text-white"
                     />
-                  )}
-                </div>
-                <div className=" w-24 md:w-64">
-                  <p className="text-sm lg:text-lg font-semibold truncate">
-                    {song?.name
-                      ?.replace("&#039;", "'")
-                      ?.replaceAll("&amp;", "&")}
-                  </p>
-                  <p className="text-gray-400 truncate text-xs">
-                    {song?.artists?.primary
-                      ?.map((artist) => artist.name)
-                      .join(", ")}
-                  </p>
-                </div>
-              </div>
-              <div
-                className={`hidden w-36 ${
-                  hidePlays ? "lg:hidden" : "lg:block"
-                }`}
-              >
-                {song?.playCount && (
-                  <p className="text-gray-400">{song?.playCount} plays</p>
+                  </>
                 )}
               </div>
-              <div className="flex items-center gap-3">
-                <p>{formatDuration(song?.duration)}</p>
-                <div className=' flex gap-2 items-center relative'>
-                  { fullScreenMode?<button onClick={(e) => { e.stopPropagation(); handleDeleteFromQueue(song?.id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'><MdOutlineDeleteOutline size={20} color={'red'} /> </button>:null}
-                    <PiDotsThreeVerticalBold onClick={(e) => { e.stopPropagation(); setShowMenu(song?.id) }} size={25} className=' text-gray-300' />
-                    {
-                      showMenu === song?.id &&
-                      <div
-                        onClick={() => { setShowMenu(false); }}
-                        className='absolute text-white top-0 right-0 bg-black/50 bg-opacity-80 backdrop-blur-sm rounded-lg p-3 w-32 flex flex-col gap-2 z-40'>
-                          {!fullScreenMode?<button onClick={(e) => { e.stopPropagation(); dispatch(addToQueue({song:song})) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>Add to Queue</button>:null}
-                        <p className='text-sm font-semibold flex gap-1 empty:hidden border-b border-white items-center'>{
-                          isUserPlaylist ? null : 'Add to playlist'
-                        }</p>
-                        {
-                          isUserPlaylist ?
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteFromPlaylist(playlistID, song?.id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'><MdOutlineDeleteOutline size={20} /> Remove</button>
-                            :
-                            playlists?.length > 0 ?
-                              playlists?.map((playlist, index) => (
-                                <button key={index} onClick={(e) => { e.stopPropagation(); handleAddToPlaylist(song?.id, playlist._id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>{playlist?.name}</button>
-                              ))
-                              :
-                              <p className='text-sm font-semibold flex gap-1 items-center'>No Playlist</p>
-                        }
-                      </div>
-                    }
-                  </div>
+
+              {/* Title & Artist */}
+              <div className="col-span-7 sm:col-span-6 md:col-span-7 flex items-center gap-3 min-w-0 pr-2">
+                <img
+                  src={
+                    song?.image?.[2]?.url ||
+                    song?.image?.[1]?.url ||
+                    song?.image?.[0]?.url ||
+                    ""
+                  }
+                  alt={song?.name || "cover"}
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-lg object-cover flex-shrink-0 bg-[#18181f] shadow-sm"
+                />
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={`text-sm font-semibold truncate transition-colors ${
+                      isThisActive
+                        ? "text-[#a855f7]"
+                        : "text-white group-hover:text-white"
+                    }`}
+                  >
+                    {song?.name
+                      ?.replaceAll("&#039;", "'")
+                      ?.replaceAll("&amp;", "&")}
+                  </p>
+                  <p className="text-xs text-[#b3b3b3] truncate mt-0.5 group-hover:text-gray-300">
+                    {artistName}
+                  </p>
+                </div>
+              </div>
+
+              {/* Plays count */}
+              {!hidePlays && (
+                <div className="hidden lg:block lg:col-span-2 text-xs text-gray-400">
+                  {song?.playCount
+                    ? Number(song.playCount).toLocaleString()
+                    : "-"}
+                </div>
+              )}
+
+              {/* Duration & Options Menu */}
+              <div className="col-span-3 sm:col-span-5 md:col-span-4 lg:col-span-2 flex items-center justify-end gap-2 text-xs text-gray-400">
+                <span className="font-mono">
+                  {formatDuration(song?.duration)}
+                </span>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(showMenu === song?.id ? null : song?.id);
+                    }}
+                    className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <PiDotsThreeVerticalBold size={18} />
+                  </button>
+
+                  {showMenu === song?.id && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 top-8 z-50 w-44 rounded-xl border border-white/15 bg-[#18181f]/95 backdrop-blur-2xl p-2 shadow-2xl text-white text-xs animate-fadeIn"
+                    >
+                      {isUserPlaylist ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDeleteFromPlaylist(playlistID, song?.id)
+                          }
+                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-red-500/20 text-red-400 flex items-center gap-2 transition-colors font-medium"
+                        >
+                          <MdOutlineDeleteOutline size={16} /> Remove from
+                          playlist
+                        </button>
+                      ) : (
+                        <>
+                          <div className="px-3 py-1 text-[10px] text-gray-400 uppercase font-bold tracking-wider border-b border-white/10 mb-1">
+                            Add to Playlist
+                          </div>
+                          {playlists?.length > 0 ? (
+                            playlists.map((pl) => (
+                              <button
+                                key={pl._id}
+                                type="button"
+                                onClick={() =>
+                                  handleAddToPlaylist(song?.id, pl._id)
+                                }
+                                className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 text-gray-200 hover:text-white transition-colors truncate"
+                              >
+                                {pl.name}
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-3 py-2 text-gray-500 italic">
+                              No personal playlists
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          ))
-        ) : (
-          <SongListSkeleton />
-        )}
+          );
+        })}
       </div>
-      {/* overlay */}
+
       {showMenu && (
         <div
-          onClick={() => setShowMenu(false)}
-          className="fixed top-0 left-0 w-full h-full z-30"
-        ></div>
+          onClick={() => setShowMenu(null)}
+          className="fixed inset-0 z-40 bg-transparent"
+        />
       )}
     </>
   );

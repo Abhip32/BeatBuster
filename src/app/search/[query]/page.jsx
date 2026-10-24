@@ -1,31 +1,32 @@
-"use client"
-import SwiperLayout from '@/components/Homepage/Swiper';
-import SongCard from '@/components/Homepage/SongCard';
-import { getSearchedData, getSongData } from '@/services/dataAPI';
-import React, { useEffect } from 'react';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { SwiperSlide } from 'swiper/react';
-import { BsPlayFill } from 'react-icons/bs';
-import { useDispatch } from 'react-redux';
-import Image from 'next/image';
-import Link from 'next/link';
-import SongListSkeleton from '@/components/SongListSkeleton';
-import { setProgress } from '@/redux/features/loadingBarSlice';
-import { PiDotsThreeVerticalBold } from 'react-icons/pi';
-import { addSongToPlaylist, getUserPlaylists } from '@/services/playlistApi';
-import { toast } from 'react-hot-toast';
-import { playPause, setActiveSong, setFullScreen, addToQueue } from "@/redux/features/playerSlice";
+"use client";
+import React, { useEffect, useState } from "react";
+import SwiperLayout from "@/components/Homepage/Swiper";
+import SongCard from "@/components/Homepage/SongCard";
+import { getSearchedData, getSongData } from "@/services/dataAPI";
+import { useSelector, useDispatch } from "react-redux";
+import { SwiperSlide } from "swiper/react";
+import { BsPlayFill } from "react-icons/bs";
+import { playPause, setActiveSong } from "@/redux/features/playerSlice";
+import Link from "next/link";
+import SongListSkeleton from "@/components/SongListSkeleton";
+import SearchSkeleton from "@/components/Skeletons/SearchSkeleton";
+import { setProgress } from "@/redux/features/loadingBarSlice";
+import { useParams } from "next/navigation";
 
-const Page = ({ params }) => {
+const SearchResultsPage = ({ params }) => {
+  const routeParams = useParams();
+  const rawQuery = routeParams?.query || params?.query || "";
   const dispatch = useDispatch();
-  const [query, setQuery] = useState(params.query);
+  const [query, setQuery] = useState(rawQuery);
   const [searchedData, setSearchedData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { currentSongs } = useSelector(state => state.player);
-  const [showMenu, setShowMenu] = useState(false);
-  const [playlists, setPlaylists] = useState([]);
-  const fullScreenMode = useSelector(state => state.player.fullScreen);
+  const { currentSongs } = useSelector((state) => state.player);
+
+  useEffect(() => {
+    if (rawQuery && rawQuery !== query) {
+      setQuery(rawQuery);
+    }
+  }, [rawQuery, query]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,12 +37,16 @@ const Page = ({ params }) => {
       dispatch(setProgress(100));
     };
     fetchData();
-  }, [query]);
+  }, [query, dispatch]);
+
+  if (loading) {
+    return <SearchSkeleton />;
+  }
 
   const handlePlayClick = async (song) => {
     if (song?.type === "song") {
       const Data = await getSongData(song?.id);
-      const songData = await Data?.[0];
+      const songData = Array.isArray(Data) ? Data[0] : Data || song;
       dispatch(
         setActiveSong({
           song: songData,
@@ -53,177 +58,163 @@ const Page = ({ params }) => {
             : currentSongs?.length,
         })
       );
-      dispatch(setFullScreen(true));
       dispatch(playPause(true));
     }
   };
 
-  const handleAddToQueue = async (song) => {
-    if (song?.type === "song") {
-      const Data = await getSongData(song?.id);
-      const songData = await Data?.[0]
-      dispatch(addToQueue({ song: songData }));
-      dispatch(setFullScreen(true));
-      dispatch(playPause(true));
-      setShowMenu(false);
-    }
-  }
+  const songResults = Array.isArray(searchedData?.songs?.results)
+    ? searchedData.songs.results
+    : Array.isArray(searchedData?.songs)
+    ? searchedData.songs
+    : [];
 
-  useEffect(() => {
-    const getPlaylists = async () => {
-      const res = await getUserPlaylists();
-      if (res?.success == true) {
-        setPlaylists(res?.data?.playlists)
-      }
-    }
-    getPlaylists()
-  }, [])
+  const albumResults = Array.isArray(searchedData?.albums?.results)
+    ? searchedData.albums.results
+    : Array.isArray(searchedData?.albums)
+    ? searchedData.albums
+    : [];
 
-  const handleAddToPlaylist = async (song, playlistID) => {
-    setShowMenu(false);
-    const res = await addSongToPlaylist(playlistID, song);
-    if (res?.success == true) {
-      toast.success(res?.message)
-      setShowMenu(false);
-    }
-    else {
-      toast.error(res?.message)
-    }
-  }
+  const artistResults = Array.isArray(searchedData?.artists?.results)
+    ? searchedData.artists.results
+    : Array.isArray(searchedData?.artists)
+    ? searchedData.artists
+    : [];
+
+  const playlistResults = Array.isArray(searchedData?.playlists?.results)
+    ? searchedData.playlists.results
+    : Array.isArray(searchedData?.playlists)
+    ? searchedData.playlists
+    : [];
+
+  const decodedTitle = decodeURIComponent(query || "").replaceAll("%20", " ");
 
   return (
-    <div>
-      <div className="w-11/12 m-auto mt-16">
-        <div className="mt-10 text-gray-200">
-          <h1 className="text-3xl font-bold">
-            Search results for "{query.replaceAll("%20", " ")}"
-          </h1>
-          <div className="mt-10 text-gray-200">
-            <h2 className="text-lg lg:text-4xl font-semibold">Songs</h2>
-            {searchedData && searchedData?.songs?.results?.length > 0 ? (
-              <div className="mt-5">
-                {searchedData?.songs?.results?.map((song, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      handlePlayClick(song);
-                    }}
-                    className="flex items-center  mt-5 cursor-pointer group border-b-[1px] border-gray-400 justify-between"
-                  >
-                    <div className="flex items-center gap-5">
-                      <div className=" relative">
-                        <img
-                          src={song?.image?.[2]?.url}
-                          alt={song?.title}
-                          width={50}
-                          height={50}
-                          className="mb-3"
-                        />
-                        <BsPlayFill
-                          size={25}
-                          className=" group-hover:block hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-200"
-                        />
-                      </div>
-                      <div className="w-32 lg:w-80">
-                        <p className="text-sm lg:text-lg font-semibold truncate">
-                          {song?.title
-                            ?.replace("&#039;", "'")
-                            ?.replace("&amp;", "&")}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className='flex gap-2 items-center relative'>
-                      <div className="hidden lg:block max-w-56">
-                        {song?.primaryArtists && (
-                          <p className="text-gray-400 truncate">By: {song?.primaryArtists}</p>
-                        )}
-                      </div>
-                      <PiDotsThreeVerticalBold onClick={(e) => { e.stopPropagation(); setShowMenu(song?.id) }} size={25} className='text-gray-300' />
-                      {showMenu === song?.id &&
-                        <div onClick={() => { setShowMenu("sd"); }}
-                          className='absolute text-white top-0 right-0 bg-black/50 bg-opacity-80 backdrop-blur-sm rounded-lg p-3 w-32 flex flex-col gap-2 z-40'>
-                          {!fullScreenMode ? <button onClick={(e) => { e.stopPropagation(); handleAddToQueue(song) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>Add to Queue</button> : null}
-                          <p className='text-sm font-semibold flex gap-1 empty:hidden border-b border-white items-center'>
-                            {'Add to playlist'}
-                          </p>
-                          {
-                            playlists?.length > 0 ?
-                              playlists?.map((playlist, index) => (
-                                <button key={index} onClick={(e) => { e.stopPropagation(); handleAddToPlaylist(song?.id, playlist._id) }} className='text-sm font-semibold flex gap-1 items-center hover:underline'>{playlist?.name}</button>
-                              ))
-                              :
-                              <p className='text-sm font-semibold flex gap-1 items-center'>No Playlist</p>
-                          }
-                        </div>
-                      }
-                    </div>
-
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <SongListSkeleton />
-            )}
-          </div>
-
-          <div className="mt-10 text-gray-200">
-            <SwiperLayout title={"Albums"}>
-              {searchedData &&
-                searchedData?.albums?.results?.length > 0 &&
-                searchedData?.albums?.results?.map((song) => (
-                  <SwiperSlide key={song?.id}>
-                    <SongCard song={song} />
-                  </SwiperSlide>
-                ))}
-            </SwiperLayout>
-          </div>
-          <div className="mt-10 text-gray-200">
-            <SwiperLayout title={"Artists"}>
-              {searchedData &&
-                searchedData?.artists?.results?.length > 0 &&
-                searchedData?.artists?.results?.map((artist) => (
-                  <SwiperSlide key={artist?.id}>
-                    <Link href={`/artist/${artist?.id}`}>
-                      <div className=" flex flex-col justify-center items-center">
-                        <Image
-                          src={artist?.image?.[2]?.url}
-                          alt={artist?.name}
-                          width={200}
-                          height={200}
-                          className="rounded-full"
-                        />
-                        <p className="lg:text-base lg:w-44 w-24 text-center text-xs font-semibold mt-3 truncate">
-                          {artist?.title?.replace("&amp;", "&")}
-                        </p>
-                        <div>
-                          {artist?.description && (
-                            <p className="text-gray-400 truncate text-[8px] lg:text-xs">
-                              {artist?.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-                  </SwiperSlide>
-                ))}
-            </SwiperLayout>
-          </div>
-          <div className="mt-10 text-gray-200">
-            <SwiperLayout title={"Playlists"}>
-              {searchedData &&
-                searchedData?.albums?.results?.length > 0 &&
-                searchedData?.playlists?.results?.map((song) => (
-                  <SwiperSlide key={song?.id}>
-                    <SongCard song={song} />
-                  </SwiperSlide>
-                ))}
-            </SwiperLayout>
-          </div>
-        </div>
+    <div className="w-11/12 max-w-7xl mx-auto mt-8 mb-20">
+      <div className="mb-8">
+        <span className="text-xs font-bold uppercase tracking-widest text-[#a855f7]">
+          Search Results
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-1">
+          Showing results for &ldquo;{decodedTitle}&rdquo;
+        </h1>
       </div>
+
+      {/* Songs Section */}
+      <div className="mt-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
+          Songs
+        </h2>
+        {loading ? (
+          <SongListSkeleton />
+        ) : songResults.length > 0 ? (
+          <div className="flex flex-col gap-1.5">
+            {songResults.slice(0, 8).map((song, index) => (
+              <div
+                key={song?.id || index}
+                onClick={() => handlePlayClick(song)}
+                className="group flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] backdrop-blur-md border border-white/[0.05] hover:border-white/15 transition-all duration-200 cursor-pointer"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-[#18181f]">
+                    <img
+                      src={
+                        song?.image?.[2]?.url ||
+                        song?.image?.[1]?.url ||
+                        song?.image?.[0]?.url ||
+                        ""
+                      }
+                      alt={song?.title || song?.name || "song"}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <BsPlayFill size={24} className="text-[#a855f7]" />
+                    </div>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-white truncate group-hover:text-[#a855f7] transition-colors">
+                      {(song?.title || song?.name)
+                        ?.replaceAll("&#039;", "'")
+                        ?.replaceAll("&amp;", "&")}
+                    </p>
+                    <p className="text-xs text-[#b3b3b3] truncate mt-0.5">
+                      {song?.primaryArtists || song?.singers || "Artist"}
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden sm:block text-xs text-gray-400 max-w-44 truncate">
+                  {song?.album || "Single"}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400 text-sm">No songs found.</p>
+        )}
+      </div>
+
+      {/* Albums Section */}
+      {albumResults.length > 0 && (
+        <div className="mt-12">
+          <SwiperLayout title="Albums">
+            {albumResults.map((album, index) => (
+              <SwiperSlide key={album?.id || index}>
+                <SongCard song={album} />
+              </SwiperSlide>
+            ))}
+          </SwiperLayout>
+        </div>
+      )}
+
+      {/* Artists Section */}
+      {artistResults.length > 0 && (
+        <div className="mt-12">
+          <SwiperLayout title="Artists">
+            {artistResults.map((artist, index) => (
+              <SwiperSlide key={artist?.id || index}>
+                <Link href={`/artist/${artist?.id}`}>
+                  <div className="group flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] backdrop-blur-md border border-white/[0.05] hover:border-white/15 transition-all text-center">
+                    <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden mb-3 bg-[#18181f] shadow-lg">
+                      <img
+                        src={
+                          artist?.image?.[2]?.url ||
+                          artist?.image?.[1]?.url ||
+                          artist?.image?.[0]?.url ||
+                          ""
+                        }
+                        alt={artist?.name || artist?.title || "artist"}
+                        width={144}
+                        height={144}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#a855f7] transition-colors">
+                      {(artist?.title || artist?.name)?.replaceAll("&amp;", "&")}
+                    </p>
+                    <span className="text-xs text-[#b3b3b3] mt-0.5">Artist</span>
+                  </div>
+                </Link>
+              </SwiperSlide>
+            ))}
+          </SwiperLayout>
+        </div>
+      )}
+
+      {/* Playlists Section */}
+      {playlistResults.length > 0 && (
+        <div className="mt-12">
+          <SwiperLayout title="Playlists">
+            {playlistResults.map((playlist, index) => (
+              <SwiperSlide key={playlist?.id || index}>
+                <SongCard song={playlist} />
+              </SwiperSlide>
+            ))}
+          </SwiperLayout>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Page;
+export default SearchResultsPage;

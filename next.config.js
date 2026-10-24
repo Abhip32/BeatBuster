@@ -1,21 +1,73 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        domains: ['c.saavncdn.com','static.saavncdn.com','www.jiosaavn.com'],
-    },
-}
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "c.saavncdn.com" },
+      { protocol: "https", hostname: "static.saavncdn.com" },
+      { protocol: "https", hostname: "www.jiosaavn.com" },
+      { protocol: "https", hostname: "avatars.githubusercontent.com" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+    ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+      {
+        source: "/sitemap.xml",
+        headers: [
+          { key: "Content-Type", value: "application/xml" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, s-maxage=3600",
+          },
+        ],
+      },
+      {
+        source: "/robots.txt",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, s-maxage=3600",
+          },
+        ],
+      },
+    ];
+  },
+  webpack: (config, { isServer }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "./taglib-web.wasm$": require("path").resolve(
+        __dirname,
+        "node_modules/taglib-wasm/dist/taglib-web.wasm",
+      ),
+    };
 
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        module: false,
+        fs: false,
+        path: false,
+      };
+    }
+    return config;
+  },
+};
 
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+});
 
-
-const withPWA = require('next-pwa')({
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-  });
-  
-  module.exports = withPWA({
-    reactStrictMode: true,
-  });
-
-module.exports = nextConfig
+module.exports = withPWA(nextConfig);
