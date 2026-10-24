@@ -1,7 +1,6 @@
 import PlayButton from "@/components/PlayButton";
 import SongList from "@/components/SongsList";
 import { getplaylistData, homePageData } from "@/services/dataAPI";
-import { BsSpotify } from "react-icons/bs";
 
 const page = async ({ params }) => {
   const resolvedParams = await params;
@@ -29,7 +28,7 @@ const page = async ({ params }) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/5 text-gray-500">
-              <BsSpotify size={64} className="text-[#f43f5e]" />
+              <img src="/images/logo.png" alt="Musify" className="w-16 h-16 rounded-full opacity-60" />
             </div>
           )}
         </div>
@@ -49,7 +48,7 @@ const page = async ({ params }) => {
 
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-300 mt-4 font-semibold">
             <span className="flex items-center gap-1.5 text-white">
-              <BsSpotify className="text-[#f43f5e]" /> Musify
+              <img src="/images/logo.png" alt="Musify" className="w-4 h-4 rounded-full object-cover" /> Musify
             </span>
             {playlistData?.followerCount && (
               <>

@@ -14,32 +14,36 @@ This is a free music streaming web application built with Next.js and powered by
 ## Screenshots
 
 ### Home Page
-Dual Hindi & English trending sliders, separate albums slider, Quick Access tiles, and unified Liked Songs pill.
-![Home Page](./screenshots/Screenshot%201.png)
+Bilingual Hindi & English trending tracks, Quick Access cards, live Liked Songs badge, and one-click New Playlist creation.
+![Home Page](./screenshots/Screenshot%202026-10-25%20014108.png)
 
-### Account, Languages & Navigation Drawer
-Slide-out sidebar with official Musify logo, multi-language preferences, playlists, and user profile.
-![Account and Navigation Drawer](./screenshots/Screenshot%202.png)
+### Navigation Drawer & Multi-Language Preferences
+Slide-out drawer featuring official Musify branding, user profile, custom playlists, and multi-language selection.
+![Navigation Drawer and Languages](./screenshots/Screenshot%202026-10-25%20014126.png)
 
-### Playlist View
-Curated playlist with bold playback controls, ZIP bulk downloader, and tracklist.
-![Playlist View](./screenshots/Screenshot%203.png)
+### Trending Songs & Trending Albums Sliders
+Dual independent carousels organizing trending songs and trending albums in high-fidelity cards.
+![Trending Songs and Albums](./screenshots/Screenshot%202026-10-25%20014150.png)
 
 ### Search Experience
-Fast search across songs, albums, and artists.
-![Search Page](./screenshots/Screenshot%204.png)
+Real-time search across songs, albums, and artists with instant playback support.
+![Search Results](./screenshots/Screenshot%202026-10-25%20014359.png)
 
-### Liked Songs (Official Dedicated View)
-Dedicated view featuring live count badge, row-level favourite actions, and infinite scroll loading.
-![Liked Songs](./screenshots/Screenshot%205.png)
+### Liked Songs (Dedicated View)
+Single official Liked Songs page featuring Neon Rose gradient hero banner, live song count, and row-level heart toggles.
+![Liked Songs](./screenshots/Screenshot%202026-10-25%20014456.png)
 
-### Music Player
-Persistent bottom bar player with spinning vinyl turntable, Neon Rose active glow, synchronized heart toggle, and audio controls.
-![Music Player](./screenshots/Screenshot%206.png)
+### Curated Playlist & Bulk Downloader
+Full playlist view with high-res artwork, Lossless 320kbps playback, and one-click ZIP bulk downloader.
+![Playlist View](./screenshots/Screenshot%202026-10-25%20014611.png)
 
-### Fullscreen Player & Ambient Canvas
-Immersive full-screen playback with dynamic album art color extraction, time-synced lyrics modal, and ambient lighting.
-![Fullscreen Music Player](./screenshots/Screenshot%207.png)
+### Fullscreen Music Player (Queue View)
+Immersive full-screen playback with dynamic ambient lighting, upcoming track queue, and lossless controls.
+![Fullscreen Music Player](./screenshots/Screenshot%202026-10-25%20014209.png)
+
+### Time-Synced Lyrics
+Real-time synchronized karaoke lyrics with dynamic highlight tracking.
+![Time-Synced Lyrics](./screenshots/Screenshot%202026-10-25%20014234.png)
 
 ***
 

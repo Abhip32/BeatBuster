@@ -7,7 +7,6 @@ import Profile from "./Profile";
 import SettingsLink from "./SettingsLink";
 import { FaGithub } from "react-icons/fa";
 import { MdOutlineClose } from "react-icons/md";
-import { BsSpotify } from "react-icons/bs";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { setProgress } from "@/redux/features/loadingBarSlice";

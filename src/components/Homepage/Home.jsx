@@ -18,15 +18,21 @@ import PlayButton from "@/components/PlayButton";
 import { useSession } from "next-auth/react";
 import { AiFillHeart } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
+import { FaPlus } from "react-icons/fa";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import PlaylistModal from "@/components/Sidebar/PlaylistModal";
 
 const Home = () => {
+  const router = useRouter();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [salutation, setSalutation] = useState("Welcome to Musify");
   const [activeTab, setActiveTab] = useState("all");
   const [likedSongs, setLikedSongs] = useState([]);
   const [loadingLiked, setLoadingLiked] = useState(false);
+  const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
 
   const dispatch = useDispatch();
   const { data: session, status } = useSession();
@@ -119,6 +125,15 @@ const Home = () => {
   const albums = Array.isArray(data?.albums) ? data.albums : [];
   const playlists = Array.isArray(data?.playlists) ? data.playlists : [];
 
+  const handleOpenCreatePlaylist = () => {
+    if (status === "unauthenticated") {
+      toast.error("Please log in to create playlists");
+      router.push("/login");
+      return;
+    }
+    setShowCreatePlaylist(true);
+  };
+
   if (loading && !data) {
     return <HomeSkeleton />;
   }
@@ -137,10 +152,10 @@ const Home = () => {
             Discover trending tracks, chart toppers, and your personal favorites
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-[0_0_15px_rgba(244, 63, 94,0.2)]">
-          <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
-          <span>Lossless 320kbps</span>
-        </div>
+        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+            <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+            <span>Lossless 320kbps</span>
+          </div>
       </div>
 
       {/* Spotify Category Tabs */}
@@ -214,8 +229,25 @@ const Home = () => {
             </div>
           </Link>
 
-          {/* First 3 Charts as Quick Access Tiles */}
-          {charts.slice(0, 3).map((chart, idx) => (
+          {/* Create Playlist Tile */}
+          <button
+            type="button"
+            onClick={handleOpenCreatePlaylist}
+            className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-white/[0.04] to-white/[0.02] hover:from-rose-950/30 hover:to-white/[0.06] backdrop-blur-md border border-dashed border-white/20 hover:border-rose-500/60 transition-all duration-300 shadow-md text-left cursor-pointer"
+          >
+            <div className="w-12 h-12 rounded-lg bg-white/[0.05] border border-white/10 group-hover:border-rose-500/50 group-hover:bg-rose-500/15 flex items-center justify-center flex-shrink-0 transition-all shadow">
+              <FaPlus className="text-gray-400 group-hover:text-rose-400 text-base transition-colors" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-white group-hover:text-rose-200 truncate transition-colors">
+                New Playlist
+              </h3>
+              <p className="text-xs text-gray-400 font-medium">Build custom mix</p>
+            </div>
+          </button>
+
+          {/* First 2 Charts as Quick Access Tiles */}
+          {charts.slice(0, 2).map((chart, idx) => (
             <Link
               key={chart?.id || idx}
               href={`/playlist/${chart?.id}`}
@@ -362,6 +394,9 @@ const Home = () => {
           </SwiperLayout>
         </>
       )}
+
+      {/* Create Playlist Modal */}
+      <PlaylistModal show={showCreatePlaylist} setShow={setShowCreatePlaylist} />
     </div>
   );
 };

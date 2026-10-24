@@ -9,7 +9,6 @@ import {
 } from "@/redux/features/settingsSlice";
 import ToggleSwitch from "@/components/Settings/ToggleSwitch";
 import CustomSelect from "@/components/Settings/CustomSelect";
-import { BsSpotify } from "react-icons/bs";
 
 const QUALITY_OPTIONS = [
   { value: "ask", label: "Always ask" },
@@ -75,7 +74,7 @@ const SettingsPage = () => {
           </p>
         </div>
         <div className="w-10 h-10 rounded-full bg-[#f43f5e] flex items-center justify-center shadow-[0_0_15px_rgba(244, 63, 94,0.35)]">
-          <BsSpotify className="text-black text-2xl" />
+          <img src="/images/logo.png" alt="Musify" className="w-8 h-8 rounded-full object-cover" />
         </div>
       </div>
 

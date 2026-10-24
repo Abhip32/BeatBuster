@@ -8,7 +8,6 @@ import { useParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import SongList from "@/components/SongsList";
 import PlaylistSkeleton from "@/components/Skeletons/PlaylistSkeleton";
-import { BsSpotify } from "react-icons/bs";
 
 const AlbumPage = ({ params }) => {
   const routeParams = useParams();
@@ -62,7 +61,7 @@ const AlbumPage = ({ params }) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/5 text-gray-500">
-              <BsSpotify size={64} className="text-[#f43f5e]" />
+              <img src="/images/logo.png" alt="Musify" className="w-16 h-16 rounded-full opacity-60" />
             </div>
           )}
         </div>
