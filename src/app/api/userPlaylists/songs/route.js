@@ -50,8 +50,17 @@ export async function POST(req) {
         { status: 401 }
       );
     }
-    // check if song already exists in playlist
-    const songExists = playlist.songs.find((s) => s === song);
+    // check if song already exists in playlist (handling both object and string ID)
+    const targetSongId = String(
+      (typeof song === "object" ? song?.id || song?._id : song) || ""
+    );
+    const songExists = playlist.songs.some((s) => {
+      const sId = String(
+        (typeof s === "object" ? s?.id || s?._id : s) || ""
+      );
+      return sId && sId === targetSongId;
+    });
+
     if (songExists) {
       return NextResponse.json(
         {
@@ -62,16 +71,15 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-    await Playlist.findByIdAndUpdate(playlistID, {
-      $push: {
-        songs: song,
-      },
-    });
+
+    playlist.songs.push(song);
+    await playlist.save();
+
     return NextResponse.json(
       {
         success: true,
         message: "Song added to playlist",
-        data: null,
+        data: playlist.songs,
       },
       { status: 200 }
     );
@@ -131,8 +139,18 @@ export async function DELETE(req) {
         { status: 401 }
       );
     }
-    const songExists = playlist.songs.find((s) => s === song);
-    if (!songExists) {
+    const targetSongId = String(
+      (typeof song === "object" ? song?.id || song?._id : song) || ""
+    );
+    const initialLen = playlist.songs.length;
+    playlist.songs = playlist.songs.filter((s) => {
+      const sId = String(
+        (typeof s === "object" ? s?.id || s?._id : s) || ""
+      );
+      return sId !== targetSongId;
+    });
+
+    if (playlist.songs.length === initialLen) {
       return NextResponse.json(
         {
           success: false,
@@ -142,11 +160,7 @@ export async function DELETE(req) {
         { status: 400 }
       );
     }
-    await Playlist.findByIdAndUpdate(playlistID, {
-      $pull: {
-        songs: song,
-      },
-    });
+    await playlist.save();
     return NextResponse.json(
       {
         success: true,

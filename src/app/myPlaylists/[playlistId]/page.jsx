@@ -30,16 +30,45 @@ const UserPlaylistPage = ({ params }) => {
             const rawSongs = res.data.songs;
             const fetched = await Promise.all(
               rawSongs.map(async (item) => {
-                if (item && typeof item === "object" && (item.name || item.title)) {
+                if (
+                  item &&
+                  typeof item === "object" &&
+                  (item.name || item.title) &&
+                  (item.downloadUrl || item.url)
+                ) {
                   return item;
                 }
                 const songId = typeof item === "object" ? item?.id : item;
-                if (!songId || typeof songId !== "string") return null;
-                const data = await getSongData(songId);
-                return Array.isArray(data) ? data[0] : data || null;
+                if (!songId || typeof songId !== "string") {
+                  return item && typeof item === "object" && (item.name || item.title)
+                    ? item
+                    : null;
+                }
+                try {
+                  const data = await getSongData(songId);
+                  const resolved = Array.isArray(data) ? data[0] : data;
+                  if (resolved && (resolved.name || resolved.title)) {
+                    return resolved;
+                  }
+                } catch (e) {
+                  // ignore
+                }
+                if (item && typeof item === "object" && (item.name || item.title)) {
+                  return item;
+                }
+                return {
+                  id: songId,
+                  name: `Track (${songId})`,
+                  title: `Track (${songId})`,
+                  duration: 0,
+                  image: [],
+                  artists: { primary: [{ name: "Artist" }] },
+                };
               })
             );
             setSongs(fetched.filter(Boolean).reverse());
+          } else {
+            setSongs([]);
           }
         }
       } catch (err) {

@@ -120,9 +120,25 @@ const SearchResultsPage = ({ params }) => {
     if (!item) return;
     const type = item?.type || (item?.singers || item?.duration ? "song" : "artist");
     if (type === "song") {
-      const songData = item?.downloadUrl ? item : (await getSongData(item.id))?.[0] || item;
-      dispatch(setActiveSong({ song: songData, data: songResults, i: 0 }));
-      dispatch(playPause(true));
+      let songData = item;
+      if (!Array.isArray(item?.downloadUrl) || item.downloadUrl.length === 0) {
+        const fetched = await getSongData(item.id);
+        songData = Array.isArray(fetched) ? fetched[0] : fetched || item;
+      }
+      if (songData) {
+        const queue = songResults.some((s) => s?.id === songData?.id)
+          ? songResults
+          : [songData, ...songResults];
+        const index = queue.findIndex((s) => s?.id === songData?.id);
+        dispatch(
+          setActiveSong({
+            song: songData,
+            data: queue,
+            i: Math.max(0, index),
+          })
+        );
+        dispatch(playPause(true));
+      }
     } else if (type === "artist") {
       router.push(`/artist/${item.id}`);
     } else if (type === "album") {
@@ -426,105 +442,96 @@ const SearchResultsPage = ({ params }) => {
 
           {/* Artists Shelf */}
           {artistResults.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-white">
-                  Artists
-                </h2>
-                {artistResults.length > 6 && (
+            <SwiperLayout
+              title="Artists"
+              action={
+                artistResults.length > 6 && (
                   <button
                     type="button"
                     onClick={() => setActiveTab("artists")}
-                    className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer"
+                    className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer mr-1"
                   >
                     See all ({artistResults.length})
                   </button>
-                )}
-              </div>
-              <SwiperLayout>
-                {artistResults.map((artist, index) => (
-                  <SwiperSlide key={artist?.id || index}>
-                    <Link href={`/artist/${artist?.id}`}>
-                      <div className="group flex flex-col items-center p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.05] hover:border-white/15 transition-all text-center cursor-pointer">
-                        <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden mb-3 bg-[#18181f] shadow-lg">
-                          <img
-                            src={
-                              artist?.image?.[2]?.url ||
-                              artist?.image?.[1]?.url ||
-                              artist?.image?.[0]?.url ||
-                              "/images/vinyl.png"
-                            }
-                            alt={artist?.name || artist?.title || "artist"}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              e.currentTarget.src = "/images/vinyl.png";
-                            }}
-                          />
-                        </div>
-                        <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
-                          {(artist?.name || artist?.title)?.replaceAll("&amp;", "&")}
-                        </p>
-                        <span className="text-xs text-gray-400 mt-0.5">Artist</span>
+                )
+              }
+            >
+              {artistResults.map((artist, index) => (
+                <SwiperSlide key={artist?.id || index}>
+                  <Link href={`/artist/${artist?.id}`}>
+                    <div className="group flex flex-col items-center p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.05] hover:border-white/15 transition-all text-center cursor-pointer">
+                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden mb-3 bg-[#18181f] shadow-lg">
+                        <img
+                          src={
+                            artist?.image?.[2]?.url ||
+                            artist?.image?.[1]?.url ||
+                            artist?.image?.[0]?.url ||
+                            "/images/vinyl.png"
+                          }
+                          alt={artist?.name || artist?.title || "artist"}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/vinyl.png";
+                          }}
+                        />
                       </div>
-                    </Link>
-                  </SwiperSlide>
-                ))}
-              </SwiperLayout>
-            </div>
+                      <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
+                        {(artist?.name || artist?.title)?.replaceAll("&amp;", "&")}
+                      </p>
+                      <span className="text-xs text-gray-400 mt-0.5">Artist</span>
+                    </div>
+                  </Link>
+                </SwiperSlide>
+              ))}
+            </SwiperLayout>
           )}
 
           {/* Albums Shelf */}
           {albumResults.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-white">
-                  Albums
-                </h2>
-                {albumResults.length > 6 && (
+            <SwiperLayout
+              title="Albums"
+              action={
+                albumResults.length > 6 && (
                   <button
                     type="button"
                     onClick={() => setActiveTab("albums")}
-                    className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer"
+                    className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer mr-1"
                   >
                     See all ({albumResults.length})
                   </button>
-                )}
-              </div>
-              <SwiperLayout>
-                {albumResults.map((album, index) => (
-                  <SwiperSlide key={album?.id || index}>
-                    <SongCard song={album} />
-                  </SwiperSlide>
-                ))}
-              </SwiperLayout>
-            </div>
+                )
+              }
+            >
+              {albumResults.map((album, index) => (
+                <SwiperSlide key={album?.id || index}>
+                  <SongCard song={album} />
+                </SwiperSlide>
+              ))}
+            </SwiperLayout>
           )}
 
           {/* Playlists Shelf */}
           {playlistResults.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-white">
-                  Featured Playlists
-                </h2>
-                {playlistResults.length > 6 && (
+            <SwiperLayout
+              title="Featured Playlists"
+              action={
+                playlistResults.length > 6 && (
                   <button
                     type="button"
                     onClick={() => setActiveTab("playlists")}
-                    className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer"
+                    className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer mr-1"
                   >
                     See all ({playlistResults.length})
                   </button>
-                )}
-              </div>
-              <SwiperLayout>
-                {playlistResults.map((playlist, index) => (
-                  <SwiperSlide key={playlist?.id || index}>
-                    <SongCard song={playlist} />
-                  </SwiperSlide>
-                ))}
-              </SwiperLayout>
-            </div>
+                )
+              }
+            >
+              {playlistResults.map((playlist, index) => (
+                <SwiperSlide key={playlist?.id || index}>
+                  <SongCard song={playlist} />
+                </SwiperSlide>
+              ))}
+            </SwiperLayout>
           )}
         </div>
       )}

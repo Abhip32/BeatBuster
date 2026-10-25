@@ -11,7 +11,7 @@ import {
 } from "swiper/modules";
 import { MdNavigateNext, MdNavigateBefore } from "react-icons/md";
 
-const SwiperLayout = ({ children, title }) => {
+const SwiperLayout = ({ children, title, action, className = "" }) => {
   const albumNext = useRef(null);
   const albumPrv = useRef(null);
 
@@ -25,30 +25,39 @@ const SwiperLayout = ({ children, title }) => {
   };
 
   return (
-    <div className="my-8 lg:my-14">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-white text-2xl lg:text-3xl font-bold tracking-tight">
-          {title}
-        </h2>
-        <div className="hidden md:flex items-center gap-2">
-          <button
-            ref={albumPrv}
-            type="button"
-            aria-label="Previous"
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-30"
-          >
-            <MdNavigateBefore size={24} />
-          </button>
-          <button
-            ref={albumNext}
-            type="button"
-            aria-label="Next"
-            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-30"
-          >
-            <MdNavigateNext size={24} />
-          </button>
+    <div className={`my-6 sm:my-8 ${className}`}>
+      {(title || action) && (
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          {title ? (
+            <h2 className="text-white text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
+              {title}
+            </h2>
+          ) : (
+            <div />
+          )}
+          <div className="flex items-center gap-2.5">
+            {action}
+            <div className="hidden sm:flex items-center gap-1.5">
+              <button
+                ref={albumPrv}
+                type="button"
+                aria-label="Previous"
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-30"
+              >
+                <MdNavigateBefore size={22} />
+              </button>
+              <button
+                ref={albumNext}
+                type="button"
+                aria-label="Next"
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-30"
+              >
+                <MdNavigateNext size={22} />
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
       <Swiper
         modules={[Navigation, FreeMode, Mousewheel, Keyboard, Virtual]}
         breakpoints={{

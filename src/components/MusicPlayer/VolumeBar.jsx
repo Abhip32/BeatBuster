@@ -150,7 +150,7 @@ const VolumeBar = ({
                         key={index}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAddToPlaylist(activeSong?.id, playlist._id);
+                          handleAddToPlaylist(activeSong, playlist._id);
                         }}
                         className="text-sm text-gray-200 hover:text-[#f43f5e] hover:bg-white/10 px-2.5 py-1.5 rounded-lg text-left transition-colors truncate"
                       >
