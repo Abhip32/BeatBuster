@@ -7,6 +7,7 @@ import Favicon from "./favicon.ico";
 import SongsHistory from "@/components/SongsHistory";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "./AuthProvider";
+import AiMascot from "@/components/AiDj/AiMascot";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import {
@@ -172,6 +173,7 @@ export default function RootLayout({ children }) {
               }}
             />
             <main className="pb-28">{children}</main>
+            <AiMascot />
             <div className="fixed bottom-0 left-0 right-0 glass-player z-50">
               <MusicPlayer />
             </div>

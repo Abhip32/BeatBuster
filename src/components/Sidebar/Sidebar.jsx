@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Languages from "./Languages";
 import Favourites from "./Favourites";
 import Playlists from "./Playlists";
@@ -7,12 +7,15 @@ import Profile from "./Profile";
 import SettingsLink from "./SettingsLink";
 import { FaGithub } from "react-icons/fa";
 import { MdOutlineClose } from "react-icons/md";
+import { IoSparkles } from "react-icons/io5";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { setProgress } from "@/redux/features/loadingBarSlice";
+import AiDjModal from "@/components/AiDj/AiDjModal";
 
 const Sidebar = ({ showNav, setShowNav }) => {
   const dispatch = useDispatch();
+  const [showAiDj, setShowAiDj] = useState(false);
 
   return (
     <aside
@@ -55,6 +58,28 @@ const Sidebar = ({ showNav, setShowNav }) => {
       <div className="flex-1 min-h-0 overflow-y-auto px-3 py-2 space-y-1">
         <Profile setShowNav={setShowNav} />
         <div className="py-1">
+          <button
+            type="button"
+            onClick={() => {
+              setShowNav(false);
+              setShowAiDj(true);
+            }}
+            className="w-full flex items-center justify-between px-3 py-2.5 text-gray-200 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all cursor-pointer group"
+          >
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-[#f43f5e] flex items-center justify-center shadow-[0_0_12px_rgba(168,85,247,0.35)] group-hover:scale-105 transition-transform flex-shrink-0">
+                <IoSparkles size={15} className="text-white animate-pulse" />
+              </div>
+              <span className="text-sm font-semibold tracking-wide group-hover:text-purple-300 transition-colors truncate">
+                AI DJ
+              </span>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              Smart Mix
+            </span>
+          </button>
+        </div>
+        <div className="py-0.5">
           <Favourites setShowNav={setShowNav} />
         </div>
         <Playlists setShowNav={setShowNav} />
@@ -88,6 +113,8 @@ const Sidebar = ({ showNav, setShowNav }) => {
         </div>
         <span className="text-[10px] text-gray-500 font-mono">v3.0 Musify</span>
       </div>
+
+      <AiDjModal show={showAiDj} setShow={setShowAiDj} />
     </aside>
   );
 };

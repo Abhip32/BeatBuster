@@ -21,12 +21,14 @@ import PlayButton from "@/components/PlayButton";
 import { useSession } from "next-auth/react";
 import { AiFillHeart } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaSpotify } from "react-icons/fa";
 import { MdPlaylistPlay } from "react-icons/md";
+import { IoSparkles } from "react-icons/io5";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import PlaylistModal from "@/components/Sidebar/PlaylistModal";
+import AiDjModal from "@/components/AiDj/AiDjModal";
 
 const Home = () => {
   const router = useRouter();
@@ -37,6 +39,8 @@ const Home = () => {
   const [likedSongs, setLikedSongs] = useState([]);
   const [loadingLiked, setLoadingLiked] = useState(false);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
+  const [initialModalTab, setInitialModalTab] = useState("create");
+  const [showAiDj, setShowAiDj] = useState(false);
 
   const dispatch = useDispatch();
   const { data: session, status } = useSession();
@@ -177,12 +181,13 @@ const Home = () => {
   const albums = Array.isArray(data?.albums) ? data.albums : [];
   const playlists = Array.isArray(data?.playlists) ? data.playlists : [];
 
-  const handleOpenCreatePlaylist = () => {
+  const handleOpenCreatePlaylist = (tab = "create") => {
     if (status === "unauthenticated") {
-      toast.error("Please log in to create playlists");
+      toast.error("Please log in to manage playlists");
       router.push("/login");
       return;
     }
+    setInitialModalTab(tab);
     setShowCreatePlaylist(true);
   };
 
@@ -221,6 +226,15 @@ const Home = () => {
           }`}
         >
           All
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowAiDj(true)}
+          className="glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-purple-300 hover:text-white border-purple-500/30 hover:border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer"
+        >
+          <IoSparkles className="text-purple-400 text-sm animate-pulse" />
+          <span>AI DJ</span>
         </button>
 
         <Link
@@ -383,7 +397,16 @@ const Home = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleOpenCreatePlaylist}
+                onClick={() => handleOpenCreatePlaylist("spotify")}
+                className="text-xs font-semibold text-[#1ed760] hover:text-[#1db954] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
+                title="Import from Spotify"
+              >
+                <FaSpotify size={12} className="text-[#1ed760]" />
+                <span>Import</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenCreatePlaylist("create")}
                 className="text-xs font-semibold text-[#f43f5e] hover:text-[#fb7185] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
               >
                 <FaPlus size={10} />
@@ -465,14 +488,24 @@ const Home = () => {
                 Custom collections and mixes crafted by you
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleOpenCreatePlaylist}
-              className="text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 transition-all px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(244,63,94,0.35)] flex items-center gap-2 cursor-pointer"
-            >
-              <FaPlus size={12} />
-              <span>Create Playlist</span>
-            </button>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => handleOpenCreatePlaylist("spotify")}
+                className="text-xs sm:text-sm font-semibold text-[#1ed760] bg-[#1db954]/10 hover:bg-[#1db954]/20 border border-[#1db954]/30 transition-all px-4 py-2 rounded-full shadow-sm flex items-center gap-2 cursor-pointer"
+              >
+                <FaSpotify size={14} className="text-[#1ed760]" />
+                <span>Import Spotify</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenCreatePlaylist("create")}
+                className="text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 transition-all px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(244,63,94,0.35)] flex items-center gap-2 cursor-pointer"
+              >
+                <FaPlus size={12} />
+                <span>Create Playlist</span>
+              </button>
+            </div>
           </div>
 
           {userPlaylists && userPlaylists.length > 0 ? (
@@ -680,8 +713,15 @@ const Home = () => {
         </>
       )}
 
-      {/* Create Playlist Modal */}
-      <PlaylistModal show={showCreatePlaylist} setShow={setShowCreatePlaylist} />
+      {/* Create / Import Playlist Modal */}
+      <PlaylistModal
+        show={showCreatePlaylist}
+        setShow={setShowCreatePlaylist}
+        initialTab={initialModalTab}
+      />
+
+      {/* AI DJ Modal */}
+      <AiDjModal show={showAiDj} setShow={setShowAiDj} />
     </div>
   );
 };

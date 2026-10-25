@@ -109,3 +109,21 @@ export async function getSinglePlaylist(id) {
     console.log('Get single playlist error', error);
   }
 }
+
+// import spotify playlist
+export async function importSpotifyPlaylist(url, customName) {
+  try {
+    const response = await fetch(`/api/spotify/import`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url, customName }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Import Spotify playlist error', error);
+    return { success: false, message: 'Network error importing playlist' };
+  }
+}

@@ -4,11 +4,67 @@ This is a free music streaming web application built with Next.js and powered by
 * Search and stream music from vast collection.
 * Play, pause, skip, and control the playback of songs.
 * Create your own playlists.
+* **Spotify Playlist Importer**: One-click import from any public Spotify playlist or album link with automatic song resolution (zero developer credentials required).
+* **AI Music DJ (Google Gemini 2.5 Flash)**: Conversational vibe and mood-based music curator that generates playable tracklists on the fly.
+* **Interactive Floating AI Mascot**: Cyber-DJ assistant floating across the application for instant vibe curation.
 * Add songs to your favorite.
 * Auto add similar songs to queue.
 * Display song details such as title, artist, album, and album artwork.
 * Responsive and mobile-friendly design for a great user experience.
 * Minimalistic and intuitive user interface.
+
+## Architecture & Data Flows
+
+### 1. Spotify Playlist Importer (Zero-Credential Architecture)
+
+Users can paste any public Spotify playlist or album URL (`https://open.spotify.com/playlist/...`). The system imports the entire tracklist without needing Spotify OAuth tokens or developer client secrets.
+
+```mermaid
+flowchart TD
+    A["User Pastes Spotify URL\n(playlist or album)"] --> B["Backend Route\n(/api/spotify/import)"]
+    B --> C["Extract Playlist / Album ID"]
+    C --> D["Fetch Public Embed HTML\n(open.spotify.com/embed/playlist/ID)"]
+    D --> E["Extract JSON state from\n`<script id='__NEXT_DATA__'>`"]
+    E --> F["Parse Tracklist\n(Title, Artists, Durations)"]
+    F --> G["Batch Search JioSaavn API\n(/api/search/songs)"]
+    G --> H["Resolve to 320kbps Audio Streams &\nHigh-Res Artwork"]
+    H --> I["Save Playlist to MongoDB &\nSync Redux State"]
+    I --> J["Redirect to /myPlaylists/ID with\nInstant Playback Ready"]
+```
+
+#### Why it works without a Spotify API Key:
+- Spotify's public embed player (`open.spotify.com/embed/...`) is a server-side rendered Next.js application.
+- Next.js injects its pre-rendered state inside a `<script id="__NEXT_DATA__">` JSON block in the raw HTML.
+- Our backend extracts this JSON directly, parses all song titles and artists, and then queries the JioSaavn audio database to deliver playable 320kbps streams without DRM restrictions.
+
+---
+
+### 2. AI Music DJ Flow (Google Gemini 2.5 Flash)
+
+The AI Music DJ blends generative AI intelligence with streaming audio discovery to curate tailored sets based on moods, genres, or currently playing songs.
+
+```mermaid
+flowchart TD
+    A["User Prompt / Mood Chip\n(e.g., 'Late night drive acoustic Bollywood')\n+ Optional Currently Playing Track"] --> B["Backend Route\n(/api/ai/dj)"]
+    B --> C["Construct System Prompt &\nDJ Instructions"]
+    C --> D["Call Google Gemini 2.5 Flash\n(Structured JSON Output Mode)"]
+    D --> E["Gemini Generates DJ Commentary &\n6-10 Recommended Track Objects"]
+    E --> F["Concurrent JioSaavn Audio Search\nResolves Each Song Title + Artist"]
+    F --> G["Construct Full Playable Song Objects\n(Audio URL, Artwork, Duration)"]
+    G --> H["Client Modal (AiDjModal)"]
+    H -->|Play Mix| I["Inject to Redux Player Queue &\nPlay Immediately"]
+    H -->|Save Playlist| J["Persist as Named Playlist in\nMongoDB Library"]
+```
+
+---
+
+### 3. Floating AI Mascot Companion
+
+- Located at the bottom-right corner of the application above the playback bar.
+- Features dynamic animated SVG headphones, neon equalizer visor, responsive speech bubble notifications, and idle hover animations.
+- Provides one-click access to summon the AI DJ modal from any page in the app.
+
+---
 
 
 ## Screenshots

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaSpotify } from "react-icons/fa";
 import { MdPlaylistPlay, MdOutlineDeleteOutline } from "react-icons/md";
 import Link from "next/link";
 import PlaylistModal from "./PlaylistModal";
@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 
 const Playlists = ({ setShowNav }) => {
   const [show, setShow] = useState(false);
+  const [initialModalTab, setInitialModalTab] = useState("create");
   const dispatch = useDispatch();
   const { status } = useSession();
   const playlists = useSelector((state) => state.playlists.playlists);
@@ -56,15 +57,32 @@ const Playlists = ({ setShowNav }) => {
         <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
           Playlists {playlists.length > 0 && `(${playlists.length})`}
         </span>
-        <button
-          type="button"
-          onClick={() => setShow(true)}
-          className="text-xs text-[#f43f5e] hover:text-[#fb7185] transition-colors flex items-center gap-1.5 cursor-pointer font-semibold py-1 px-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10"
-          title="Create Playlist"
-        >
-          <FaPlus size={10} />
-          <span>New</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              setInitialModalTab("spotify");
+              setShow(true);
+            }}
+            className="text-xs text-[#1ed760] hover:text-[#1db954] transition-colors flex items-center gap-1 cursor-pointer font-semibold py-1 px-2 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10"
+            title="Import from Spotify"
+          >
+            <FaSpotify size={11} />
+            <span>Import</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setInitialModalTab("create");
+              setShow(true);
+            }}
+            className="text-xs text-[#f43f5e] hover:text-[#fb7185] transition-colors flex items-center gap-1 cursor-pointer font-semibold py-1 px-2 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10"
+            title="Create Playlist"
+          >
+            <FaPlus size={10} />
+            <span>New</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1 max-h-56 overflow-y-auto px-1 mt-1 scrollbar-thin">
@@ -120,7 +138,11 @@ const Playlists = ({ setShowNav }) => {
         )}
       </div>
 
-      <PlaylistModal show={show} setShow={setShow} />
+      <PlaylistModal
+        show={show}
+        setShow={setShow}
+        initialTab={initialModalTab}
+      />
     </div>
   );
 };
