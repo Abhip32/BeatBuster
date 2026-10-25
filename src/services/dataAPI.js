@@ -394,14 +394,132 @@ export async function getArtistAlbums(id, page = 0) {
   }
 }
 
-// get search data
+// search songs specifically (returns up to limit songs with full data)
+export async function searchSongs(query, page = 1, limit = 40) {
+  try {
+    const base = getApiBase();
+    const response = await fetch(
+      `${base}/api/search/songs?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.data?.results) ? data.data.results : [];
+  } catch (error) {
+    console.error("searchSongs error:", error);
+    return [];
+  }
+}
+
+// search albums specifically
+export async function searchAlbums(query, page = 1, limit = 20) {
+  try {
+    const base = getApiBase();
+    const response = await fetch(
+      `${base}/api/search/albums?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.data?.results) ? data.data.results : [];
+  } catch (error) {
+    console.error("searchAlbums error:", error);
+    return [];
+  }
+}
+
+// search artists specifically
+export async function searchArtists(query, page = 1, limit = 20) {
+  try {
+    const base = getApiBase();
+    const response = await fetch(
+      `${base}/api/search/artists?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.data?.results) ? data.data.results : [];
+  } catch (error) {
+    console.error("searchArtists error:", error);
+    return [];
+  }
+}
+
+// search playlists specifically
+export async function searchPlaylists(query, page = 1, limit = 20) {
+  try {
+    const base = getApiBase();
+    const response = await fetch(
+      `${base}/api/search/playlists?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.data?.results) ? data.data.results : [];
+  } catch (error) {
+    console.error("searchPlaylists error:", error);
+    return [];
+  }
+}
+
+// get comprehensive search data (combines topQuery from global overview + full specific searches)
 export async function getSearchedData(query) {
   try {
     const base = getApiBase();
-    const response = await fetch(`${base}/api/search?query=${encodeURIComponent(query)}`);
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data?.data || null;
+    const [globalRes, songsRes, albumsRes, artistsRes, playlistsRes] = await Promise.all([
+      fetch(`${base}/api/search?query=${encodeURIComponent(query)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(`${base}/api/search/songs?query=${encodeURIComponent(query)}&limit=40`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(`${base}/api/search/albums?query=${encodeURIComponent(query)}&limit=20`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(`${base}/api/search/artists?query=${encodeURIComponent(query)}&limit=20`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(`${base}/api/search/playlists?query=${encodeURIComponent(query)}&limit=20`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]);
+
+    const globalData = globalRes?.data || {};
+    const topQuery = Array.isArray(globalData?.topQuery?.results)
+      ? globalData.topQuery.results
+      : [];
+
+    const songs = Array.isArray(songsRes?.data?.results) && songsRes.data.results.length > 0
+      ? songsRes.data.results
+      : Array.isArray(globalData?.songs?.results)
+      ? globalData.songs.results
+      : [];
+
+    const albums = Array.isArray(albumsRes?.data?.results) && albumsRes.data.results.length > 0
+      ? albumsRes.data.results
+      : Array.isArray(globalData?.albums?.results)
+      ? globalData.albums.results
+      : [];
+
+    const artists = Array.isArray(artistsRes?.data?.results) && artistsRes.data.results.length > 0
+      ? artistsRes.data.results
+      : Array.isArray(globalData?.artists?.results)
+      ? globalData.artists.results
+      : [];
+
+    const playlists = Array.isArray(playlistsRes?.data?.results) && playlistsRes.data.results.length > 0
+      ? playlistsRes.data.results
+      : Array.isArray(globalData?.playlists?.results)
+      ? globalData.playlists.results
+      : [];
+
+    return {
+      topQuery,
+      songs,
+      albums,
+      artists,
+      playlists,
+      totalSongs: songsRes?.data?.total || songs.length,
+      totalAlbums: albumsRes?.data?.total || albums.length,
+      totalArtists: artistsRes?.data?.total || artists.length,
+      totalPlaylists: playlistsRes?.data?.total || playlists.length,
+    };
   } catch (error) {
     console.error("getSearchedData error:", error);
     return null;

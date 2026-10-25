@@ -10,6 +10,12 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { addSongToPlaylist, getUserPlaylists } from "@/services/playlistApi";
 import { toast } from "react-hot-toast";
 import MiniLyricsModal from "./MiniLyricsModal";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setPlaylists,
+  addSongToPlaylistState,
+} from "@/redux/features/playlistsSlice";
+import { useSession } from "next-auth/react";
 
 const VolumeBar = ({
   value,
@@ -25,30 +31,45 @@ const VolumeBar = ({
   showLyrics,
   setShowLyrics,
 }) => {
+  const dispatch = useDispatch();
+  const { status } = useSession();
+  const playlists = useSelector((state) => state.playlists.playlists);
+  const isLoaded = useSelector((state) => state.playlists.isLoaded);
+
   const [showMenu, setShowMenu] = useState(false);
   const [localShowLyrics, setLocalShowLyrics] = useState(false);
   const isLyricsOpen = showLyrics !== undefined ? showLyrics : localShowLyrics;
   const setLyricsOpen = setShowLyrics !== undefined ? setShowLyrics : setLocalShowLyrics;
-  const [playlists, setPlaylists] = useState([]);
 
   useEffect(() => {
-    const getPlaylists = async () => {
-      const res = await getUserPlaylists();
-      if (res?.success == true) {
-        setPlaylists(res?.data?.playlists || []);
-      }
-    };
-    getPlaylists();
-  }, []);
+    if (status === "authenticated" && !isLoaded) {
+      const getPlaylists = async () => {
+        try {
+          const res = await getUserPlaylists();
+          if (res?.success === true) {
+            dispatch(setPlaylists(res?.data?.playlists || []));
+          }
+        } catch (e) {
+          // ignore
+        }
+      };
+      getPlaylists();
+    }
+  }, [status, isLoaded, dispatch]);
 
   // add song to playlist
   const handleAddToPlaylist = async (song, playlistID) => {
     setShowMenu(false);
-    const res = await addSongToPlaylist(playlistID, song);
-    if (res?.success == true) {
-      toast.success(res?.message);
-    } else {
-      toast.error(res?.message);
+    try {
+      dispatch(addSongToPlaylistState({ playlistId: playlistID, song }));
+      const res = await addSongToPlaylist(playlistID, song);
+      if (res?.success === true) {
+        toast.success(res?.message || "Added to playlist");
+      } else {
+        toast.error(res?.message || "Failed to add song");
+      }
+    } catch {
+      toast.error("Failed to add song to playlist");
     }
   };
 

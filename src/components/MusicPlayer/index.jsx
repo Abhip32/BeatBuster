@@ -124,20 +124,24 @@ const MusicPlayer = () => {
   }, [currentIndex]);
 
   useEffect(() => {
-    const fetchFavourites = async () => {
-      try {
-        setLoading(true);
-        const res = await getFavourite();
-        // console.log("favourites",res);
-        if (Array.isArray(res)) {
-          dispatch(setFavourites(res));
+    if (status === "authenticated") {
+      const fetchFavourites = async () => {
+        try {
+          setLoading(true);
+          const res = await getFavourite();
+          if (Array.isArray(res)) {
+            dispatch(setFavourites(res));
+          }
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
         }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
-    };
-    fetchFavourites();
+      };
+      fetchFavourites();
+    }
+  }, [status, dispatch]);
+
+  useEffect(() => {
     // set ambient background
     const src = activeSong?.image?.[1]?.url;
 

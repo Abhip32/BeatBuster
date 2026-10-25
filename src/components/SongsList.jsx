@@ -14,6 +14,11 @@ import {
 } from "@/services/playlistApi";
 import { addFavourite, getFavourite } from "@/services/dataAPI";
 import { setFavourites, toggleFavouriteSong, removeFavouriteSong } from "@/redux/features/favouritesSlice";
+import {
+  setPlaylists,
+  addSongToPlaylistState,
+  removeSongFromPlaylistState,
+} from "@/redux/features/playlistsSlice";
 import { toast } from "react-hot-toast";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { useSession } from "next-auth/react";
@@ -30,7 +35,8 @@ const SongsList = ({
   const { activeSong, isPlaying } = useSelector((state) => state.player);
   const { status } = useSession();
   const [showMenu, setShowMenu] = useState(null);
-  const [playlists, setPlaylists] = useState([]);
+  const playlists = useSelector((state) => state.playlists.playlists);
+  const isPlaylistsLoaded = useSelector((state) => state.playlists.isLoaded);
   const { items: favouriteSongs } = useSelector((state) => state.favourites || { items: [] });
   const [visibleCount, setVisibleCount] = useState(25);
   const sentinelRef = useRef(null);
@@ -82,13 +88,23 @@ const SongsList = ({
     const loadUserData = async () => {
       try {
         if (status === "authenticated") {
-          const [plRes, favRes] = await Promise.all([
-            getUserPlaylists().catch(() => null),
-            getFavourite().catch(() => []),
-          ]);
+          const promises = [];
+          if (!isPlaylistsLoaded) {
+            promises.push(getUserPlaylists().catch(() => null));
+          }
+          promises.push(getFavourite().catch(() => []));
+          const results = await Promise.all(promises);
           if (!isCancelled) {
+            let plRes = null;
+            let favRes = null;
+            if (!isPlaylistsLoaded) {
+              plRes = results[0];
+              favRes = results[1];
+            } else {
+              favRes = results[0];
+            }
             if (plRes?.success === true) {
-              setPlaylists(plRes?.data?.playlists || []);
+              dispatch(setPlaylists(plRes?.data?.playlists || []));
             }
             if (Array.isArray(favRes)) {
               dispatch(setFavourites(favRes));
@@ -101,7 +117,7 @@ const SongsList = ({
     return () => {
       isCancelled = true;
     };
-  }, [status]);
+  }, [status, isPlaylistsLoaded, dispatch]);
 
   const isSongInFavourites = (song) => {
     if (!song) return false;
@@ -152,6 +168,8 @@ const SongsList = ({
   const handleAddToPlaylist = async (song, pId) => {
     setShowMenu(null);
     try {
+      // Optimistic Redux state update
+      dispatch(addSongToPlaylistState({ playlistId: pId, song }));
       const res = await addSongToPlaylist(pId, song);
       if (res?.success === true) {
         toast.success(res?.message || "Added to playlist");
@@ -166,13 +184,15 @@ const SongsList = ({
   const handleDeleteFromPlaylist = async (pId, song) => {
     setShowMenu(null);
     try {
+      if (setSongs) {
+        setSongs((prev) =>
+          prev.filter((s) => s?.id?.toString() !== song?.toString())
+        );
+      }
+      // Optimistic Redux state update
+      dispatch(removeSongFromPlaylistState({ playlistId: pId, song }));
       const res = await deleteSongFromPlaylist(pId, song);
       if (res?.success === true) {
-        if (setSongs) {
-          setSongs((prev) =>
-            prev.filter((s) => s?.id?.toString() !== song?.toString())
-          );
-        }
         toast.success(res?.message || "Removed from playlist");
       } else {
         toast.error(res?.message || "Could not remove");

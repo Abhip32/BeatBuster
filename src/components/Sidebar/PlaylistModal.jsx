@@ -6,8 +6,9 @@ import { toast } from "react-hot-toast";
 import { createPlaylist } from "@/services/playlistApi";
 import { useDispatch } from "react-redux";
 import { setIsTyping } from "@/redux/features/loadingBarSlice";
+import { addPlaylist } from "@/redux/features/playlistsSlice";
 
-const PlaylistModal = ({ show, setShow }) => {
+const PlaylistModal = ({ show, setShow, onCreated }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,13 @@ const PlaylistModal = ({ show, setShow }) => {
       const res = await createPlaylist(name.trim());
       if (res?.success === true) {
         toast.success(res.message || "Playlist created");
+        const createdItem = res?.data?.playlist || {
+          _id: res?.data?._id || Date.now().toString(),
+          name: name.trim(),
+          songs: [],
+        };
+        dispatch(addPlaylist(createdItem));
+        onCreated?.(createdItem);
         setName("");
         setShow(false);
       } else {

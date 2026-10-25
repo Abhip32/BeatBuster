@@ -8,6 +8,7 @@ import loadingBarReducer from "./features/loadingBarSlice";
 import languagesReducer from "./features/languagesSlice";
 import settingsReducer from "./features/settingsSlice";
 import favouritesReducer from "./features/favouritesSlice";
+import playlistsReducer from "./features/playlistsSlice";
 
 const createNoopStorage = () => {
   return {
@@ -55,6 +56,7 @@ export const store = configureStore({
     languages: languagePersistedReducer,
     settings: settingsPersistedReducer,
     favourites: favouritesReducer,
+    playlists: playlistsReducer,
   },
   middleware: [thunk],
 });
