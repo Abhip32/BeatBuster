@@ -56,6 +56,8 @@ flowchart TD
     H -->|Save Playlist| J["Persist as Named Playlist in\nMongoDB Library"]
 ```
 
+![AI Music DJ Interface](./screenshots/ai-dj.png)
+
 ---
 
 ### 3. Floating AI Mascot Companion
@@ -68,6 +70,10 @@ flowchart TD
 
 
 ## Screenshots
+
+### AI Music DJ (Curated Vibe Mixes)
+Interactive conversational DJ generating instant tailored playlists based on moods, genres, or current tracks, powered by Google Gemini 2.5 Flash and JioSaavn audio hydration.
+![AI Music DJ](./screenshots/ai-dj.png)
 
 ### Home Page
 Bilingual Hindi & English trending tracks, Quick Access cards, live Liked Songs badge, and one-click New Playlist creation.
