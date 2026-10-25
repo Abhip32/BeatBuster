@@ -15,45 +15,66 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
 
   const dispatch = useDispatch();
 
+  const isSong =
+    song?.type === "song" ||
+    (song?.type !== "album" && song?.type !== "playlist" && song?.type !== "artist");
+
+  const isCurrentActive =
+    activeSong?.id === song?.id ||
+    (activeSong?.name && activeSong?.name === song?.name);
+
   const handlePauseClick = () => {
-    if (song?.type === "song") {
-      dispatch(playPause(false));
-    }
+    dispatch(playPause(false));
   };
 
   const handlePlayClick = async () => {
-    if (song?.type === "song") {
-      setLoading(true);
-      const Data = await getSongData(song?.id);
-      const songData = Array.isArray(Data) ? Data[0] : Data || song;
-      const primaryArtistsId =
-        songData?.primaryArtistsId ||
-        songData?.artists?.primary?.[0]?.id ||
-        songData?.id;
-      const recommendedSongs = await getRecommendedSongs(
-        primaryArtistsId,
-        songData?.id
-      );
-      const filteredRecommendedSongs =
-        recommendedSongs?.filter(
-          (s) => !currentSongs?.find((cs) => cs?.id === s?.id)
-        ) || [];
-
-      dispatch(
-        setActiveSong({
-          song: songData,
-          data: currentSongs?.find((s) => s?.id === songData?.id)
-            ? currentSongs
-            : autoAdd
-            ? [...currentSongs, songData, ...filteredRecommendedSongs]
-            : [...currentSongs, songData],
-          i: currentSongs?.find((s) => s?.id === songData?.id)
-            ? currentSongs?.findIndex((s) => s?.id === songData?.id)
-            : currentSongs?.length,
-        })
-      );
+    if (isCurrentActive) {
       dispatch(playPause(true));
-      setLoading(false);
+      return;
+    }
+
+    if (isSong) {
+      setLoading(true);
+      try {
+        let songData = song;
+        if (!Array.isArray(song?.downloadUrl) || song.downloadUrl.length === 0) {
+          const Data = await getSongData(song?.id);
+          songData = Array.isArray(Data) ? Data[0] : Data || song;
+        }
+
+        const nextQueue = currentSongs?.find((s) => s?.id === songData?.id)
+          ? currentSongs
+          : [...(currentSongs || []), songData];
+        const nextIndex = currentSongs?.find((s) => s?.id === songData?.id)
+          ? currentSongs?.findIndex((s) => s?.id === songData?.id)
+          : (currentSongs?.length || 0);
+
+        dispatch(
+          setActiveSong({
+            song: songData,
+            data: nextQueue,
+            i: nextIndex,
+          })
+        );
+        dispatch(playPause(true));
+
+        // Load suggestions in background without blocking playback
+        const primaryArtistsId =
+          songData?.primaryArtistsId ||
+          songData?.artists?.primary?.[0]?.id ||
+          songData?.id;
+        if (autoAdd && primaryArtistsId) {
+          getRecommendedSongs(primaryArtistsId, songData?.id)
+            .then((recommended) => {
+              // optional background queue fill
+            })
+            .catch(() => {});
+        }
+      } catch (err) {
+        console.error("Playback start error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -72,10 +93,6 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
       song?.subtitle) ||
     "";
 
-  const isCurrentActive =
-    activeSong?.id === song?.id ||
-    (activeSong?.name && activeSong?.name === song?.name);
-
   return (
     <div
       key={song?.id}
@@ -83,7 +100,7 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
     >
       <Link
         onClick={(e) => {
-          if (song?.type === "song") {
+          if (isSong) {
             e.preventDefault();
             handlePlayClick();
           }
@@ -116,7 +133,7 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
           />
 
           {/* Floating Spotify Play/Pause Button */}
-          {song?.type === "song" && (
+          {isSong && (
             <div
               className={`absolute right-3 bottom-3 transition-all duration-300 z-10 ${
                 isCurrentActive

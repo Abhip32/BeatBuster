@@ -183,7 +183,13 @@ export async function homePageData(language) {
 // get song data
 export async function getSongData(id) {
   try {
-    if (typeof id === "object" && id !== null && (id.name || id.title)) {
+    // If id is already a fully resolved song object with downloadUrl, return it directly
+    if (
+      typeof id === "object" &&
+      id !== null &&
+      Array.isArray(id.downloadUrl) &&
+      id.downloadUrl.length > 0
+    ) {
       return id;
     }
     const rawId = typeof id === "object" ? id?.id : id;

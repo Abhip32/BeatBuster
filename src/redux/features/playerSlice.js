@@ -39,6 +39,7 @@ const playerSlice = createSlice({
       state.currentIndex = action.payload.i;
       }
       state.isActive = true;
+      state.isPlaying = true;
       state.openedByClick = true;
     },
 
@@ -47,6 +48,7 @@ const playerSlice = createSlice({
         state.activeSong = state.currentSongs[action.payload];
         state.currentIndex = action.payload;
         state.isActive = true;
+        state.isPlaying = true;
         state.openedByClick = false;
       }
     },
@@ -56,6 +58,7 @@ const playerSlice = createSlice({
         state.activeSong = state.currentSongs[action.payload];
         state.currentIndex = action.payload;
         state.isActive = true;
+        state.isPlaying = true;
         state.openedByClick = false;
       }
     },
