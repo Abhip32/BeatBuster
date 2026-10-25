@@ -33,7 +33,7 @@ const AiMascot = () => {
           <div
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="mb-2 mr-1 w-[260px] sm:w-[280px] bg-[#140b1e]/95 backdrop-blur-xl border border-rose-500/30 rounded-2xl p-3 shadow-[0_12px_40px_rgba(0,0,0,0.7),0_0_24px_rgba(244,63,94,0.25)] animate-fadeIn transition-all relative"
+            className="mb-2 mr-2 w-[260px] sm:w-[280px] bg-[#140b1e]/95 backdrop-blur-xl border border-rose-500/30 rounded-2xl p-3 shadow-[0_12px_40px_rgba(0,0,0,0.7),0_0_24px_rgba(244,63,94,0.25)] animate-fadeIn transition-all relative"
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-white/[0.08]">
@@ -124,16 +124,16 @@ const AiMascot = () => {
           </div>
         )}
 
-        {/* Mascot Avatar in Circle */}
+        {/* Mascot Character Button - Completely unclipped cutout */}
         <div className="relative flex flex-col items-center">
           {/* Floating musical notes when playing */}
           {isPlaying && (
             <>
-              <div className="absolute -top-6 left-1 pointer-events-none text-rose-400 text-sm animate-bounce">
+              <div className="absolute -top-6 left-2 pointer-events-none text-rose-400 text-sm animate-bounce">
                 <BsMusicNoteBeamed />
               </div>
               <div
-                className="absolute -top-4 right-0 pointer-events-none text-purple-400 text-xs animate-bounce"
+                className="absolute -top-4 right-1 pointer-events-none text-purple-400 text-xs animate-bounce"
                 style={{ animationDelay: "0.35s" }}
               >
                 ♪
@@ -141,7 +141,15 @@ const AiMascot = () => {
             </>
           )}
 
-          {/* Interactive Circle Button */}
+          {/* Hologram Pulse Ring when music is active */}
+          {isPlaying && (
+            <div
+              className="absolute inset-0 rounded-full border-2 border-rose-500/30 animate-ping pointer-events-none"
+              style={{ animationDuration: "2.6s" }}
+            />
+          )}
+
+          {/* The Cat Mascot Button (Free-standing cutout, NO circular clipping) */}
           <button
             type="button"
             onClick={() => openWithPrompt("")}
@@ -150,33 +158,33 @@ const AiMascot = () => {
             title="Chat with Milo the AI DJ Cat"
             className="group relative cursor-pointer outline-none transition-all duration-300 transform hover:scale-110 active:scale-95 flex flex-col items-center"
           >
-            {/* Ambient Floor Glow */}
-            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-16 h-3 bg-black/60 rounded-full blur-[3px]" />
+            {/* Soft Ambient Neon Glow Behind Cat */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-rose-500/25 via-pink-500/20 to-purple-600/25 blur-lg group-hover:blur-xl transition-all" />
 
-            {/* Circular Avatar Container - Clean, Uncropped, NO fake headphones */}
-            <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-full p-[2.5px] bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 shadow-[0_8px_25px_rgba(244,63,94,0.35)] flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-[#12081c] overflow-hidden flex items-center justify-center relative p-1">
-                {/* Fluffy White Cat - Fitted completely, cleanly, without cropping */}
-                <Image
-                  src="/images/cat-mascot.png"
-                  alt="Milo AI DJ Cat"
-                  width={90}
-                  height={90}
-                  priority
-                  className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:scale-105"
-                />
+            {/* Soft Ground Shadow Under Paws */}
+            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-3 bg-black/60 rounded-full blur-[3px]" />
 
-                {/* Sparkle Badge in top-right */}
-                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center shadow-md border border-white/30 animate-pulse">
-                  <IoSparkles className="text-yellow-200 text-[8px]" />
-                </div>
+            {/* Fluffy White Cat Cutout - 100% visible, ZERO clipping */}
+            <div className="relative w-20 h-24 sm:w-22 sm:h-26 flex items-center justify-center">
+              <Image
+                src="/images/cat-mascot.png"
+                alt="Milo AI DJ Cat"
+                width={88}
+                height={108}
+                priority
+                className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(244,63,94,0.35)] transition-transform duration-300"
+              />
+
+              {/* Sparkle badge near top ear */}
+              <div className="absolute top-1 right-0 w-4 h-4 rounded-full bg-gradient-to-tr from-rose-500 to-purple-600 flex items-center justify-center shadow-md border border-white/30 animate-pulse">
+                <IoSparkles className="text-yellow-200 text-[8px]" />
               </div>
             </div>
 
-            {/* Mascot Pill Tag At Bottom of Circle */}
-            <div className="relative -mt-2 px-2.5 py-0.5 rounded-full bg-black/90 border border-rose-500/50 text-[9px] font-black text-rose-300 shadow-xl flex items-center gap-1 whitespace-nowrap group-hover:border-rose-400 group-hover:text-white transition-colors">
+            {/* Cute Pill Tag Under Paws */}
+            <div className="relative -mt-1 px-2.5 py-0.5 rounded-full bg-black/90 border border-rose-500/50 text-[9px] font-black text-rose-300 shadow-xl flex items-center gap-1 whitespace-nowrap group-hover:border-rose-400 group-hover:text-white transition-colors">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>MILO DJ</span>
+              <span>MILO AI DJ</span>
             </div>
           </button>
         </div>
