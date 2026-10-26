@@ -19,8 +19,7 @@ const PlayPause = ({
 
   const isCurrentActive =
     isPlaying &&
-    (activeSong?.id === song?.id ||
-      (activeSong?.name && activeSong?.name === song?.name));
+    Boolean(activeSong?.id && String(activeSong.id) === String(song?.id));
 
   return (
     <button

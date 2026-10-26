@@ -372,8 +372,7 @@ const SearchResultsPage = ({ params }) => {
                 <div className="flex flex-col gap-1.5">
                   {songResults.slice(0, 5).map((song, index) => {
                     const isThisActive =
-                      activeSong?.id === song?.id ||
-                      (activeSong?.name && activeSong?.name === song?.name);
+                      Boolean(activeSong?.id && String(activeSong.id) === String(song?.id));
                     const artistName =
                       (Array.isArray(song?.artists?.primary) &&
                         song.artists.primary.map((a) => a?.name).join(", ")) ||

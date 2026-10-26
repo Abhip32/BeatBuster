@@ -23,6 +23,18 @@ import { toast } from "react-hot-toast";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { useSession } from "next-auth/react";
 
+const decodeHtml = (str) => {
+  if (!str) return "";
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+};
+
 const SongsList = ({
   SongData,
   loading,
@@ -32,7 +44,7 @@ const SongsList = ({
   setSongs,
   isFavouritePage,
 }) => {
-  const { activeSong, isPlaying } = useSelector((state) => state.player);
+  const { activeSong, isPlaying, currentIndex } = useSelector((state) => state.player);
   const { status } = useSession();
   const [showMenu, setShowMenu] = useState(null);
   const playlists = useSelector((state) => state.playlists.playlists);
@@ -45,15 +57,16 @@ const SongsList = ({
   // Deduplicate songs by ID to prevent repeated tracks
   const uniqueSongs = useMemo(() => {
     if (!Array.isArray(SongData)) return [];
+    if (hidePlays) return SongData; // Preserve queue tracks and exact currentSongs indices
     const seen = new Set();
     return SongData.filter((s) => {
       if (!s) return false;
-      const key = String(s?.id || s?.name || "");
+      const key = String(s?.id || "");
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
     });
-  }, [SongData]);
+  }, [SongData, hidePlays]);
 
   // Scroll-based loading (Infinite scroll observer)
   useEffect(() => {
@@ -220,25 +233,26 @@ const SongsList = ({
     <>
       <div className="mt-4 flex flex-col gap-1">
         {/* Spotify Table Header */}
-        <div className="hidden sm:grid grid-cols-12 px-4 py-2 border-b border-white/[0.08] text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-          <div className="col-span-1 text-center">#</div>
-          <div className="col-span-6 md:col-span-7">Title</div>
-          {!hidePlays && (
-            <div className="hidden lg:block lg:col-span-2">Plays</div>
-          )}
-          <div
-            className={`${
-              hidePlays ? "col-span-4 md:col-span-3" : "col-span-4 md:col-span-2"
-            } text-right pr-6`}
-          >
-            Duration
+        <div className="hidden sm:flex items-center justify-between px-3 sm:px-4 py-2 border-b border-white/[0.08] text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 mr-3">
+            <span className="w-6 sm:w-8 text-center flex-shrink-0">#</span>
+            <span className="pl-12 sm:pl-14">Title</span>
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+            {!hidePlays && (
+              <span className="hidden md:block w-20 text-right mr-1">Plays</span>
+            )}
+            <span className="w-24 sm:w-28 text-right pr-2">Duration</span>
           </div>
         </div>
 
         {renderedSongs.map((song, index) => {
-          const isThisActive =
-            activeSong?.id === song?.id ||
-            (activeSong?.name && activeSong?.name === song?.name);
+          const songId = song?.id ? String(song.id) : null;
+          const activeId = activeSong?.id ? String(activeSong.id) : null;
+          const idMatches = Boolean(songId && activeId && songId === activeId);
+          const isThisActive = hidePlays
+            ? (idMatches && index === currentIndex) || (!activeId && index === currentIndex)
+            : idMatches;
 
           const artistName =
             (Array.isArray(song?.artists?.primary) &&
@@ -253,43 +267,44 @@ const SongsList = ({
 
           return (
             <div
-              key={song?.id || index}
+              key={hidePlays ? `${song?.id || "track"}-${index}` : (song?.id || index)}
               onClick={() => handlePlayClick(song, index)}
-              className={`group grid grid-cols-12 items-center px-3 sm:px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+              className={`group flex items-center justify-between px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
                 isThisActive
                   ? "bg-white/[0.08] border border-[var(--primary-accent,#f43f5e)]/40 shadow-md"
                   : "hover:bg-white/[0.05] border border-transparent"
               }`}
             >
-              {/* Index / Play indicator */}
-              <div className="col-span-2 sm:col-span-1 flex items-center justify-center">
-                {isThisActive ? (
-                  isPlaying ? (
-                    <BiHeadphone
-                      size={22}
-                      className="text-[var(--primary-accent,#f43f5e)] animate-pulse"
-                    />
+              {/* Left Column: Index / Play + Artwork + Title & Artist */}
+              <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 mr-3">
+                {/* Index / Play indicator */}
+                <div className="w-6 sm:w-8 flex items-center justify-center flex-shrink-0 text-center">
+                  {isThisActive ? (
+                    isPlaying ? (
+                      <BiHeadphone
+                        size={20}
+                        className="text-[var(--primary-accent,#f43f5e)] animate-pulse"
+                      />
+                    ) : (
+                      <BsPauseFill
+                        size={18}
+                        className="text-[var(--primary-accent,#f43f5e)]"
+                      />
+                    )
                   ) : (
-                    <BsPauseFill
-                      size={20}
-                      className="text-[var(--primary-accent,#f43f5e)]"
-                    />
-                  )
-                ) : (
-                  <>
-                    <span className="group-hover:hidden text-xs font-bold text-gray-400">
-                      {index + 1}
-                    </span>
-                    <BsPlayFill
-                      size={20}
-                      className="hidden group-hover:block text-white"
-                    />
-                  </>
-                )}
-              </div>
+                    <>
+                      <span className="group-hover:hidden text-xs font-bold text-gray-400">
+                        {index + 1}
+                      </span>
+                      <BsPlayFill
+                        size={18}
+                        className="hidden group-hover:block text-white"
+                      />
+                    </>
+                  )}
+                </div>
 
-              {/* Title & Artist */}
-              <div className="col-span-7 sm:col-span-6 md:col-span-7 flex items-center gap-3 min-w-0 pr-2">
+                {/* Cover Artwork */}
                 <img
                   src={
                     song?.image?.[2]?.url ||
@@ -305,46 +320,44 @@ const SongsList = ({
                   height={40}
                   className="w-10 h-10 rounded-lg object-cover flex-shrink-0 bg-[#18181f] shadow-sm"
                 />
-                <div className="min-w-0 flex-1">
+
+                {/* Title and Artist */}
+                <div className="min-w-0 flex-1 pr-1">
                   <p
-                    className={`text-sm font-semibold truncate transition-colors ${
+                    className={`text-xs sm:text-sm font-semibold truncate transition-colors leading-tight ${
                       isThisActive
                         ? "text-[var(--primary-accent,#f43f5e)]"
                         : "text-white group-hover:text-white"
                     }`}
                   >
-                    {song?.name
-                      ?.replaceAll("&#039;", "'")
-                      ?.replaceAll("&amp;", "&")}
+                    {decodeHtml(song?.name)}
                   </p>
-                  <p className="text-xs text-[#b3b3b3] truncate mt-0.5 group-hover:text-gray-300">
-                    {artistName}
+                  <p className="text-[11px] sm:text-xs text-[#b3b3b3] truncate mt-0.5 group-hover:text-gray-300 leading-tight">
+                    {decodeHtml(artistName)}
                   </p>
                 </div>
               </div>
 
-              {/* Plays count */}
-              {!hidePlays && (
-                <div className="hidden lg:block lg:col-span-2 text-xs text-gray-400">
-                  {song?.playCount
-                    ? Number(song.playCount).toLocaleString()
-                    : "-"}
-                </div>
-              )}
+              {/* Right Column: Plays count + Heart + Duration + Options Menu */}
+              <div className="flex items-center gap-2 sm:gap-3 text-xs text-gray-400 flex-shrink-0 ml-auto">
+                {/* Optional Plays count on full pages */}
+                {!hidePlays && song?.playCount && (
+                  <span className="hidden md:block text-xs text-gray-400 tabular-nums mr-1">
+                    {Number(song.playCount).toLocaleString()}
+                  </span>
+                )}
 
-              {/* Actions, Heart, Duration & Options Menu */}
-              <div className="col-span-3 sm:col-span-5 md:col-span-4 lg:col-span-2 flex items-center justify-end gap-3 text-xs text-gray-400">
                 {/* Direct Heart Button on row */}
                 <button
                   type="button"
                   onClick={(e) => handleToggleFavourite(e, song)}
                   title={isFav ? "Remove from Liked Songs" : "Save to Liked Songs"}
-                  className="p-1 cursor-pointer transition-transform hover:scale-125 outline-none focus:outline-none"
+                  className="p-1 cursor-pointer transition-transform hover:scale-125 outline-none focus:outline-none flex-shrink-0"
                 >
                   {isFav ? (
                     <AiFillHeart
                       size={18}
-                      className="text-[#f43f5e] drop-shadow-[0_0_8px_rgba(244, 63, 94,0.6)]"
+                      className="text-[#f43f5e] drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]"
                     />
                   ) : (
                     <AiOutlineHeart
@@ -354,11 +367,13 @@ const SongsList = ({
                   )}
                 </button>
 
-                <span className="font-mono">
+                {/* Duration */}
+                <span className="font-mono text-xs text-gray-300 tabular-nums w-10 sm:w-11 text-right flex-shrink-0">
                   {formatDuration(song?.duration)}
                 </span>
 
-                <div className="relative">
+                {/* 3 dots menu container */}
+                <div className="relative flex-shrink-0">
                   <button
                     type="button"
                     onClick={(e) => {

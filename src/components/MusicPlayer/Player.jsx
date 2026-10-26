@@ -160,8 +160,18 @@ const Player = ({
   }, [volume]);
 
   useEffect(() => {
-    if (ref.current && typeof seekTime === "number") {
-      ref.current.currentTime = seekTime;
+    if (ref.current && seekTime !== undefined && seekTime !== null) {
+      const targetTime =
+        typeof seekTime === "object"
+          ? Number(seekTime.time)
+          : Number(seekTime);
+      if (!isNaN(targetTime) && isFinite(targetTime)) {
+        try {
+          ref.current.currentTime = Math.max(0, targetTime);
+        } catch (e) {
+          // Ignore if audio metadata isn't ready
+        }
+      }
     }
   }, [seekTime]);
 

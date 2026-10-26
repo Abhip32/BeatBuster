@@ -43,8 +43,17 @@ const MusicPlayer = () => {
     (state) => state.settings?.autoOpenFullscreen
   );
   const [duration, setDuration] = useState(0);
-  const [seekTime, setSeekTime] = useState(0);
+  const [seekTime, setSeekTime] = useState(null);
   const [appTime, setAppTime] = useState(0);
+
+  const handleSeek = (newTime) => {
+    const parsed = typeof newTime === "number" ? newTime : parseFloat(newTime);
+    if (!isNaN(parsed) && isFinite(parsed)) {
+      const clamped = Math.max(0, parsed);
+      setAppTime(clamped);
+      setSeekTime({ time: clamped, stamp: Date.now() + Math.random() });
+    }
+  };
   const [volume, setVolume] = useState(0.8);
   const [repeat, setRepeat] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -264,12 +273,19 @@ const MusicPlayer = () => {
     } catch (error) {
       console.error("add to fav error", error);
     }
-  };return (
+  };
+
+  const coverUrl =
+    activeSong?.image?.[2]?.url ||
+    activeSong?.image?.[1]?.url ||
+    activeSong?.image?.[0]?.url;
+
+  return (
     <div
       className={`relative transition-all duration-100 flex flex-col hideScrollBar backdrop-blur-2xl ${
         fullScreen
-          ? "h-[100dvh] w-full justify-center overflow-y-auto min-[1180px]:overflow-hidden px-4 sm:px-6 lg:px-8"
-          : "w-full h-20 px-3 sm:px-6 lg:px-8 justify-center overflow-visible"
+          ? "h-[100dvh] w-full justify-center overflow-y-auto min-[1180px]:overflow-hidden px-4 sm:px-6 lg:px-8 bg-[#0c0c0e]"
+          : "w-full h-20 px-3 sm:px-6 lg:px-8 justify-center overflow-visible border-t border-white/[0.08] shadow-[0_-8px_32px_rgba(0,0,0,0.5)]"
       }`}
       onClick={() => {
         if (showLyrics) {
@@ -282,26 +298,33 @@ const MusicPlayer = () => {
         }
       }}
       style={{
-        backgroundColor: bgColor
-          ? `rgba(${bgColor.red}, ${bgColor.green}, ${bgColor.blue}, 0.2)`
-          : "rgba(0,0,0,0.2)",
+        backgroundColor: fullScreen
+          ? undefined
+          : bgColor
+          ? `rgba(${bgColor.red}, ${bgColor.green}, ${bgColor.blue}, 0.16)`
+          : "rgba(16, 16, 20, 0.75)",
       }}
     >
-      {/* Fullscreen Close Button */}
-      {fullScreen && (
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={(e) => {
-            e.stopPropagation();
-            e.currentTarget.blur();
-            dispatch(setFullScreen(false));
-          }}
-          className="absolute top-4 right-4 sm:top-6 sm:right-8 z-30 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer backdrop-blur-md outline-none focus:outline-none focus:ring-0"
-          title="Close Fullscreen"
-        >
-          <HiOutlineChevronDown className="text-2xl sm:text-3xl" />
-        </button>
+      {/* Fullscreen Dynamic Ambient Cover Art Backdrop */}
+      {fullScreen && coverUrl && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 select-none">
+          <div
+            className="absolute inset-0 bg-cover bg-center scale-125 blur-[90px] opacity-45 brightness-75 transition-all duration-700"
+            style={{ backgroundImage: `url(${coverUrl})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/85" />
+        </div>
+      )}
+
+      {/* Mini Player Ambient Cover Glow Backdrop (Frosted Glass Effect) */}
+      {!fullScreen && coverUrl && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 select-none">
+          <div
+            className="absolute inset-0 bg-cover bg-center scale-150 blur-3xl opacity-20 brightness-90 transition-all duration-700"
+            style={{ backgroundImage: `url(${coverUrl})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/80 backdrop-blur-2xl" />
+        </div>
       )}
 
       {/* Fullscreen Main Content */}
@@ -325,7 +348,7 @@ const MusicPlayer = () => {
             loading={loading}
             appTime={appTime}
             duration={duration}
-            setSeekTime={setSeekTime}
+            setSeekTime={handleSeek}
             volume={volume}
             setVolume={handleSetVolume}
             bgColor={bgColor}
@@ -384,8 +407,8 @@ const MusicPlayer = () => {
               min="0"
               max={duration}
               fullScreen={false}
-              onInput={(event) => setSeekTime(event.target.value)}
-              setSeekTime={setSeekTime}
+              onInput={(event) => handleSeek(event.target.value)}
+              setSeekTime={handleSeek}
               appTime={appTime}
             />
           </div>
@@ -402,7 +425,7 @@ const MusicPlayer = () => {
               onChange={(event) => handleSetVolume(event.target.value)}
               setVolume={handleSetVolume}
               appTime={appTime}
-              setSeekTime={setSeekTime}
+              setSeekTime={handleSeek}
               showLyrics={showLyrics}
               setShowLyrics={setShowLyrics}
             />
@@ -482,7 +505,7 @@ const MusicPlayer = () => {
         onTimeUpdate={(event) => setAppTime(event.target.currentTime)}
         onLoadedData={(event) => setDuration(event.target.duration)}
         appTime={appTime}
-        setSeekTime={setSeekTime}
+        setSeekTime={handleSeek}
       />
     </div>
   );

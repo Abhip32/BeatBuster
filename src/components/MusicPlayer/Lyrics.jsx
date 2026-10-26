@@ -263,16 +263,16 @@ const Lyrics = ({
           /* Queue Tab */
           <div className="w-full flex-1 min-h-0 flex flex-col">
             <div
-              className="flex justify-between items-center gap-4 py-1.5 px-2 flex-shrink-0"
+              className="flex items-center justify-between gap-3 py-2 px-3 bg-white/[0.05] rounded-xl border border-white/[0.08] mb-2 flex-shrink-0"
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="text-white font-medium text-sm sm:text-base">
+              <p className="text-white font-medium text-xs sm:text-sm truncate min-w-0 select-none">
                 Auto add similar songs to queue
               </p>
 
               <label
                 htmlFor="autoAddButton"
-                className="relative inline-flex items-center cursor-pointer mr-1"
+                className="relative inline-flex items-center cursor-pointer flex-shrink-0"
               >
                 <input
                   onChange={(e) => {
@@ -286,7 +286,7 @@ const Lyrics = ({
                   placeholder="autoAddButton"
                   title={autoAdd ? "on" : "off"}
                 />
-                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none ring-2 ring-gray-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-[#f43f5e]" />
+                <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#f43f5e]" />
               </label>
             </div>
             {currentSongs?.length > 0 ? (

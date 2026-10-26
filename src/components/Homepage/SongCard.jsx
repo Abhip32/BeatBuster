@@ -20,8 +20,7 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
     (song?.type !== "album" && song?.type !== "playlist" && song?.type !== "artist");
 
   const isCurrentActive =
-    activeSong?.id === song?.id ||
-    (activeSong?.name && activeSong?.name === song?.name);
+    Boolean(activeSong?.id && String(activeSong.id) === String(song?.id));
 
   const handlePauseClick = () => {
     dispatch(playPause(false));
@@ -114,28 +113,30 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
         }
         className="flex flex-col h-full"
       >
-        <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3 bg-[#18181f] shadow-md">
-          <img
-            width={240}
-            height={240}
-            loading="lazy"
-            alt={song?.name || "cover"}
-            src={
-              song?.image?.[2]?.url ||
-              song?.image?.[1]?.url ||
-              song?.image?.[0]?.url ||
-              "/images/vinyl.png"
-            }
-            onError={(e) => {
-              e.currentTarget.src = "/images/vinyl.png";
-            }}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+        <div className="relative w-full aspect-square rounded-xl mb-3 shadow-md">
+          <div className="w-full h-full rounded-xl overflow-hidden bg-[#18181f]">
+            <img
+              width={240}
+              height={240}
+              loading="lazy"
+              alt={song?.name || "cover"}
+              src={
+                song?.image?.[2]?.url ||
+                song?.image?.[1]?.url ||
+                song?.image?.[0]?.url ||
+                "/images/vinyl.png"
+              }
+              onError={(e) => {
+                e.currentTarget.src = "/images/vinyl.png";
+              }}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          </div>
 
           {/* Floating Spotify Play/Pause Button */}
           {isSong && (
             <div
-              className={`absolute right-3 bottom-3 transition-all duration-300 z-10 ${
+              className={`absolute right-2.5 bottom-2.5 transition-all duration-300 z-10 ${
                 isCurrentActive
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"

@@ -102,13 +102,22 @@ const FullscreenTrack = ({
     <div
       className={`${
         fullScreen ? "flex" : "hidden"
-      } w-full h-full flex-col justify-center max-w-[1550px] 2xl:max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-4 sm:py-6 xl:py-8`}
+      } w-full h-full flex-col justify-center max-w-[1550px] 2xl:max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-2 sm:py-6 xl:py-8`}
     >
+      {/* Centered Bottom-Sheet Drag Handle Bar (Mobile & Desktop) */}
+      <div
+        className="w-full flex items-center justify-center -mt-6 sm:-mt-3 mb-2 sm:mb-4 py-2 cursor-pointer select-none active:opacity-60 transition-opacity z-40 group"
+        onClick={() => dispatch(setFullScreen(false))}
+        title="Click or swipe down to minimize"
+      >
+        <div className="w-14 sm:w-20 h-1.5 rounded-full bg-white/30 group-hover:bg-white/70 group-hover:scale-110 transition-all shadow-sm" />
+      </div>
+
       {/* Main Content Area */}
       <div className="flex-1 min-h-0 w-full flex min-[1180px]:flex-row items-center justify-center min-[1180px]:items-center min-[1180px]:justify-between gap-6 min-[1180px]:gap-12 xl:gap-20 py-2 sm:py-4 my-auto">
         {/* Left Column (Artwork, Track Info, Controls, Seekbar) */}
         <div
-          className={`flex-col items-center justify-between w-full min-[1180px]:max-w-[620px] xl:max-w-[720px] 2xl:max-w-[820px] h-full min-[1180px]:h-[640px] xl:h-[700px] 2xl:h-[760px] min-[1180px]:max-h-[85vh] ${
+          className={`flex-col items-center justify-between w-full min-[1180px]:max-w-[500px] xl:max-w-[560px] 2xl:max-w-[620px] h-full min-[1180px]:h-[560px] xl:h-[620px] 2xl:h-[680px] min-[1180px]:max-h-[85vh] ${
             mobileTab !== "song" ? "hidden min-[1180px]:flex" : "flex"
           }`}
         >
@@ -116,7 +125,7 @@ const FullscreenTrack = ({
           <div
             {...handlers}
             onClick={(e) => e.stopPropagation()}
-            className="w-[min(70vw,280px)] h-[min(70vw,280px)] sm:w-[340px] sm:h-[340px] md:w-[380px] md:h-[380px] min-[1180px]:w-[480px] min-[1180px]:h-[480px] xl:w-[520px] xl:h-[520px] 2xl:w-[580px] 2xl:h-[580px] aspect-square flex-shrink-0 relative shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 mx-auto my-auto max-h-[36vh] sm:max-h-none border border-white/10 cursor-pointer"
+            className="w-[min(70vw,260px)] h-[min(70vw,260px)] sm:w-[300px] sm:h-[300px] md:w-[320px] md:h-[320px] min-[1180px]:w-[320px] min-[1180px]:h-[320px] xl:w-[360px] xl:h-[360px] 2xl:w-[400px] 2xl:h-[400px] aspect-square flex-shrink-0 relative shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 mx-auto my-auto max-h-[36vh] sm:max-h-none border border-white/10 cursor-pointer"
           >
             <img
               src={
@@ -299,7 +308,7 @@ const FullscreenTrack = ({
         {/* Right Column: Queue & Lyrics + VolumeBar (Desktop >= 1180px) */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="flex-col justify-between min-[1180px]:flex hidden flex-1 max-w-[500px] xl:max-w-[560px] 2xl:max-w-[620px] w-full min-[1180px]:h-[640px] xl:h-[700px] 2xl:h-[760px] min-[1180px]:max-h-[85vh]"
+          className="flex-col justify-between min-[1180px]:flex hidden flex-1 max-w-[500px] xl:max-w-[560px] 2xl:max-w-[620px] w-full min-[1180px]:h-[560px] xl:h-[620px] 2xl:h-[680px] min-[1180px]:max-h-[85vh]"
         >
           <div className="w-full flex-1 min-h-0 flex flex-col">
             <Lyrics

@@ -14,6 +14,19 @@ const Seekbar = ({
   const getTime = (time) =>
     `${Math.floor(time / 60)}:${`0${Math.floor(time % 60)}`.slice(-2)}`;
 
+  const handleSeek = (event) => {
+    event.stopPropagation();
+    const val = parseFloat(event.target.value);
+    if (!isNaN(val)) {
+      if (setSeekTime) setSeekTime(val);
+      if (onInput) onInput(event);
+    }
+  };
+
+  const curValue = Number(value) || 0;
+  const maxValue = Number(max) || 0;
+  const minValue = Number(min) || 0;
+
   return (
     <div
       className={`${
@@ -52,11 +65,22 @@ const Seekbar = ({
         }}
         type="range"
         step="any"
-        value={value}
-        min={min}
-        max={max}
-        onInput={onInput}
-        style={{ background: `linear-gradient(to right, #f43f5e ${max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0}%, rgba(255, 255, 255, 0.2) ${max > 0 ? Math.min(Math.max((value / max) * 100, 0), 100) : 0}%)` }}
+        value={curValue}
+        min={minValue}
+        max={maxValue}
+        onChange={handleSeek}
+        onInput={handleSeek}
+        style={{
+          background: `linear-gradient(to right, #f43f5e ${
+            maxValue > 0
+              ? Math.min(Math.max((curValue / maxValue) * 100, 0), 100)
+              : 0
+          }%, rgba(255, 255, 255, 0.2) ${
+            maxValue > 0
+              ? Math.min(Math.max((curValue / maxValue) * 100, 0), 100)
+              : 0
+          }%)`,
+        }}
         className={`w-full flex-1 min-w-0 ${
           fullScreen ? "h-1.5 sm:h-2 mx-2 sm:mx-4" : "h-1.5 mx-2 sm:mx-4"
         } rounded-lg accent-[#f43f5e] cursor-pointer transition-all outline-none focus:outline-none focus:ring-0`}

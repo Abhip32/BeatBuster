@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { IoClose, IoSparkles } from "react-icons/io5";
 import { BsFillPlayFill, BsDisc } from "react-icons/bs";
 import { FaBookmark, FaKey } from "react-icons/fa";
@@ -8,6 +9,18 @@ import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import { addPlaylist } from "@/redux/features/playlistsSlice";
 import { createPlaylist, addSongToPlaylist } from "@/services/playlistApi";
 import { toast } from "react-hot-toast";
+
+const decodeHtml = (str) => {
+  if (!str) return "";
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+};
 
 const QUICK_PROMPTS = [
   "🌙 Late Night Chill",
@@ -24,10 +37,16 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
 
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSavingPlaylist, setIsSavingPlaylist] = useState(false);
   const [commentary, setCommentary] = useState("");
   const [songs, setSongs] = useState([]);
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (show && initialPrompt) {
@@ -103,11 +122,13 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
   };
 
   const handleSaveAsPlaylist = async () => {
-    if (songs.length === 0) return;
+    if (songs.length === 0 || isSavingPlaylist) return;
     const playlistTitle = prompt.trim()
       ? `AI Mix: ${prompt.slice(0, 24)}`
       : `AI Mix: ${new Date().toLocaleDateString()}`;
 
+    setIsSavingPlaylist(true);
+    const toastId = toast.loading("Saving AI playlist to your library...");
     try {
       const createRes = await createPlaylist(playlistTitle);
       if (createRes?.success === true) {
@@ -128,19 +149,25 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
           songs,
         };
         dispatch(addPlaylist(populatedItem));
-        toast.success(`Saved "${playlistTitle}" with ${songs.length} songs!`);
+        toast.success(`Saved "${playlistTitle}" with ${songs.length} songs!`, {
+          id: toastId,
+        });
         setShow(false);
       } else {
-        toast.error(createRes?.message || "Failed to create playlist");
+        toast.error(createRes?.message || "Failed to create playlist", {
+          id: toastId,
+        });
       }
     } catch {
-      toast.error("Failed to save playlist");
+      toast.error("Failed to save playlist", { id: toastId });
+    } finally {
+      setIsSavingPlaylist(false);
     }
   };
 
-  if (!show) return null;
+  if (!show || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       onClick={() => setShow(false)}
       className="fixed inset-0 bg-black/85 backdrop-blur-md z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200"
@@ -296,11 +323,21 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  disabled={isSavingPlaylist || loading}
                   onClick={handleSaveAsPlaylist}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/[0.06] hover:bg-white/[0.12] text-gray-200 hover:text-white border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/[0.08] hover:bg-white/[0.15] text-gray-200 hover:text-white border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <FaBookmark size={10} />
-                  <span>Save Playlist</span>
+                  {isSavingPlaylist ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaBookmark size={10} />
+                      <span>Save Playlist</span>
+                    </>
+                  )}
                 </button>
                 <button
                   type="button"
@@ -337,7 +374,7 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-bold text-white truncate group-hover:text-[#f43f5e] transition-colors">
-                        {song.name?.replaceAll("&#039;", "'")?.replaceAll("&amp;", "&")}
+                        {decodeHtml(song?.name)}
                       </p>
                       <p className="text-[11px] text-gray-400 truncate">
                         {song?.artists?.primary?.[0]?.name || song?.primaryArtists || "Artist"}
@@ -353,7 +390,8 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -216,10 +216,10 @@ const Home = () => {
       </div>
 
       {/* Spotify Category Tabs */}
-      <div className="flex items-center gap-2.5 mb-8 overflow-x-auto pb-1 scrollbar-none">
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
           onClick={() => setActiveTab("all")}
-          className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "all"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -231,7 +231,7 @@ const Home = () => {
         <button
           type="button"
           onClick={() => setShowAiDj(true)}
-          className="glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-purple-300 hover:text-white border-purple-500/30 hover:border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer"
+          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-purple-300 hover:text-white border-purple-500/30 hover:border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer"
         >
           <IoSparkles className="text-purple-400 text-sm animate-pulse" />
           <span>AI DJ</span>
@@ -239,7 +239,7 @@ const Home = () => {
 
         <Link
           href="/favourite"
-          className="glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-[#f43f5e]/50 cursor-pointer"
+          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-[#f43f5e]/50 cursor-pointer"
         >
           <AiFillHeart className="text-[#f43f5e]" />
           <span>Liked Songs</span>
@@ -252,7 +252,7 @@ const Home = () => {
 
         <button
           onClick={() => setActiveTab("playlists")}
-          className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
             activeTab === "playlists"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -269,7 +269,7 @@ const Home = () => {
 
         <button
           onClick={() => setActiveTab("trending")}
-          className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "trending"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -280,7 +280,7 @@ const Home = () => {
 
         <button
           onClick={() => setActiveTab("charts")}
-          className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "charts"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -292,22 +292,24 @@ const Home = () => {
 
       {/* Quick Access Tiles (Shown on All tab) */}
       {activeTab === "all" && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 mb-8">
           {/* Liked Songs Tile */}
           <Link
             href="/favourite"
-            className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-rose-950/30 via-rose-900/15 to-white/[0.03] hover:from-rose-900/40 hover:to-white/[0.07] backdrop-blur-md border border-[#f43f5e]/30 hover:border-[#f43f5e]/60 transition-all duration-300 shadow-md cursor-pointer"
+            className="group flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 min-h-[58px] sm:min-h-[64px] rounded-xl bg-gradient-to-r from-rose-950/30 via-rose-900/15 to-white/[0.03] hover:from-rose-900/40 hover:to-white/[0.07] backdrop-blur-md border border-[#f43f5e]/30 hover:border-[#f43f5e]/60 transition-all duration-300 shadow-md cursor-pointer min-w-0"
           >
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#f43f5e] to-[#be123c] flex items-center justify-center flex-shrink-0 shadow-md shadow-[#f43f5e]/25 group-hover:scale-105 transition-transform">
-              <AiFillHeart className="text-white text-2xl drop-shadow" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-[#f43f5e] to-[#be123c] flex items-center justify-center flex-shrink-0 shadow-md shadow-[#f43f5e]/25 group-hover:scale-105 transition-transform">
+              <AiFillHeart className="text-white text-lg sm:text-xl drop-shadow" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-white truncate">Liked Songs</h3>
-              <p className="text-xs text-rose-300 font-medium">
+              <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-tight break-words">
+                Liked Songs
+              </h3>
+              <p className="text-[10px] sm:text-xs text-rose-300 font-medium truncate mt-0.5">
                 {(likedCount > 0 || likedSongs.length > 0) ? `${likedCount || likedSongs.length} songs` : "Collection"}
               </p>
             </div>
-            <div className="w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 flex items-center justify-center shadow-md">
+            <div className="hidden sm:flex w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 items-center justify-center shadow-md flex-shrink-0">
               <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
             </div>
           </Link>
@@ -316,21 +318,21 @@ const Home = () => {
           {userPlaylists && userPlaylists.length > 0 ? (
             <Link
               href={`/myPlaylists/${userPlaylists[0]._id}`}
-              className="group flex items-center gap-3.5 p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 shadow-md cursor-pointer"
+              className="group flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 min-h-[58px] sm:min-h-[64px] rounded-xl bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 shadow-md cursor-pointer min-w-0"
             >
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-rose-950/80 via-zinc-900 to-black flex items-center justify-center flex-shrink-0 border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow">
-                <MdPlaylistPlay className="text-[#f43f5e] text-2xl" />
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-rose-950/80 via-zinc-900 to-black flex items-center justify-center flex-shrink-0 border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow">
+                <MdPlaylistPlay className="text-[#f43f5e] text-xl" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-white truncate">
+                <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-tight break-words">
                   {userPlaylists[0].name}
                 </h3>
-                <p className="text-xs text-gray-400 font-medium">
+                <p className="text-[10px] sm:text-xs text-gray-400 font-medium truncate mt-0.5">
                   {userPlaylists[0].songs?.length || 0}{" "}
                   {userPlaylists[0].songs?.length === 1 ? "track" : "tracks"}
                 </p>
               </div>
-              <div className="w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 flex items-center justify-center shadow-md">
+              <div className="hidden sm:flex w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 items-center justify-center shadow-md flex-shrink-0">
                 <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
               </div>
             </Link>
@@ -338,16 +340,16 @@ const Home = () => {
             <button
               type="button"
               onClick={handleOpenCreatePlaylist}
-              className="group flex items-center gap-3.5 p-2 rounded-xl bg-gradient-to-r from-white/[0.04] to-white/[0.02] hover:from-rose-950/30 hover:to-white/[0.06] backdrop-blur-md border border-dashed border-white/20 hover:border-rose-500/60 transition-all duration-300 shadow-md text-left cursor-pointer"
+              className="group flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 min-h-[58px] sm:min-h-[64px] rounded-xl bg-gradient-to-r from-white/[0.04] to-white/[0.02] hover:from-rose-950/30 hover:to-white/[0.06] backdrop-blur-md border border-dashed border-white/20 hover:border-rose-500/60 transition-all duration-300 shadow-md text-left cursor-pointer min-w-0"
             >
-              <div className="w-12 h-12 rounded-lg bg-white/[0.05] border border-white/10 group-hover:border-rose-500/50 group-hover:bg-rose-500/15 flex items-center justify-center flex-shrink-0 transition-all shadow">
-                <FaPlus className="text-gray-400 group-hover:text-rose-400 text-base transition-colors" />
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-white/[0.05] border border-white/10 group-hover:border-rose-500/50 group-hover:bg-rose-500/15 flex items-center justify-center flex-shrink-0 transition-all shadow">
+                <FaPlus className="text-gray-400 group-hover:text-rose-400 text-sm sm:text-base transition-colors" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-white group-hover:text-rose-200 truncate transition-colors">
+                <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-rose-200 line-clamp-2 leading-tight break-words transition-colors">
                   New Playlist
                 </h3>
-                <p className="text-xs text-gray-400 font-medium">Build custom mix</p>
+                <p className="text-[10px] sm:text-xs text-gray-400 font-medium truncate mt-0.5">Build mix</p>
               </div>
             </button>
           )}
@@ -357,7 +359,7 @@ const Home = () => {
             <Link
               key={chart?.id || idx}
               href={`/playlist/${chart?.id}`}
-              className="group flex items-center gap-3.5 p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 shadow-md cursor-pointer"
+              className="group flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 min-h-[58px] sm:min-h-[64px] rounded-xl bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 shadow-md cursor-pointer min-w-0"
             >
               <img
                 src={
@@ -366,15 +368,15 @@ const Home = () => {
                   "/images/vinyl.png"
                 }
                 alt={chart?.name || "chart"}
-                className="w-12 h-12 rounded-lg object-cover flex-shrink-0 shadow"
+                className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg object-cover flex-shrink-0 shadow"
               />
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-white truncate">
+                <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-tight break-words">
                   {chart?.name || chart?.title}
                 </h3>
-                <p className="text-xs text-gray-400 font-medium">Top Chart</p>
+                <p className="text-[10px] sm:text-xs text-gray-400 font-medium truncate mt-0.5">Top Chart</p>
               </div>
-              <div className="w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 flex items-center justify-center shadow-md">
+              <div className="hidden sm:flex w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 items-center justify-center shadow-md flex-shrink-0">
                 <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
               </div>
             </Link>
@@ -385,16 +387,16 @@ const Home = () => {
       {/* YOUR PLAYLISTS SECTION ON ALL TAB */}
       {activeTab === "all" && userPlaylists && userPlaylists.length > 0 && (
         <div className="mb-10">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 mb-3">
             <div className="flex items-center gap-2.5">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-white">
                 Your Playlists
               </h2>
               <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
                 {userPlaylists.length}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="w-full sm:w-auto flex items-center gap-2 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => handleOpenCreatePlaylist("spotify")}
@@ -415,27 +417,27 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab("playlists")}
-                className="text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer"
+                className="ml-auto sm:ml-2 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer flex-shrink-0"
               >
                 Show all
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-            {userPlaylists.slice(0, 6).map((pl) => {
+          <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto pb-4 pt-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+            {userPlaylists.map((pl) => {
               const trackCount = Array.isArray(pl.songs) ? pl.songs.length : 0;
               return (
                 <div
                   key={pl._id}
-                  className="group relative p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col"
+                  className="w-[145px] sm:w-[170px] md:w-[190px] flex-shrink-0 group relative p-2.5 sm:p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col"
                 >
                   <Link
                     href={`/myPlaylists/${pl._id}`}
                     className="relative aspect-square w-full rounded-xl bg-gradient-to-br from-rose-950/60 via-[#18181b] to-black flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow-lg"
                   >
                     <MdPlaylistPlay
-                      size={44}
+                      size={42}
                       className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
                     />
                     {trackCount > 0 && (
@@ -453,20 +455,35 @@ const Home = () => {
                       </button>
                     )}
                   </Link>
-                  <div className="mt-3 min-w-0">
+                  <div className="mt-2.5 min-w-0">
                     <Link
                       href={`/myPlaylists/${pl._id}`}
-                      className="text-sm font-bold text-white hover:text-[#f43f5e] transition-colors truncate block"
+                      className="text-xs sm:text-sm font-bold text-white hover:text-[#f43f5e] transition-colors truncate block"
                     >
                       {pl.name}
                     </Link>
-                    <p className="text-xs text-gray-400 mt-0.5 font-medium">
+                    <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 font-medium truncate">
                       {trackCount} {trackCount === 1 ? "track" : "tracks"}
                     </p>
                   </div>
                 </div>
               );
             })}
+
+            {/* Trailing "Create New" card */}
+            <button
+              type="button"
+              onClick={() => handleOpenCreatePlaylist("create")}
+              className="w-[145px] sm:w-[170px] md:w-[190px] flex-shrink-0 p-3 rounded-2xl bg-white/[0.02] hover:bg-white/[0.06] border border-dashed border-white/20 hover:border-rose-500/50 transition-all duration-300 flex flex-col items-center justify-center text-center group cursor-pointer"
+            >
+              <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <FaPlus size={16} />
+              </div>
+              <span className="text-xs sm:text-sm font-bold text-white group-hover:text-rose-300 transition-colors">
+                New Playlist
+              </span>
+              <span className="text-[11px] text-gray-400 mt-0.5">Create mix</span>
+            </button>
           </div>
         </div>
       )}
