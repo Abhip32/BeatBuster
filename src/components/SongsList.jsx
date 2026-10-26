@@ -22,18 +22,7 @@ import {
 import { toast } from "react-hot-toast";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { useSession } from "next-auth/react";
-
-const decodeHtml = (str) => {
-  if (!str) return "";
-  return str
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&apos;/g, "'")
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
-};
+import decodeHtml from "@/utils/decodeHtml";
 
 const SongsList = ({
   SongData,

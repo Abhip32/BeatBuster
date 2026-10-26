@@ -8,6 +8,7 @@ import {
   setActiveSong,
 } from "../../redux/features/playerSlice";
 import { getRecommendedSongs, getSongData } from "@/services/dataAPI";
+import decodeHtml from "@/utils/decodeHtml";
 
 const SongCard = ({ song, isPlaying, activeSong }) => {
   const [loading, setLoading] = useState(false);
@@ -156,11 +157,10 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
 
         <div className="flex flex-col min-w-0">
           <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
-            {song?.name?.replaceAll("&#039;", "'")?.replaceAll("&amp;", "&") ||
-              song?.title}
+            {decodeHtml(song?.name || song?.title)}
           </p>
           <p className="text-xs truncate text-[#b3b3b3] mt-1 group-hover:text-gray-300 transition-colors">
-            {artistDisplay || (song?.type === "album" ? "Album" : "Playlist")}
+            {decodeHtml(artistDisplay) || (song?.type === "album" ? "Album" : "Playlist")}
           </p>
         </div>
       </Link>

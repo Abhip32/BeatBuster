@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import SongList from "@/components/SongsList";
 import PlaylistSkeleton from "@/components/Skeletons/PlaylistSkeleton";
+import decodeHtml from "@/utils/decodeHtml";
 
 const AlbumPage = ({ params }) => {
   const routeParams = useParams();
@@ -91,7 +92,7 @@ const AlbumPage = ({ params }) => {
             Album
           </span>
           <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight line-clamp-2">
-            {albumData?.name || "Album"}
+            {decodeHtml(albumData?.name || "Album")}
           </h1>
 
           {/* Artists */}
@@ -103,13 +104,13 @@ const AlbumPage = ({ params }) => {
                     href={`/artist/${artist?.id}`}
                     className="hover:text-[#f43f5e] hover:underline transition-colors"
                   >
-                    {artist?.name?.replaceAll("&amp;", "&")}
+                    {decodeHtml(artist?.name)}
                   </Link>
                   {idx < primaryArtistsList.length - 1 && ", "}
                 </React.Fragment>
               ))
             ) : albumData?.primaryArtists ? (
-              <span>{albumData.primaryArtists.replaceAll("&amp;", "&")}</span>
+              <span>{decodeHtml(albumData.primaryArtists)}</span>
             ) : null}
           </div>
 

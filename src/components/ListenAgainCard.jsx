@@ -6,6 +6,7 @@ import {
   setActiveSong,
 } from "@/redux/features/playerSlice";
 import { BiHeadphone } from "react-icons/bi";
+import decodeHtml from "@/utils/decodeHtml";
 
 const ListenAgainCard = ({ song, index, SongData }) => {
   const { activeSong } = useSelector((state) => state.player);
@@ -69,10 +70,10 @@ const ListenAgainCard = ({ song, index, SongData }) => {
               isCurrentActive ? "text-[#f43f5e]" : "text-white group-hover:text-white"
             }`}
           >
-            {song?.name?.replace("&#039;", "'")?.replace("&amp;", "&")}
+            {decodeHtml(song?.name || song?.title)}
           </p>
           <p className="text-xs text-gray-400 truncate mt-0.5">
-            {artistDisplay}
+            {decodeHtml(artistDisplay)}
           </p>
         </div>
       </div>

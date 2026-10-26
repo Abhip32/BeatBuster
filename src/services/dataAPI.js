@@ -628,3 +628,33 @@ export async function getRecommendedSongs(artistId, songId) {
     return [];
   }
 }
+
+// get song history
+export async function getSongHistory() {
+  try {
+    const response = await fetch("/api/history");
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.data) ? data.data : [];
+  } catch (error) {
+    console.error("getSongHistory error:", error);
+    return [];
+  }
+}
+
+// sync song history
+export async function syncSongHistory(song) {
+  try {
+    const response = await fetch("/api/history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ song }),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data?.data || null;
+  } catch (error) {
+    console.error("syncSongHistory error:", error);
+    return null;
+  }
+}

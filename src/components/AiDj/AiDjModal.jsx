@@ -9,18 +9,7 @@ import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import { addPlaylist } from "@/redux/features/playlistsSlice";
 import { createPlaylist, addSongToPlaylist } from "@/services/playlistApi";
 import { toast } from "react-hot-toast";
-
-const decodeHtml = (str) => {
-  if (!str) return "";
-  return str
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&apos;/g, "'")
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
-};
+import decodeHtml from "@/utils/decodeHtml";
 
 const QUICK_PROMPTS = [
   "🌙 Late Night Chill",

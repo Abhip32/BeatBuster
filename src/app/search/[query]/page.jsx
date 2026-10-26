@@ -14,6 +14,7 @@ import SongCard from "@/components/Homepage/SongCard";
 import SwiperLayout from "@/components/Homepage/Swiper";
 import { SwiperSlide } from "swiper/react";
 import SearchSkeleton from "@/components/Skeletons/SearchSkeleton";
+import decodeHtml from "@/utils/decodeHtml";
 
 const SearchResultsPage = ({ params }) => {
   const router = useRouter();
@@ -318,9 +319,7 @@ const SearchResultsPage = ({ params }) => {
 
                     <div>
                       <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight line-clamp-2 group-hover:text-[#f43f5e] transition-colors">
-                        {(topResult?.title || topResult?.name)
-                          ?.replaceAll("&#039;", "'")
-                          ?.replaceAll("&amp;", "&")}
+                        {decodeHtml(topResult?.title || topResult?.name)}
                       </h3>
                       <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 font-medium">
                         <span className="px-2 py-0.5 rounded-full bg-white/10 text-white font-semibold uppercase text-[10px] tracking-wider">
@@ -418,12 +417,10 @@ const SearchResultsPage = ({ params }) => {
                                 isThisActive ? "text-[#f43f5e]" : "text-white group-hover:text-[#f43f5e]"
                               } transition-colors`}
                             >
-                              {(song?.name || song?.title)
-                                ?.replaceAll("&#039;", "'")
-                                ?.replaceAll("&amp;", "&")}
+                              {decodeHtml(song?.name || song?.title)}
                             </p>
                             <p className="text-xs text-gray-400 truncate mt-0.5">
-                              {artistName}
+                              {decodeHtml(artistName)}
                             </p>
                           </div>
                         </div>
@@ -475,7 +472,7 @@ const SearchResultsPage = ({ params }) => {
                         />
                       </div>
                       <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
-                        {(artist?.name || artist?.title)?.replaceAll("&amp;", "&")}
+                        {decodeHtml(artist?.name || artist?.title)}
                       </p>
                       <span className="text-xs text-gray-400 mt-0.5">Artist</span>
                     </div>
@@ -577,7 +574,7 @@ const SearchResultsPage = ({ params }) => {
                     />
                   </div>
                   <p className="font-bold text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
-                    {(artist?.name || artist?.title)?.replaceAll("&amp;", "&")}
+                    {decodeHtml(artist?.name || artist?.title)}
                   </p>
                   <span className="text-xs text-gray-400 mt-1">Artist</span>
                 </div>
