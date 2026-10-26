@@ -19,6 +19,7 @@ import TracklistSkeleton from "@/components/Skeletons/TracklistSkeleton";
 import SongsList from "@/components/SongsList";
 import PlayButton from "@/components/PlayButton";
 import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
 import { AiFillHeart } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
 import { FaPlus, FaSpotify } from "react-icons/fa";
@@ -32,8 +33,6 @@ import AiDjModal from "@/components/AiDj/AiDjModal";
 
 const Home = () => {
   const router = useRouter();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [salutation, setSalutation] = useState("Welcome to Musify");
   const [activeTab, setActiveTab] = useState("all");
   const [likedSongs, setLikedSongs] = useState([]);
@@ -66,30 +65,21 @@ const Home = () => {
     }
   }, []);
 
-  useEffect(() => {
-    let isCancelled = false;
-    const fetchData = async () => {
-      setLoading(true);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["homePageData", languages],
+    queryFn: async () => {
       dispatch(setProgress(50));
       try {
         const res = await homePageData(languages);
-        if (!isCancelled) {
-          setData(res || null);
-        }
-      } catch (e) {
-        console.error("Home page data fetch error:", e);
-      } finally {
-        if (!isCancelled) {
-          dispatch(setProgress(100));
-          setLoading(false);
-        }
+        dispatch(setProgress(100));
+        return res;
+      } catch (err) {
+        dispatch(setProgress(100));
+        throw err;
       }
-    };
-    fetchData();
-    return () => {
-      isCancelled = true;
-    };
-  }, [languages, dispatch]);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   // Fetch liked songs when Liked Songs tab is clicked or for Quick Access tile
   useEffect(() => {

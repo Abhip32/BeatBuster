@@ -17,33 +17,41 @@ import { SwiperSlide } from "swiper/react";
 import { useParams } from "next/navigation";
 import { MdVerified } from "react-icons/md";
 import PlayButton from "@/components/PlayButton";
+import { useQuery } from "@tanstack/react-query";
 
 const ArtistPage = ({ params }) => {
   const routeParams = useParams();
   const artistId = routeParams?.artistId || params?.artistId;
   const dispatch = useDispatch();
-  const [artistDetails, setArtistDetails] = useState({});
-  const [artistSongs, setArtistSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [artistAlbums, setArtistAlbums] = useState([]);
 
-  useEffect(() => {
-    if (!artistId) return;
-    const fetchData = async () => {
-      dispatch(setProgress(30));
-      const details = await getArtistData(artistId);
-      dispatch(setProgress(60));
-      setArtistDetails(details || {});
-      const songs = await getArtistSongs(artistId, 0);
-      dispatch(setProgress(85));
-      setArtistSongs(songs);
-      const albums = await getArtistAlbums(artistId, 0);
-      setArtistAlbums(albums?.albums || (Array.isArray(albums) ? albums : []));
-      dispatch(setProgress(100));
-      setLoading(false);
-    };
-    fetchData();
-  }, [artistId, dispatch]);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["artist", artistId],
+    queryFn: async () => {
+      dispatch(setProgress(40));
+      try {
+        const [details, songs, albums] = await Promise.all([
+          getArtistData(artistId),
+          getArtistSongs(artistId, 0),
+          getArtistAlbums(artistId, 0),
+        ]);
+        dispatch(setProgress(100));
+        return {
+          details: details || {},
+          songs: songs || [],
+          albums: albums?.albums || (Array.isArray(albums) ? albums : []),
+        };
+      } catch (err) {
+        dispatch(setProgress(100));
+        throw err;
+      }
+    },
+    enabled: Boolean(artistId),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const artistDetails = data?.details || {};
+  const artistSongs = data?.songs || [];
+  const artistAlbums = data?.albums || [];
 
   if (loading) {
     return <ArtistSkeleton />;

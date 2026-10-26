@@ -15,15 +15,24 @@ const dbConnect = async () => {
     return null;
   }
 
-  if (cached.conn) {
+  // Reuse active connection immediately (0ms latency)
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
+  }
+
+  // If connection dropped or disconnected, clear stale reference
+  if (cached.conn && mongoose.connection.readyState === 0) {
+    cached.conn = null;
+    cached.promise = null;
   }
 
   if (!cached.promise) {
     const opts = {
       dbName: DB_NAME,
       bufferCommands: false,
+      maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     };
 
     cached.promise = mongoose

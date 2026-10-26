@@ -13,6 +13,7 @@ import SongsList from "@/components/SongsList";
 import SongCard from "@/components/Homepage/SongCard";
 import SwiperLayout from "@/components/Homepage/Swiper";
 import { SwiperSlide } from "swiper/react";
+import { useQuery } from "@tanstack/react-query";
 import SearchSkeleton from "@/components/Skeletons/SearchSkeleton";
 import decodeHtml from "@/utils/decodeHtml";
 
@@ -23,8 +24,6 @@ const SearchResultsPage = ({ params }) => {
   const dispatch = useDispatch();
 
   const [query, setQuery] = useState(rawQuery);
-  const [searchedData, setSearchedData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
 
   const { activeSong, isPlaying } = useSelector((state) => state.player);
@@ -35,32 +34,22 @@ const SearchResultsPage = ({ params }) => {
     }
   }, [rawQuery, query]);
 
-  useEffect(() => {
-    let isCancelled = false;
-    const fetchData = async () => {
-      setLoading(true);
+  const { data: searchedData, isLoading: loading } = useQuery({
+    queryKey: ["search", query],
+    queryFn: async () => {
       dispatch(setProgress(50));
       try {
         const response = await getSearchedData(query);
-        if (!isCancelled) {
-          setSearchedData(response);
-        }
-      } catch (e) {
-        console.error("Search fetch error:", e);
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-          dispatch(setProgress(100));
-        }
+        dispatch(setProgress(100));
+        return response;
+      } catch (err) {
+        dispatch(setProgress(100));
+        throw err;
       }
-    };
-    if (query) {
-      fetchData();
-    }
-    return () => {
-      isCancelled = true;
-    };
-  }, [query, dispatch]);
+    },
+    enabled: Boolean(query),
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (loading) {
     return <SearchSkeleton />;

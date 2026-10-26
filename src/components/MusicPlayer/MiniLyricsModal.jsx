@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { getlyricsData } from "@/services/dataAPI";
+import { useQuery } from "@tanstack/react-query";
 import { IoClose, IoMusicalNotesOutline } from "react-icons/io5";
 import { TbMicrophone2 } from "react-icons/tb";
 
@@ -34,38 +35,17 @@ const MiniLyricsModal = ({
   setSeekTime,
   bgColor,
 }) => {
-  const [lyricsData, setLyricsData] = useState(null);
-  const [loading, setLoading] = useState(false);
   const containerRef = useRef(null);
   const activeLineRef = useRef(null);
   const [isUserInteracting, setIsUserInteracting] = useState(false);
   const scrollTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    let isCancelled = false;
-    const fetchLyrics = async () => {
-      setLoading(true);
-      try {
-        const res = await getlyricsData(activeSong);
-        if (!isCancelled) {
-          setLyricsData(res);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (!isCancelled) {
-          setLyricsData(null);
-          setLoading(false);
-        }
-      }
-    };
-
-    if (isOpen && (activeSong?.name || activeSong?.id)) {
-      fetchLyrics();
-    }
-    return () => {
-      isCancelled = true;
-    };
-  }, [isOpen, activeSong?.id, activeSong?.name, activeSong?.duration]);
+  const { data: lyricsData, isLoading: loading } = useQuery({
+    queryKey: ["lyrics", activeSong?.id, activeSong?.name],
+    queryFn: () => getlyricsData(activeSong),
+    enabled: Boolean(isOpen && (activeSong?.name || activeSong?.id)),
+    staleTime: 60 * 60 * 1000,
+  });
 
   const parsedLyrics = useMemo(() => {
     if (lyricsData?.syncedLyrics) {

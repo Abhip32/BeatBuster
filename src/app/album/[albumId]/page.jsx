@@ -7,27 +7,31 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import SongList from "@/components/SongsList";
+import { useQuery } from "@tanstack/react-query";
 import PlaylistSkeleton from "@/components/Skeletons/PlaylistSkeleton";
 import decodeHtml from "@/utils/decodeHtml";
 
 const AlbumPage = ({ params }) => {
   const routeParams = useParams();
   const albumId = routeParams?.albumId || params?.albumId;
-  const [albumData, setAlbumData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!albumId) return;
-    const fetchData = async () => {
+  const { data: albumData, isLoading: loading } = useQuery({
+    queryKey: ["album", albumId],
+    queryFn: async () => {
       dispatch(setProgress(50));
-      const response = await getAlbumData(albumId);
-      dispatch(setProgress(100));
-      setAlbumData(response);
-      setLoading(false);
-    };
-    fetchData();
-  }, [albumId, dispatch]);
+      try {
+        const response = await getAlbumData(albumId);
+        dispatch(setProgress(100));
+        return response;
+      } catch (err) {
+        dispatch(setProgress(100));
+        throw err;
+      }
+    },
+    enabled: Boolean(albumId),
+    staleTime: 10 * 60 * 1000,
+  });
 
   if (loading) {
     return <PlaylistSkeleton type="album" count={8} />;

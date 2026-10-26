@@ -2,6 +2,7 @@
 import { getlyricsData } from "@/services/dataAPI";
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 import SongsList from "../SongsList";
 import { setAutoAdd } from "@/redux/features/playerSlice";
 import { IoMusicalNotesOutline } from "react-icons/io5";
@@ -38,8 +39,6 @@ const Lyrics = ({
 }) => {
   const dispatch = useDispatch();
   const { currentSongs, autoAdd } = useSelector((state) => state.player);
-  const [lyricsData, setLyricsData] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [internalTab, setInternalTab] = useState("queue");
   const activeTab = controlledTab !== undefined ? controlledTab : internalTab;
 
@@ -72,36 +71,12 @@ const Lyrics = ({
   const [isUserInteracting, setIsUserInteracting] = useState(false);
   const scrollTimeoutRef = useRef(null);
 
-  // Fetch lyrics from lrclib.net when activeSong changes
-  useEffect(() => {
-    let isCancelled = false;
-
-    const fetchLyrics = async () => {
-      setLoading(true);
-      try {
-        const res = await getlyricsData(activeSong);
-        if (!isCancelled) {
-          setLyricsData(res);
-          setLoading(false);
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          setLyricsData(null);
-          setLoading(false);
-        }
-      }
-    };
-
-    if (activeSong?.name || activeSong?.id) {
-      fetchLyrics();
-    } else {
-      setLyricsData(null);
-    }
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [activeSong?.id, activeSong?.name, activeSong?.duration]);
+  const { data: lyricsData, isLoading: loading } = useQuery({
+    queryKey: ["lyrics", activeSong?.id, activeSong?.name],
+    queryFn: () => getlyricsData(activeSong),
+    enabled: Boolean(activeSong?.name || activeSong?.id),
+    staleTime: 60 * 60 * 1000,
+  });
 
   // Parse synchronized lyrics if available
   const parsedLyrics = useMemo(() => {
