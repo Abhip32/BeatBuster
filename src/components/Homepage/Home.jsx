@@ -112,7 +112,7 @@ const Home = () => {
             );
             const list = resolved.filter(Boolean).reverse();
             setLikedSongs(list);
-            dispatch(setFavourites(items));
+            dispatch(setFavourites(list));
           }
         } catch (err) {
           console.error("Error fetching liked songs:", err);

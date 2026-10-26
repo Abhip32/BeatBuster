@@ -50,17 +50,25 @@ export async function GET(req) {
       );
     }
 
-    // Deduplicate favourites
+    // Deduplicate and sanitize favourites (filter out corrupted/empty entries)
     const seen = new Set();
     const uniqueFavs = [];
     for (const item of (userData.favourites || [])) {
-      const sid = String(typeof item === "object" ? item?.id : item);
-      if (sid && !seen.has(sid)) {
+      if (!item) continue;
+      const rawId = typeof item === "object" ? item?.id : item;
+      const sid = typeof rawId === "string" ? rawId.trim() : String(rawId || "");
+      if (sid && sid !== "undefined" && sid !== "null" && !seen.has(sid)) {
         seen.add(sid);
         uniqueFavs.push(item);
       }
     }
-    userData.favourites = uniqueFavs;
+    if (uniqueFavs.length !== (userData.favourites || []).length) {
+      userData.favourites = uniqueFavs;
+      userData.markModified("favourites");
+      await userData.save();
+    } else {
+      userData.favourites = uniqueFavs;
+    }
 
     return NextResponse.json({
       success: true,
@@ -131,26 +139,37 @@ export async function POST(request) {
     const seen = new Set();
     const uniqueFavs = [];
     for (const item of (userData.favourites || [])) {
-      const sid = String(typeof item === "object" ? item?.id : item);
-      if (sid && !seen.has(sid)) {
+      if (!item) continue;
+      const rawId = typeof item === "object" ? item?.id : item;
+      const sid = typeof rawId === "string" ? rawId.trim() : String(rawId || "");
+      if (sid && sid !== "undefined" && sid !== "null" && !seen.has(sid)) {
         seen.add(sid);
         uniqueFavs.push(item);
       }
     }
     userData.favourites = uniqueFavs;
 
-    const songId = typeof id === "object" ? id?.id : id;
-    const targetId = String(songId);
+    const rawTarget = typeof id === "object" ? id?.id : id;
+    const targetId = typeof rawTarget === "string" ? rawTarget.trim() : String(rawTarget || "");
 
-    const isAlreadyFav = (userData.favourites || []).some(
-      (item) => String(typeof item === "object" ? item?.id : item) === targetId
-    );
+    if (!targetId || targetId === "undefined" || targetId === "null") {
+      return NextResponse.json(
+        { success: false, message: "Invalid song ID", data: userData },
+        { status: 400 }
+      );
+    }
+
+    const isAlreadyFav = (userData.favourites || []).some((item) => {
+      const sid = typeof item === "object" ? item?.id : item;
+      return String(sid || "").trim() === targetId;
+    });
 
     if (isAlreadyFav) {
       // Remove all instances of this song (toggle off)
-      userData.favourites = userData.favourites.filter(
-        (item) => String(typeof item === "object" ? item?.id : item) !== targetId
-      );
+      userData.favourites = userData.favourites.filter((item) => {
+        const sid = typeof item === "object" ? item?.id : item;
+        return String(sid || "").trim() !== targetId;
+      });
     } else {
       // Add it (toggle on)
       userData.favourites.push(id);

@@ -16,8 +16,9 @@ const favouritesSlice = createSlice({
       const unique = [];
       for (const item of raw) {
         if (!item) continue;
-        const id = String(typeof item === "object" ? item?.id || item?.name : item);
-        if (id && !seen.has(id)) {
+        const rawId = typeof item === "object" ? item?.id || item?.name : item;
+        const id = typeof rawId === "string" ? rawId.trim() : String(rawId || "");
+        if (id && id !== "undefined" && id !== "null" && !seen.has(id)) {
           seen.add(id);
           unique.push(item);
         }
@@ -29,11 +30,14 @@ const favouritesSlice = createSlice({
     toggleFavouriteSong: (state, action) => {
       const song = action.payload;
       if (!song) return;
-      const songId = String(song.id || "");
-      const songName = song.name?.trim().toLowerCase() || "";
+      const rawSongId = typeof song === "object" ? song?.id : song;
+      const songId = typeof rawSongId === "string" ? rawSongId.trim() : String(rawSongId || "");
+      if (!songId || songId === "undefined" || songId === "null") return;
+      const songName = song?.name?.trim().toLowerCase() || "";
 
       const existsIndex = state.items.findIndex((item) => {
-        const itemId = String(typeof item === "object" ? item?.id : item);
+        const rawItemId = typeof item === "object" ? item?.id : item;
+        const itemId = typeof rawItemId === "string" ? rawItemId.trim() : String(rawItemId || "");
         if (songId && itemId === songId) return true;
         if (typeof item === "object" && item?.name && songName) {
           return item.name.trim().toLowerCase() === songName;
@@ -51,11 +55,13 @@ const favouritesSlice = createSlice({
     },
     removeFavouriteSong: (state, action) => {
       const target = action.payload;
-      const targetId = String(typeof target === "object" ? target?.id : target || "");
+      const rawTarget = typeof target === "object" ? target?.id : target;
+      const targetId = typeof rawTarget === "string" ? rawTarget.trim() : String(rawTarget || "");
       const targetName = typeof target === "object" ? target?.name?.trim().toLowerCase() : "";
 
       state.items = state.items.filter((item) => {
-        const itemId = String(typeof item === "object" ? item?.id : item);
+        const rawItemId = typeof item === "object" ? item?.id : item;
+        const itemId = typeof rawItemId === "string" ? rawItemId.trim() : String(rawItemId || "");
         if (targetId && itemId === targetId) return false;
         if (targetName && typeof item === "object" && item?.name) {
           return item.name.trim().toLowerCase() !== targetName;
