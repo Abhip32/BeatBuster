@@ -26,7 +26,7 @@ const FavouritePage = () => {
         if (Array.isArray(items) && items.length > 0) {
           const resolved = await Promise.all(
             items.map(async (item) => {
-              if (item && typeof item === "object" && (item.name || item.title)) {
+              if (item && typeof item === "object" && item?.id && (item.name || item.title)) {
                 return item;
               }
               const songId = typeof item === "object" ? item?.id : item;

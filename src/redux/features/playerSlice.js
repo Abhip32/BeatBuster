@@ -18,9 +18,10 @@ const playerSlice = createSlice({
     setActiveSong: (state, action) => {
       if (action.payload.song) {
         const newSong = action.payload.song;
+        const newSongId = String(newSong?.id || "");
       
         // Check if the song is not already in currentSongs
-        if (!state.currentSongs.some(song => song.id === newSong.id)) {
+        if (newSongId && !state.currentSongs.some(song => String(song?.id) === newSongId)) {
           state.activeSong = newSong;
           state.currentSongs = [...state.currentSongs, newSong];
         }
@@ -80,11 +81,11 @@ const playerSlice = createSlice({
     },
 
     deleteSong: (state, action) => {
-      const songIdToDelete = action.payload;
+      const songIdToDelete = String(action.payload || "");
 
-      state.currentSongs = state.currentSongs.filter(song => song.id !== songIdToDelete);
+      state.currentSongs = state.currentSongs.filter(song => String(song?.id) !== songIdToDelete);
 
-      if (state.activeSong === songIdToDelete) {
+      if (String(state.activeSong?.id) === songIdToDelete) {
         state.activeSong = {};
         state.isActive = false;
       }
@@ -97,7 +98,10 @@ const playerSlice = createSlice({
     },
     addToQueue: (state, action) => {
       const newSong = action.payload.song;
-      const isSongInQueue = state.currentSongs.some(song => song.id === newSong.id);
+      const newSongId = String(newSong?.id || "");
+      const isSongInQueue = Boolean(
+        newSongId && state.currentSongs.some(song => String(song?.id) === newSongId)
+      );
       
       if (!isSongInQueue) {
         state.currentSongs = [...state.currentSongs, newSong];

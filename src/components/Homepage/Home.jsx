@@ -91,7 +91,7 @@ const Home = () => {
           if (Array.isArray(items) && items.length > 0) {
             const resolved = await Promise.all(
               items.slice(0, 30).map(async (item) => {
-                if (item && typeof item === "object" && (item.name || item.title)) {
+                if (item && typeof item === "object" && item?.id && (item.name || item.title)) {
                   return item;
                 }
                 const songId = typeof item === "object" ? item?.id : item;
@@ -139,7 +139,7 @@ const Home = () => {
         const rawSongs = res.data.songs;
         const fetched = await Promise.all(
           rawSongs.map(async (item) => {
-            if (item && typeof item === "object" && (item.name || item.title)) {
+            if (item && typeof item === "object" && item?.id && (item.name || item.title)) {
               return item;
             }
             const songId = typeof item === "object" ? item?.id : item;

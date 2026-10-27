@@ -146,7 +146,7 @@ export async function POST(req) {
       for (const song of results) {
         if (song) {
           // Avoid duplicates in the same playlist
-          if (!matchedSongs.some((s) => s.id === song.id)) {
+          if (!matchedSongs.some((s) => String(s?.id) === String(song?.id))) {
             matchedSongs.push(song);
           }
         }

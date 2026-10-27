@@ -16,7 +16,7 @@ const favouritesSlice = createSlice({
       const unique = [];
       for (const item of raw) {
         if (!item) continue;
-        const rawId = typeof item === "object" ? item?.id || item?.name : item;
+        const rawId = typeof item === "object" ? item?.id : item;
         const id = typeof rawId === "string" ? rawId.trim() : String(rawId || "");
         if (id && id !== "undefined" && id !== "null" && !seen.has(id)) {
           seen.add(id);
@@ -33,16 +33,11 @@ const favouritesSlice = createSlice({
       const rawSongId = typeof song === "object" ? song?.id : song;
       const songId = typeof rawSongId === "string" ? rawSongId.trim() : String(rawSongId || "");
       if (!songId || songId === "undefined" || songId === "null") return;
-      const songName = song?.name?.trim().toLowerCase() || "";
 
       const existsIndex = state.items.findIndex((item) => {
         const rawItemId = typeof item === "object" ? item?.id : item;
         const itemId = typeof rawItemId === "string" ? rawItemId.trim() : String(rawItemId || "");
-        if (songId && itemId === songId) return true;
-        if (typeof item === "object" && item?.name && songName) {
-          return item.name.trim().toLowerCase() === songName;
-        }
-        return false;
+        return Boolean(itemId && itemId === songId);
       });
 
       if (existsIndex !== -1) {
@@ -57,16 +52,12 @@ const favouritesSlice = createSlice({
       const target = action.payload;
       const rawTarget = typeof target === "object" ? target?.id : target;
       const targetId = typeof rawTarget === "string" ? rawTarget.trim() : String(rawTarget || "");
-      const targetName = typeof target === "object" ? target?.name?.trim().toLowerCase() : "";
+      if (!targetId || targetId === "undefined" || targetId === "null") return;
 
       state.items = state.items.filter((item) => {
         const rawItemId = typeof item === "object" ? item?.id : item;
         const itemId = typeof rawItemId === "string" ? rawItemId.trim() : String(rawItemId || "");
-        if (targetId && itemId === targetId) return false;
-        if (targetName && typeof item === "object" && item?.name) {
-          return item.name.trim().toLowerCase() !== targetName;
-        }
-        return true;
+        return itemId !== targetId;
       });
       state.count = state.items.length;
     },

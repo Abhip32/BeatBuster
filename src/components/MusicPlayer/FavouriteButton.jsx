@@ -14,15 +14,13 @@ const FavouriteButton = ({
   }
 
   const isFav = Boolean(
-    Array.isArray(favouriteSongs) &&
+    activeSong?.id &&
+      Array.isArray(favouriteSongs) &&
       favouriteSongs.some((item) => {
-        const itemId = String(typeof item === "object" ? item?.id : item);
-        const songId = String(activeSong.id || "");
-        if (songId && itemId === songId) return true;
-        if (typeof item === "object" && item?.name && activeSong?.name) {
-          return item.name.trim().toLowerCase() === activeSong.name.trim().toLowerCase();
-        }
-        return false;
+        const rawItemId = typeof item === "object" ? item?.id : item;
+        const itemId = typeof rawItemId === "string" ? rawItemId.trim() : String(rawItemId || "");
+        const songId = String(activeSong.id || "").trim();
+        return Boolean(songId && itemId && songId === itemId);
       })
   );
 

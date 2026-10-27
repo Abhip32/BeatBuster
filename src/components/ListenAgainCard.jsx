@@ -26,7 +26,9 @@ const ListenAgainCard = ({ song, index, SongData }) => {
       song.artists.all.map((artist) => artist?.name).join(", ")) ||
     "";
 
-  const isCurrentActive = activeSong?.id === song?.id;
+  const isCurrentActive = Boolean(
+    activeSong?.id && song?.id && String(activeSong.id) === String(song.id)
+  );
 
   return (
     <div

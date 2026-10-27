@@ -246,17 +246,16 @@ const MusicPlayer = () => {
       return;
     }
 
-    const songId = String(favsong.id || "");
-    const songName = favsong.name?.trim().toLowerCase() || "";
+    const songId = String(favsong.id || "").trim();
+    if (!songId) return;
 
-    const exists = (favouriteSongs || []).some((s) => {
-      const sId = String(typeof s === "object" ? s?.id : s);
-      if (songId && sId === songId) return true;
-      if (typeof s === "object" && s?.name && songName) {
-        return s.name.trim().toLowerCase() === songName;
-      }
-      return false;
-    });
+    const exists = Boolean(
+      (favouriteSongs || []).some((s) => {
+        const rawId = typeof s === "object" ? s?.id : s;
+        const sId = typeof rawId === "string" ? rawId.trim() : String(rawId || "");
+        return Boolean(sId && sId === songId);
+      })
+    );
 
     dispatch(toggleFavouriteSong(favsong));
     if (exists) {

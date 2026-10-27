@@ -152,7 +152,7 @@ Recommend 6 to 10 popular, recognizable songs fitting the request. Include India
       const batch = rawSuggestions.slice(i, i + batchSize);
       const results = await Promise.all(batch.map((t) => resolveSong(t)));
       for (const song of results) {
-        if (song && !resolvedSongs.some((s) => s.id === song.id)) {
+        if (song && !resolvedSongs.some((s) => String(s?.id) === String(song?.id))) {
           resolvedSongs.push(song);
         }
       }

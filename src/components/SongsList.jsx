@@ -123,15 +123,13 @@ const SongsList = ({
 
   const isSongInFavourites = (song) => {
     if (!song) return false;
-    const songId = String(song.id || "");
-    const songName = song.name?.trim().toLowerCase() || "";
+    const rawSongId = typeof song === "object" ? song?.id : song;
+    const songId = typeof rawSongId === "string" ? rawSongId.trim() : String(rawSongId || "");
+    if (!songId || songId === "undefined" || songId === "null") return false;
     return (favouriteSongs || []).some((item) => {
-      const itemId = String(typeof item === "object" ? item?.id : item);
-      if (songId && itemId === songId) return true;
-      if (typeof item === "object" && item?.name && songName) {
-        return item.name.trim().toLowerCase() === songName;
-      }
-      return false;
+      const rawItemId = typeof item === "object" ? item?.id : item;
+      const itemId = typeof rawItemId === "string" ? rawItemId.trim() : String(rawItemId || "");
+      return Boolean(itemId && itemId === songId);
     });
   };
 
@@ -142,8 +140,8 @@ const SongsList = ({
       return;
     }
     const currentlyFav = isSongInFavourites(song);
-    const songId = String(song.id || "");
-    const songName = song.name?.trim().toLowerCase() || "";
+    const rawSongId = typeof song === "object" ? song?.id : song;
+    const songId = typeof rawSongId === "string" ? rawSongId.trim() : String(rawSongId || "");
 
     // Global optimistic update
     dispatch(toggleFavouriteSong(song));

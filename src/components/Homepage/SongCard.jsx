@@ -42,11 +42,12 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
           songData = Array.isArray(Data) ? Data[0] : Data || song;
         }
 
-        const nextQueue = currentSongs?.find((s) => s?.id === songData?.id)
+        const targetId = String(songData?.id || "");
+        const nextQueue = currentSongs?.find((s) => String(s?.id) === targetId)
           ? currentSongs
           : [...(currentSongs || []), songData];
-        const nextIndex = currentSongs?.find((s) => s?.id === songData?.id)
-          ? currentSongs?.findIndex((s) => s?.id === songData?.id)
+        const nextIndex = currentSongs?.find((s) => String(s?.id) === targetId)
+          ? currentSongs?.findIndex((s) => String(s?.id) === targetId)
           : (currentSongs?.length || 0);
 
         dispatch(
