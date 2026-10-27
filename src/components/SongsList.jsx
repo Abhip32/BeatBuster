@@ -352,8 +352,8 @@ const SongsList = ({
                 </div>
               </div>
 
-              {/* Right Column: Plays count + Heart + Duration + Options Menu */}
-              <div className="flex items-center gap-2 sm:gap-3 text-xs text-gray-400 flex-shrink-0 ml-auto">
+              {/* Right Column: Plays count + Heart + Duration + (Delete) + Options Menu */}
+              <div className="flex items-center gap-1.5 sm:gap-2.5 text-xs text-gray-400 flex-shrink-0 ml-auto">
                 {/* Optional Plays count on full pages */}
                 {!hidePlays && song?.playCount && (
                   <span className="hidden md:block text-xs text-gray-400 tabular-nums mr-1">
@@ -382,9 +382,25 @@ const SongsList = ({
                 </button>
 
                 {/* Duration */}
-                <span className="font-mono text-xs text-gray-300 tabular-nums w-10 sm:w-11 text-right flex-shrink-0">
+                <span className="font-mono text-[11px] sm:text-xs text-gray-300 tabular-nums w-9 sm:w-11 text-right flex-shrink-0">
                   {formatDuration(song?.duration)}
                 </span>
+
+                {/* Direct 1-Click Delete from Queue Button */}
+                {isQueueMode && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleRemoveFromQueue(e, index, song)}
+                    title="Remove from Queue"
+                    aria-label="Remove from Queue"
+                    className="p-1 cursor-pointer text-gray-400 hover:text-[#f43f5e] active:scale-90 transition-all outline-none focus:outline-none flex-shrink-0 opacity-70 group-hover:opacity-100"
+                  >
+                    <MdOutlineDeleteOutline
+                      size={18}
+                      className="hover:scale-115 transition-transform"
+                    />
+                  </button>
+                )}
 
                 {/* 3 dots menu container */}
                 <div className="relative flex-shrink-0">
