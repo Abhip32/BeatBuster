@@ -56,7 +56,7 @@ flowchart TD
     H -->|Save Playlist| J["Persist as Named Playlist in\nMongoDB Library"]
 ```
 
-![AI Music DJ Interface](./screenshots/ai-dj.png)
+![AI Music DJ Interface](./screenshots/z-ai-dj.png)
 
 ---
 
@@ -70,10 +70,6 @@ flowchart TD
 
 
 ## Screenshots
-
-### AI Music DJ (Curated Vibe Mixes)
-Interactive conversational DJ generating instant tailored playlists based on moods, genres, or current tracks, powered by Google Gemini 2.5 Flash and JioSaavn audio hydration.
-![AI Music DJ](./screenshots/ai-dj.png)
 
 ### Home Page
 Bilingual Hindi & English trending tracks, Quick Access cards, live Liked Songs badge, and one-click New Playlist creation.
@@ -106,6 +102,10 @@ Immersive full-screen playback with dynamic ambient lighting, upcoming track que
 ### Time-Synced Lyrics
 Real-time synchronized karaoke lyrics with dynamic highlight tracking.
 ![Time-Synced Lyrics](./screenshots/Screenshot%202026-10-25%20014234.png)
+
+### AI Music DJ (Curated Vibe Mixes)
+Interactive conversational DJ generating instant tailored playlists based on moods, genres, or current tracks, powered by Google Gemini 2.5 Flash and JioSaavn audio hydration.
+![AI Music DJ](./screenshots/z-ai-dj.png)
 
 ***
 

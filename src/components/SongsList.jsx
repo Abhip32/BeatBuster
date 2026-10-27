@@ -241,7 +241,7 @@ const SongsList = ({
 
   return (
     <>
-      <div className={`mt-4 flex flex-col gap-1 ${isQueueMode ? "pb-36" : "pb-12"}`}>
+      <div className={`flex flex-col gap-1 ${isQueueMode ? "mt-1 pb-0" : "mt-4 pb-12"}`}>
         {/* Spotify Table Header */}
         <div className="hidden sm:flex items-center justify-between px-3 sm:px-4 py-2 border-b border-white/[0.08] text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 mr-3">
@@ -252,7 +252,9 @@ const SongsList = ({
             {!hidePlays && (
               <span className="hidden md:block w-20 text-right mr-1">Plays</span>
             )}
-            <span className="w-24 sm:w-28 text-right pr-2">Duration</span>
+            {!isQueueMode && (
+              <span className="w-24 sm:w-28 text-right pr-2">Duration</span>
+            )}
           </div>
         </div>
 
@@ -352,8 +354,8 @@ const SongsList = ({
                 </div>
               </div>
 
-              {/* Right Column: Plays count + Heart + Duration + (Delete) + Options Menu */}
-              <div className="flex items-center gap-1.5 sm:gap-2.5 text-xs text-gray-400 flex-shrink-0 ml-auto">
+              {/* Right Column: Plays count + Heart + (Duration) + (Delete) + Options Menu */}
+              <div className="flex items-center gap-2 sm:gap-2.5 text-xs text-gray-400 flex-shrink-0 ml-auto">
                 {/* Optional Plays count on full pages */}
                 {!hidePlays && song?.playCount && (
                   <span className="hidden md:block text-xs text-gray-400 tabular-nums mr-1">
@@ -381,10 +383,12 @@ const SongsList = ({
                   )}
                 </button>
 
-                {/* Duration */}
-                <span className="font-mono text-[11px] sm:text-xs text-gray-300 tabular-nums w-9 sm:w-11 text-right flex-shrink-0">
-                  {formatDuration(song?.duration)}
-                </span>
+                {/* Duration (Hidden in queue mode to give maximum space for titles & actions) */}
+                {!isQueueMode && (
+                  <span className="font-mono text-[11px] sm:text-xs text-gray-300 tabular-nums w-9 sm:w-11 text-right flex-shrink-0">
+                    {formatDuration(song?.duration)}
+                  </span>
+                )}
 
                 {/* Direct 1-Click Delete from Queue Button */}
                 {isQueueMode && (
@@ -496,7 +500,7 @@ const SongsList = ({
         })}
 
         {/* Infinite Scroll Sentinel */}
-        {visibleCount < uniqueSongs.length && (
+        {!isQueueMode && visibleCount < uniqueSongs.length && (
           <div ref={sentinelRef} className="py-4 text-center text-xs text-gray-500">
             Loading more tracks...
           </div>

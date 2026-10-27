@@ -265,7 +265,7 @@ const Lyrics = ({
               </label>
             </div>
             {currentSongs?.length > 0 ? (
-              <div className="text-white mt-1 w-full flex-1 min-h-0 overflow-y-auto hideScrollBar pb-4">
+              <div className="text-white mt-1 w-full flex-1 min-h-0 overflow-y-auto hideScrollBar">
                 <SongsList
                   SongData={currentSongs}
                   loading={false}
