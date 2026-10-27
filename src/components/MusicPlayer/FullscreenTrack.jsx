@@ -91,7 +91,7 @@ const FullscreenTrack = ({
     <div
       className={`${
         fullScreen ? "flex" : "hidden"
-      } w-full h-full flex-col justify-center max-w-[1550px] 2xl:max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-2 sm:py-6 xl:py-8`}
+      } w-full h-full flex-col justify-center max-w-[1550px] 2xl:max-w-[1720px] mx-auto px-1.5 sm:px-8 lg:px-12 xl:px-16 pt-10 pb-2 sm:py-6 xl:py-8`}
     >
       {/* Centered Bottom-Sheet Drag Handle Bar (Mobile & Desktop) */}
       <div
@@ -224,7 +224,7 @@ const FullscreenTrack = ({
         {mobileTab !== "song" && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="min-[1180px]:hidden flex-1 min-h-0 w-full max-w-lg mx-auto flex flex-col h-full px-2"
+            className="min-[1180px]:hidden flex-1 min-h-0 w-full max-w-lg mx-auto flex flex-col h-full px-0.5 sm:px-2"
           >
             <div className="w-full flex-1 min-h-0 flex flex-col">
               <Lyrics

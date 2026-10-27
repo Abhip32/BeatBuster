@@ -283,7 +283,7 @@ const MusicPlayer = () => {
     <div
       className={`relative transition-all duration-100 flex flex-col hideScrollBar backdrop-blur-2xl ${
         fullScreen
-          ? "h-[100dvh] w-full justify-center overflow-y-auto min-[1180px]:overflow-hidden px-4 sm:px-6 lg:px-8 bg-[#0c0c0e]"
+          ? "h-[100dvh] w-full justify-center overflow-y-auto min-[1180px]:overflow-hidden px-1.5 sm:px-6 lg:px-8 bg-[#0c0c0e]"
           : "w-full h-20 px-3 sm:px-6 lg:px-8 justify-center overflow-visible border-t border-white/[0.08] shadow-[0_-8px_32px_rgba(0,0,0,0.5)]"
       }`}
       onClick={() => {

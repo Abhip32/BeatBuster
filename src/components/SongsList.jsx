@@ -285,14 +285,14 @@ const SongsList = ({
             <div
               key={isQueueMode ? `queue-${song?.id || "track"}-${index}` : (song?.id || index)}
               onClick={() => handlePlayClick(song, index)}
-              className={`song-row-item group flex items-center justify-between px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+              className={`song-row-item group flex items-center justify-between px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
                 isThisActive
                   ? "bg-white/[0.08] border border-[var(--primary-accent,#f43f5e)]/40 shadow-md"
                   : "hover:bg-white/[0.05] border border-transparent"
               }`}
             >
               {/* Left Column: Index / Play + Artwork + Title & Artist */}
-              <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 mr-3">
+              <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1 mr-2 sm:mr-3">
                 {/* Index / Play indicator */}
                 <div className="w-6 sm:w-8 flex items-center justify-center flex-shrink-0 text-center">
                   {isThisActive ? (
@@ -355,7 +355,7 @@ const SongsList = ({
               </div>
 
               {/* Right Column: Plays count + Heart + (Duration) + (Delete) + Options Menu */}
-              <div className="flex items-center gap-2 sm:gap-2.5 text-xs text-gray-400 flex-shrink-0 ml-auto">
+              <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-gray-400 flex-shrink-0 ml-auto">
                 {/* Optional Plays count on full pages */}
                 {!hidePlays && song?.playCount && (
                   <span className="hidden md:block text-xs text-gray-400 tabular-nums mr-1">
@@ -368,7 +368,7 @@ const SongsList = ({
                   type="button"
                   onClick={(e) => handleToggleFavourite(e, song)}
                   title={isFav ? "Remove from Liked Songs" : "Save to Liked Songs"}
-                  className="p-1 cursor-pointer transition-transform hover:scale-125 outline-none focus:outline-none flex-shrink-0"
+                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full cursor-pointer hover:bg-white/10 active:scale-90 transition-all outline-none focus:outline-none flex-shrink-0"
                 >
                   {isFav ? (
                     <AiFillHeart
@@ -397,11 +397,10 @@ const SongsList = ({
                     onClick={(e) => handleRemoveFromQueue(e, index, song)}
                     title="Remove from Queue"
                     aria-label="Remove from Queue"
-                    className="p-1 cursor-pointer text-gray-400 hover:text-[#f43f5e] active:scale-90 transition-all outline-none focus:outline-none flex-shrink-0 opacity-70 group-hover:opacity-100"
+                    className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full cursor-pointer text-gray-400 hover:text-[#f43f5e] hover:bg-white/10 active:scale-90 transition-all outline-none focus:outline-none flex-shrink-0 opacity-70 group-hover:opacity-100"
                   >
                     <MdOutlineDeleteOutline
                       size={18}
-                      className="hover:scale-115 transition-transform"
                     />
                   </button>
                 )}
@@ -411,7 +410,7 @@ const SongsList = ({
                   <button
                     type="button"
                     onClick={(e) => handleMenuToggle(e, menuKey)}
-                    className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all outline-none focus:outline-none"
                     title="More options"
                   >
                     <PiDotsThreeVerticalBold size={18} />
