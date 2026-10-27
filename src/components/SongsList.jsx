@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { playPause, setActiveSong } from "@/redux/features/playerSlice";
+import { playPause, setActiveSong, removeFromQueue } from "@/redux/features/playerSlice";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import SongListSkeleton from "./SongListSkeleton";
@@ -32,7 +32,9 @@ const SongsList = ({
   playlistID,
   setSongs,
   isFavouritePage,
+  isQueue,
 }) => {
+  const isQueueMode = Boolean(isQueue || hidePlays);
   const { activeSong, isPlaying, currentIndex } = useSelector((state) => state.player);
   const { status } = useSession();
   const [showMenu, setShowMenu] = useState(null);
@@ -202,6 +204,27 @@ const SongsList = ({
     }
   };
 
+  const handleRemoveFromQueue = (e, index, song) => {
+    e?.stopPropagation();
+    setShowMenu(null);
+    dispatch(removeFromQueue({ index, songId: song?.id }));
+    toast.success("Removed from Queue");
+  };
+
+  const handleMenuToggle = (e, menuKey) => {
+    e?.stopPropagation();
+    if (showMenu === menuKey) {
+      setShowMenu(null);
+    } else {
+      setShowMenu(menuKey);
+      const buttonEl = e?.currentTarget;
+      setTimeout(() => {
+        const row = buttonEl?.closest(".song-row-item") || buttonEl;
+        row?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
+    }
+  };
+
   if (loading) {
     return <SongListSkeleton />;
   }
@@ -218,7 +241,7 @@ const SongsList = ({
 
   return (
     <>
-      <div className="mt-4 flex flex-col gap-1">
+      <div className={`mt-4 flex flex-col gap-1 ${isQueueMode ? "pb-36" : "pb-12"}`}>
         {/* Spotify Table Header */}
         <div className="hidden sm:flex items-center justify-between px-3 sm:px-4 py-2 border-b border-white/[0.08] text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 mr-3">
@@ -251,12 +274,16 @@ const SongsList = ({
             "";
 
           const isFav = isSongInFavourites(song);
+          const menuKey = isQueueMode
+            ? `queue-${song?.id || "track"}-${index}`
+            : (song?.id ? `${song.id}-${index}` : index);
+          const isLastFew = renderedSongs.length > 2 && index >= renderedSongs.length - 2;
 
           return (
             <div
-              key={hidePlays ? `${song?.id || "track"}-${index}` : (song?.id || index)}
+              key={isQueueMode ? `queue-${song?.id || "track"}-${index}` : (song?.id || index)}
               onClick={() => handlePlayClick(song, index)}
-              className={`group flex items-center justify-between px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
+              className={`song-row-item group flex items-center justify-between px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
                 isThisActive
                   ? "bg-white/[0.08] border border-[var(--primary-accent,#f43f5e)]/40 shadow-md"
                   : "hover:bg-white/[0.05] border border-transparent"
@@ -363,19 +390,19 @@ const SongsList = ({
                 <div className="relative flex-shrink-0">
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowMenu(showMenu === song?.id ? null : song?.id);
-                    }}
+                    onClick={(e) => handleMenuToggle(e, menuKey)}
                     className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    title="More options"
                   >
                     <PiDotsThreeVerticalBold size={18} />
                   </button>
 
-                  {showMenu === song?.id && (
+                  {showMenu === menuKey && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-8 z-50 w-48 rounded-xl border border-white/15 bg-[#18181f]/95 backdrop-blur-2xl p-2 shadow-2xl text-white text-xs animate-fadeIn"
+                      className={`absolute right-0 ${
+                        isLastFew ? "bottom-9 origin-bottom-right" : "top-8 origin-top-right"
+                      } z-50 w-48 rounded-xl border border-white/15 bg-[#18181f]/95 backdrop-blur-2xl p-2 shadow-2xl text-white text-xs animate-fadeIn`}
                     >
                       {/* Favourite Action in dropdown */}
                       <button
@@ -386,7 +413,7 @@ const SongsList = ({
                         {isFav ? (
                           <>
                             <AiFillHeart className="text-[#f43f5e]" size={16} />
-                            <span className="text-rose-">Remove from Liked</span>
+                            <span className="text-rose-400">Remove from Liked</span>
                           </>
                         ) : (
                           <>
@@ -395,6 +422,18 @@ const SongsList = ({
                           </>
                         )}
                       </button>
+
+                      {/* Remove from Queue (Queue mode) */}
+                      {isQueueMode && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleRemoveFromQueue(e, index, song)}
+                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-500/20 text-rose-400 flex items-center gap-2 transition-colors font-medium border-b border-white/10 mb-1"
+                        >
+                          <MdOutlineDeleteOutline size={16} />
+                          <span>Remove from Queue</span>
+                        </button>
+                      )}
 
                       {isUserPlaylist ? (
                         <button

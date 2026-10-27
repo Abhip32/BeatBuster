@@ -81,19 +81,74 @@ const playerSlice = createSlice({
     },
 
     deleteSong: (state, action) => {
-      const songIdToDelete = String(action.payload || "");
-
-      state.currentSongs = state.currentSongs.filter(song => String(song?.id) !== songIdToDelete);
-
-      if (String(state.activeSong?.id) === songIdToDelete) {
-        state.activeSong = {};
-        state.isActive = false;
+      const payload = action.payload;
+      let targetIndex = -1;
+      if (typeof payload === "number") {
+        targetIndex = payload;
+      } else {
+        const songIdToDelete = String(payload || "");
+        targetIndex = state.currentSongs.findIndex(
+          (song) => String(song?.id) === songIdToDelete
+        );
       }
 
+      if (targetIndex < 0 || targetIndex >= state.currentSongs.length) return;
+
+      const isRemovingActive = state.currentIndex === targetIndex;
+      state.currentSongs.splice(targetIndex, 1);
+
       if (state.currentSongs.length === 0) {
+        state.activeSong = {};
+        state.isActive = false;
+        state.isPlaying = false;
         state.currentIndex = 0;
-      } else if (state.currentIndex >= state.currentSongs.length) {
-        state.currentIndex = state.currentSongs.length - 1;
+      } else if (isRemovingActive) {
+        const newIndex =
+          targetIndex < state.currentSongs.length
+            ? targetIndex
+            : state.currentSongs.length - 1;
+        state.currentIndex = newIndex;
+        state.activeSong = state.currentSongs[newIndex] || {};
+      } else if (targetIndex < state.currentIndex) {
+        state.currentIndex = Math.max(0, state.currentIndex - 1);
+      }
+    },
+    removeFromQueue: (state, action) => {
+      const payload = action.payload;
+      let targetIndex = -1;
+
+      if (typeof payload === "number") {
+        targetIndex = payload;
+      } else if (payload && typeof payload === "object") {
+        if (typeof payload.index === "number") {
+          targetIndex = payload.index;
+        } else if (payload.songId || payload.id) {
+          const targetId = String(payload.songId || payload.id);
+          targetIndex = state.currentSongs.findIndex(
+            (s) => String(s?.id) === targetId
+          );
+        }
+      }
+
+      if (targetIndex < 0 || targetIndex >= state.currentSongs.length) return;
+
+      const isRemovingActive = state.currentIndex === targetIndex;
+      state.currentSongs.splice(targetIndex, 1);
+
+      if (state.currentSongs.length === 0) {
+        state.activeSong = {};
+        state.isActive = false;
+        state.isPlaying = false;
+        state.currentIndex = 0;
+      } else if (isRemovingActive) {
+        const newIndex =
+          targetIndex < state.currentSongs.length
+            ? targetIndex
+            : state.currentSongs.length - 1;
+        state.currentIndex = newIndex;
+        state.activeSong = state.currentSongs[newIndex] || {};
+      } else if (targetIndex < state.currentIndex) {
+        state.currentIndex = Math.max(0, state.currentIndex - 1);
       }
     },
     addToQueue: (state, action) => {
@@ -120,6 +175,7 @@ export const {
   setAutoAdd,
   resetOpenedByClick,
   deleteSong,
+  removeFromQueue,
   addToQueue
 } = playerSlice.actions;
 
