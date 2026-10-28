@@ -7,6 +7,7 @@ import { FaBookmark, FaKey } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import { addPlaylist } from "@/redux/features/playlistsSlice";
+import { setIsTyping } from "@/redux/features/loadingBarSlice";
 import { createPlaylist, addSongToPlaylist } from "@/services/playlistApi";
 import { toast } from "react-hot-toast";
 import decodeHtml from "@/utils/decodeHtml";
@@ -36,6 +37,15 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (show) {
+      dispatch(setIsTyping(true));
+      return () => {
+        dispatch(setIsTyping(false));
+      };
+    }
+  }, [show, dispatch]);
 
   useEffect(() => {
     if (show && initialPrompt) {
@@ -216,6 +226,8 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
               type="password"
               value={apiKey}
               onChange={(e) => handleSaveKey(e.target.value)}
+              onFocus={() => dispatch(setIsTyping(true))}
+              onBlur={() => dispatch(setIsTyping(false))}
               placeholder="Paste AI Studio API key here..."
               className="w-full px-3 py-1.5 bg-black/50 border border-purple-500/40 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-400"
             />
@@ -229,6 +241,8 @@ const AiDjModal = ({ show, setShow, initialPrompt = "" }) => {
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onFocus={() => dispatch(setIsTyping(true))}
+              onBlur={() => dispatch(setIsTyping(false))}
               onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
               placeholder="Describe your vibe, mood, decade, or genre..."
               className="w-full pl-4 pr-24 py-3 bg-white/[0.04] border border-white/15 focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/20 rounded-2xl text-sm text-white placeholder-gray-500 outline-none transition-all font-medium"

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   nextSong,
@@ -184,17 +184,58 @@ const MusicPlayer = () => {
     };
   }, [fullScreen]);
 
-  // Hotkey for play pause
-  const handleKeyPress = (event) => {
-    // Check if the pressed key is the spacebar (keyCode 32 or key " ")
-    if (!isTyping && (event.keyCode === 32 || event.key === " ")) {
-      event.preventDefault();
-      if (document.activeElement && typeof document.activeElement.blur === "function") {
-        document.activeElement.blur();
+  const handlePlayPause = useCallback(
+    (e) => {
+      e?.stopPropagation();
+      if (!isActive) return;
+
+      if (isPlaying) {
+        dispatch(playPause(false));
+      } else {
+        dispatch(playPause(true));
       }
+    },
+    [isActive, isPlaying, dispatch]
+  );
+
+  // Hotkey for play pause
+  const handleKeyPress = useCallback(
+    (event) => {
+      // Check if the pressed key is the spacebar (keyCode 32, key " ", or code "Space")
+      if (event.keyCode !== 32 && event.key !== " " && event.code !== "Space") {
+        return;
+      }
+
+      // Ignore if typing in any text input, textarea, select, contentEditable element, or Redux isTyping
+      const target = event.target;
+      const tagName = target?.tagName?.toLowerCase();
+      const isTargetEditable =
+        target?.isContentEditable ||
+        tagName === "input" ||
+        tagName === "textarea" ||
+        tagName === "select" ||
+        target?.getAttribute?.("role") === "textbox";
+
+      const activeEl =
+        typeof document !== "undefined" ? document.activeElement : null;
+      const activeTagName = activeEl?.tagName?.toLowerCase();
+      const isActiveEditable =
+        activeEl?.isContentEditable ||
+        activeTagName === "input" ||
+        activeTagName === "textarea" ||
+        activeTagName === "select" ||
+        activeEl?.getAttribute?.("role") === "textbox";
+
+      if (isTyping || isTargetEditable || isActiveEditable) {
+        return;
+      }
+
+      event.preventDefault();
       handlePlayPause();
-    }
-  };
+    },
+    [isTyping, handlePlayPause]
+  );
+
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress);
 
@@ -203,17 +244,6 @@ const MusicPlayer = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
-
-  const handlePlayPause = (e) => {
-    e?.stopPropagation();
-    if (!isActive) return;
-
-    if (isPlaying) {
-      dispatch(playPause(false));
-    } else {
-      dispatch(playPause(true));
-    }
-  };
 
   const handleNextSong = (e) => {
     e?.stopPropagation();
