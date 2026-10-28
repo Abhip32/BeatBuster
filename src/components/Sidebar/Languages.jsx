@@ -1,14 +1,29 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setLanguages } from "@/redux/features/languagesSlice";
 import { HiChevronDown } from "react-icons/hi2";
 
 const Languages = () => {
   const dispatch = useDispatch();
-  const { languages } = useSelector((state) => state.languages);
-  const [selectedLanguages, setSelectedLanguages] = useState([...languages]);
+  const rawLanguages = useSelector((state) => state.languages?.languages || state.languages);
+  const selectedLanguages = Array.isArray(rawLanguages) && rawLanguages.length > 0
+    ? rawLanguages
+    : ["hindi", "english"];
   const [isOpen, setIsOpen] = useState(false);
+
+  // Sync from localStorage on initial mount if available
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("languages");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          dispatch(setLanguages(parsed));
+        }
+      }
+    } catch (e) {}
+  }, [dispatch]);
 
   const languageList = [
     { id: "english", label: "English" },
@@ -28,8 +43,14 @@ const Languages = () => {
     } else {
       updatedLanguages = [...selectedLanguages, id];
     }
-    setSelectedLanguages(updatedLanguages);
+    // Prevent empty language array; keep at least one selected
+    if (updatedLanguages.length === 0) {
+      updatedLanguages = [id];
+    }
     dispatch(setLanguages(updatedLanguages));
+    try {
+      localStorage.setItem("languages", JSON.stringify(updatedLanguages));
+    } catch (e) {}
   };
 
   return (
@@ -59,7 +80,7 @@ const Languages = () => {
                 onClick={() => handleLanguageToggle(lang.id)}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium ${
                   isSelected
-                    ? "bg-[#f43f5e] text-black border-[#f43f5e] font-bold shadow-[0_0_12px_rgba(244, 63, 94,0.4)]"
+                    ? "bg-[#f43f5e] text-black border-[#f43f5e] font-bold shadow-[0_0_12px_rgba(244,63,94,0.4)]"
                     : "border-white/10 text-gray-300 hover:text-white hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.08]"
                 }`}
               >

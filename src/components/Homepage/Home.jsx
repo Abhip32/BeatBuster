@@ -49,7 +49,13 @@ const Home = () => {
   const { activeSong, isPlaying } = useSelector((state) => state.player);
   const { count: likedCount, items: favouriteItems } = useSelector((state) => state.favourites || { count: 0, items: [] });
   const { playlists: userPlaylists, count: playlistCount, isLoaded: isPlaylistsLoaded } = useSelector((state) => state.playlists || { playlists: [], count: 0, isLoaded: false });
-  const { languages } = useSelector((state) => state.languages);
+  const rawLanguages = useSelector((state) => state.languages?.languages || state.languages);
+  const languages = Array.isArray(rawLanguages) && rawLanguages.length > 0
+    ? rawLanguages
+    : ["hindi", "english"];
+  const languagesKey = Array.isArray(languages)
+    ? languages.map((l) => String(l).toLowerCase().trim()).sort().join(",")
+    : String(languages).toLowerCase().trim();
 
   const displayName =
     session?.user?.name ||
@@ -69,7 +75,7 @@ const Home = () => {
   }, []);
 
   const { data, isLoading: loading } = useQuery({
-    queryKey: ["homePageData", languages],
+    queryKey: ["homePageData", languagesKey],
     queryFn: async () => {
       dispatch(setProgress(50));
       try {

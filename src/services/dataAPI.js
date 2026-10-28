@@ -7,17 +7,21 @@ export const getApiBase = () => {
 // home page data
 export async function homePageData(language) {
   const base = getApiBase();
-  const lang = Array.isArray(language)
-    ? language.map((l) => String(l).toLowerCase().trim()).join(",")
-    : language?.toString().toLowerCase().trim() || "hindi,english";
+  let lang = "hindi,english";
+  if (Array.isArray(language) && language.length > 0) {
+    lang = language
+      .map((l) => String(l).toLowerCase().trim())
+      .filter(Boolean)
+      .join(",");
+  } else if (typeof language === "string" && language.trim()) {
+    lang = language.toLowerCase().trim();
+  }
+  if (!lang) lang = "hindi,english";
 
   // 1. First attempt: standard /api/modules endpoint
   try {
     const response = await fetch(
-      `${base}/api/modules?languages=${encodeURIComponent(lang)}`,
-      {
-        next: { revalidate: 3600 },
-      }
+      `${base}/api/modules?languages=${encodeURIComponent(lang)}`
     );
     if (response.ok) {
       const json = await response.json();
@@ -71,10 +75,7 @@ export async function homePageData(language) {
   // 2. Second attempt: /modules
   try {
     const response = await fetch(
-      `${base}/modules?language=${encodeURIComponent(lang)}`,
-      {
-        next: { revalidate: 3600 },
-      }
+      `${base}/modules?language=${encodeURIComponent(lang)}`
     );
     if (response.ok) {
       const data = await response.json();

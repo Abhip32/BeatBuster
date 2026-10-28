@@ -26,9 +26,13 @@ const ListenAgain = () => {
     loadLocalHistory();
 
     try {
-      const lang = localStorage.getItem("languages")
-        ? JSON.parse(localStorage.getItem("languages"))
-        : ["english"];
+      const storedLang = localStorage.getItem("languages");
+      if (storedLang) {
+        const parsed = JSON.parse(storedLang);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          dispatch(setLanguages(parsed));
+        }
+      }
       dispatch(
         setAutoAdd(
           localStorage.getItem("autoAdd")
@@ -36,7 +40,6 @@ const ListenAgain = () => {
             : false
         )
       );
-      dispatch(setLanguages(lang));
     } catch (e) {}
 
     // Listen to real-time history updates from SongsHistory
