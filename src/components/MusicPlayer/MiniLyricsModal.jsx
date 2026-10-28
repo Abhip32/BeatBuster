@@ -177,8 +177,20 @@ const MiniLyricsModal = ({
               })}
             </div>
           ) : lyricsData?.plainLyrics ? (
-            <div className="w-full flex-1 min-h-0 overflow-y-auto hideScrollBar text-white/90 text-sm px-4 py-4 text-left whitespace-pre-line leading-relaxed">
-              {lyricsData.plainLyrics}
+            <div className="w-full flex-1 min-h-0 overflow-y-auto hideScrollBar text-white/90 text-xs sm:text-sm px-4 py-4 text-left whitespace-pre-line leading-relaxed flex flex-col justify-between">
+              <div>
+                {lyricsData.snippet && (
+                  <p className="text-[11px] text-rose-400 font-semibold mb-2 italic">
+                    "{lyricsData.snippet}"
+                  </p>
+                )}
+                {lyricsData.plainLyrics}
+              </div>
+              {lyricsData.copyright && (
+                <p className="text-[10px] text-gray-500 mt-4 text-center border-t border-white/[0.06] pt-2">
+                  {lyricsData.copyright}
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-1 p-6 text-center">
@@ -186,7 +198,7 @@ const MiniLyricsModal = ({
                 No Lyrics Found
               </p>
               <p className="text-xs text-gray-500">
-                Couldn't find lyrics on lrclib.net
+                We couldn't find lyrics for this song
               </p>
             </div>
           )}

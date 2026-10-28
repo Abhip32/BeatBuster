@@ -221,16 +221,28 @@ const Lyrics = ({
             </div>
           ) : lyricsData?.plainLyrics ? (
             /* Fallback Plain Lyrics View */
-            <div className="w-full flex-1 min-h-0 overflow-y-auto hideScrollBar text-white/90 text-base sm:text-lg px-4 sm:px-6 py-6 text-left whitespace-pre-line leading-loose">
-              {lyricsData.plainLyrics}
+            <div className="w-full flex-1 min-h-0 overflow-y-auto hideScrollBar text-white/90 text-sm sm:text-base md:text-lg px-4 sm:px-6 py-6 text-left whitespace-pre-line leading-relaxed sm:leading-loose flex flex-col justify-between">
+              <div>
+                {lyricsData.snippet && (
+                  <p className="text-xs sm:text-sm text-rose-400 font-semibold mb-4 italic">
+                    "{lyricsData.snippet}"
+                  </p>
+                )}
+                {lyricsData.plainLyrics}
+              </div>
+              {lyricsData.copyright && (
+                <p className="text-[11px] text-gray-500 mt-8 text-center border-t border-white/[0.06] pt-3">
+                  {lyricsData.copyright}
+                </p>
+              )}
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-2 py-16 text-center">
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-2 py-16 text-center px-4">
               <p className="text-base sm:text-lg font-medium text-gray-300">
                 No Lyrics Found
               </p>
               <p className="text-xs text-gray-500">
-                We couldn't find lyrics for this song on lrclib.net
+                We couldn't find lyrics for this song
               </p>
             </div>
           )

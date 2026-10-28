@@ -98,7 +98,12 @@ const SearchResultsPage = ({ params }) => {
     }) ||
     null;
 
-  const decodedTitle = decodeURIComponent(query || "").replaceAll("%20", " ");
+  let decodedTitle = query || "";
+  try {
+    decodedTitle = decodeURIComponent(query || "").replaceAll("%20", " ");
+  } catch {
+    decodedTitle = (query || "").replaceAll("%20", " ");
+  }
 
   const hasAnyResults =
     songResults.length > 0 ||

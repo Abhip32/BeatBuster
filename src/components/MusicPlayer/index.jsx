@@ -7,6 +7,7 @@ import {
   playPause,
   setFullScreen,
   resetOpenedByClick,
+  addMultipleToQueue,
 } from "../../redux/features/playerSlice";
 import Controls from "./Controls";
 import Player from "./Player";
@@ -19,7 +20,7 @@ import Downloader from "./Downloader";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { MdSkipNext, MdSkipPrevious } from "react-icons/md";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
-import { addFavourite, getFavourite } from "@/services/dataAPI";
+import { addFavourite, getFavourite, getRecommendedSongs } from "@/services/dataAPI";
 import { setFavourites, toggleFavouriteSong } from "@/redux/features/favouritesSlice";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -37,6 +38,7 @@ const MusicPlayer = () => {
     isPlaying,
     fullScreen,
     openedByClick,
+    autoAdd,
   } = useSelector((state) => state.player);
   const { isTyping } = useSelector((state) => state.loadingBar);
   const autoOpenFullscreen = useSelector(
@@ -244,6 +246,20 @@ const MusicPlayer = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  // Auto-replenish queue when autoAdd is enabled and remaining songs <= 2
+  useEffect(() => {
+    if (!autoAdd || !activeSong?.id) return;
+    if (currentSongs?.length > 0 && currentIndex >= currentSongs.length - 2) {
+      getRecommendedSongs(null, activeSong.id)
+        .then((recommended) => {
+          if (Array.isArray(recommended) && recommended.length > 0) {
+            dispatch(addMultipleToQueue(recommended));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [autoAdd, activeSong?.id, currentIndex, currentSongs?.length, dispatch]);
 
   const handleNextSong = (e) => {
     e?.stopPropagation();

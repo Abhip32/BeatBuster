@@ -8,21 +8,60 @@ export const getApiBase = () => {
 export async function homePageData(language) {
   const base = getApiBase();
   const lang = Array.isArray(language)
-    ? language.join(",")
-    : language?.toString() || "english,hindi";
+    ? language.map((l) => String(l).toLowerCase().trim()).join(",")
+    : language?.toString().toLowerCase().trim() || "hindi,english";
 
   // 1. First attempt: standard /api/modules endpoint
   try {
     const response = await fetch(
-      `${base}/api/modules?language=${encodeURIComponent(lang)}`,
+      `${base}/api/modules?languages=${encodeURIComponent(lang)}`,
       {
         next: { revalidate: 3600 },
       }
     );
     if (response.ok) {
-      const data = await response.json();
-      if (data?.data && (data.data.trending || data.data.charts || data.data.albums)) {
-        return data.data;
+      const json = await response.json();
+      if (json?.data) {
+        const raw = json.data;
+        const trendingItems = Array.isArray(raw.trending) ? raw.trending : [];
+        let trendingSongs = trendingItems.filter((i) => i.type === "song");
+        let trendingAlbums = trendingItems.filter((i) => i.type === "album");
+
+        if (trendingAlbums.length === 0 && Array.isArray(raw.albums)) {
+          trendingAlbums = raw.albums.slice(0, 16);
+        }
+
+        // If trendingSongs is fewer than 8, supplement from top chart playlist so users have a rich list of playable songs
+        if (trendingSongs.length < 8 && Array.isArray(raw.charts) && raw.charts[0]?.id) {
+          try {
+            const chartSongsRes = await fetch(`${base}/api/playlists?id=${raw.charts[0].id}`);
+            if (chartSongsRes.ok) {
+              const chartSongsData = await chartSongsRes.json();
+              const playlistSongs = chartSongsData?.data?.songs || [];
+              const existingIds = new Set(trendingSongs.map((s) => s.id));
+              for (const s of playlistSongs) {
+                if (!existingIds.has(s.id)) {
+                  trendingSongs.push({ ...s, type: "song" });
+                  existingIds.add(s.id);
+                }
+              }
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        return {
+          trending: {
+            songs: trendingSongs,
+            albums: trendingAlbums,
+          },
+          charts: raw.charts || [],
+          albums: raw.albums || [],
+          playlists: raw.playlists || [],
+          discover: raw.discover || [],
+          radio: raw.radio || [],
+        };
       }
     }
   } catch (error) {
@@ -245,8 +284,10 @@ export async function getlyricsData(songOrId) {
     let artistName = "";
     let albumName = "";
     let duration = null;
+    let songId = null;
 
     if (typeof songOrId === "object" && songOrId !== null) {
+      songId = songOrId.id;
       trackName = songOrId.name || songOrId.title || "";
       const primaryArtists = Array.isArray(songOrId?.artists?.primary)
         ? songOrId.artists.primary
@@ -261,6 +302,7 @@ export async function getlyricsData(songOrId) {
         duration = Math.round(Number(songOrId.duration));
       }
     } else if (typeof songOrId === "string") {
+      songId = songOrId;
       trackName = songOrId;
     }
 
@@ -348,6 +390,34 @@ export async function getlyricsData(songOrId) {
       if (Array.isArray(items) && items.length > 0) {
         const withSynced = items.filter((item) => item.syncedLyrics);
         return withSynced.length > 0 ? withSynced[0] : items[0];
+      }
+    }
+
+    // 5. Native JioSaavn Lyrics Fallback
+    if (songId) {
+      try {
+        const base = getApiBase();
+        const jioRes = await fetch(`${base}/api/songs/${songId}/lyrics`);
+        if (jioRes.ok) {
+          const jioData = await jioRes.json();
+          if (jioData?.data?.lyrics) {
+            const cleanPlain = jioData.data.lyrics.replace(/<br\s*\/?>/gi, "\n");
+            return {
+              id: songId,
+              trackName: cleanTrack,
+              artistName: cleanArtist,
+              albumName,
+              duration,
+              instrumental: false,
+              plainLyrics: cleanPlain,
+              syncedLyrics: null,
+              snippet: jioData.data.snippet || null,
+              copyright: jioData.data.copyright || "Lyrics powered by JioSaavn"
+            };
+          }
+        }
+      } catch (jioErr) {
+        // Fallback error, continue
       }
     }
 
@@ -618,8 +688,25 @@ export async function sendResetPasswordLink(email) {
 // get recommended songs
 export async function getRecommendedSongs(artistId, songId) {
   try {
+    const rawId = songId || artistId;
+    if (!rawId) return [];
     const base = getApiBase();
-    const response = await fetch(`${base}/api/songs/${songId}/suggestions`);
+
+    // 1. First attempt: dedicated recommendations API
+    try {
+      const response = await fetch(`${base}/api/songs/${rawId}/recommendations`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data?.data) && data.data.length > 0) {
+          return data.data;
+        }
+      }
+    } catch (e) {
+      // Proceed to suggestions fallback
+    }
+
+    // 2. Second attempt: suggestions API
+    const response = await fetch(`${base}/api/songs/${rawId}/suggestions`);
     if (!response.ok) return [];
     const data = await response.json();
     return Array.isArray(data?.data) ? data.data : [];

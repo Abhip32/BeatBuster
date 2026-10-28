@@ -6,6 +6,7 @@ import PlayPause from "../PlayPause";
 import {
   playPause,
   setActiveSong,
+  addMultipleToQueue
 } from "../../redux/features/playerSlice";
 import { getRecommendedSongs, getSongData } from "@/services/dataAPI";
 import decodeHtml from "@/utils/decodeHtml";
@@ -64,10 +65,12 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
           songData?.primaryArtistsId ||
           songData?.artists?.primary?.[0]?.id ||
           songData?.id;
-        if (autoAdd && primaryArtistsId) {
+        if (autoAdd && (songData?.id || primaryArtistsId)) {
           getRecommendedSongs(primaryArtistsId, songData?.id)
             .then((recommended) => {
-              // optional background queue fill
+              if (Array.isArray(recommended) && recommended.length > 0) {
+                dispatch(addMultipleToQueue(recommended));
+              }
             })
             .catch(() => {});
         }

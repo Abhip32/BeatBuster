@@ -182,6 +182,19 @@ const playerSlice = createSlice({
         state.currentSongs = [...state.currentSongs, newSong];
       }
       state.fullScreen = true;
+    },
+    addMultipleToQueue: (state, action) => {
+      const newSongs = action.payload;
+      if (!Array.isArray(newSongs) || newSongs.length === 0) return;
+      const existingIds = new Set(
+        state.currentSongs.map((s) => String(s?.id || ""))
+      );
+      const uniqueNew = newSongs.filter(
+        (s) => s?.id && !existingIds.has(String(s.id))
+      );
+      if (uniqueNew.length > 0) {
+        state.currentSongs = [...state.currentSongs, ...uniqueNew];
+      }
     }
   },
 });
@@ -197,7 +210,8 @@ export const {
   deleteSong,
   removeFromQueue,
   updateActiveSong,
-  addToQueue
+  addToQueue,
+  addMultipleToQueue
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

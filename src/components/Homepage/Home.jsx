@@ -1,5 +1,5 @@
 "use client";
-import { homePageData, getFavourite, getSongData } from "@/services/dataAPI";
+import { homePageData, getFavourite, getSongData, searchSongs } from "@/services/dataAPI";
 import { setFavourites } from "@/redux/features/favouritesSlice";
 import { setPlaylists } from "@/redux/features/playlistsSlice";
 import { getUserPlaylists, getSinglePlaylist } from "@/services/playlistApi";
@@ -20,16 +20,17 @@ import SongsList from "@/components/SongsList";
 import PlayButton from "@/components/PlayButton";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
-import { AiFillHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
 import { FaPlus, FaSpotify } from "react-icons/fa";
-import { MdPlaylistPlay } from "react-icons/md";
+import { MdPlaylistPlay, MdRadio } from "react-icons/md";
 import { IoSparkles } from "react-icons/io5";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import PlaylistModal from "@/components/Sidebar/PlaylistModal";
 import AiDjModal from "@/components/AiDj/AiDjModal";
+import decodeHtml from "@/utils/decodeHtml";
 
 const Home = () => {
   const router = useRouter();
@@ -40,6 +41,8 @@ const Home = () => {
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [initialModalTab, setInitialModalTab] = useState("create");
   const [showAiDj, setShowAiDj] = useState(false);
+  const [activeMoodLoading, setActiveMoodLoading] = useState(null);
+  const [activeRadioLoading, setActiveRadioLoading] = useState(null);
 
   const dispatch = useDispatch();
   const { data: session, status } = useSession();
@@ -170,6 +173,58 @@ const Home = () => {
   const charts = Array.isArray(data?.charts) ? data.charts : [];
   const albums = Array.isArray(data?.albums) ? data.albums : [];
   const playlists = Array.isArray(data?.playlists) ? data.playlists : [];
+  const discover = Array.isArray(data?.discover) ? data.discover : [];
+  const radio = Array.isArray(data?.radio) ? data.radio : [];
+
+  const handlePlayRadio = async (station) => {
+    if (!station?.title) return;
+    const cleanTitle = decodeHtml(station.title);
+    const stationId = station.id || station.title;
+    try {
+      setActiveRadioLoading(stationId);
+      toast.loading(`Tuning into ${cleanTitle} Radio...`, { id: "radio-tune" });
+      const rawSongs = await searchSongs(cleanTitle, 1, 30);
+      const songs = Array.isArray(rawSongs)
+        ? rawSongs.filter((song, idx, arr) => arr.findIndex((s) => s.id === song.id) === idx)
+        : [];
+      if (songs.length > 0) {
+        dispatch(setActiveSong({ song: songs[0], data: songs, i: 0 }));
+        dispatch(playPause(true));
+        toast.success(`Playing ${cleanTitle} Radio 📻`, { id: "radio-tune" });
+      } else {
+        toast.error(`Could not load tracks for ${cleanTitle}`, { id: "radio-tune" });
+      }
+    } catch {
+      toast.error(`Could not tune into ${cleanTitle}`, { id: "radio-tune" });
+    } finally {
+      setActiveRadioLoading(null);
+    }
+  };
+
+  const handleExploreMood = async (item) => {
+    if (!item?.title) return;
+    const cleanTitle = decodeHtml(item.title);
+    const moodId = item.id || item.title;
+    try {
+      setActiveMoodLoading(moodId);
+      toast.loading(`Tuning into ${cleanTitle} Station...`, { id: "mood-tune" });
+      const rawSongs = await searchSongs(cleanTitle, 1, 30);
+      const validSongs = Array.isArray(rawSongs)
+        ? rawSongs.filter((song, idx, arr) => arr.findIndex((s) => s.id === song.id) === idx)
+        : [];
+      if (validSongs.length > 0) {
+        dispatch(setActiveSong({ song: validSongs[0], data: validSongs, i: 0 }));
+        dispatch(playPause(true));
+        toast.success(`Playing ${cleanTitle} Station 🎵`, { id: "mood-tune" });
+      } else {
+        toast.error(`Could not load tracks for ${cleanTitle}`, { id: "mood-tune" });
+      }
+    } catch {
+      toast.error(`Could not tune into ${cleanTitle} Station`, { id: "mood-tune" });
+    } finally {
+      setActiveMoodLoading(null);
+    }
+  };
 
   const handleOpenCreatePlaylist = (tab = "create") => {
     if (status === "unauthenticated") {
@@ -278,6 +333,23 @@ const Home = () => {
         >
           Top Charts
         </button>
+
+        {radio.length > 0 && (
+          <button
+            onClick={() => setActiveTab("radio")}
+            className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+              activeTab === "radio"
+                ? "glass-pill-active"
+                : "glass-pill text-gray-300 hover:text-white"
+            }`}
+          >
+            <MdRadio className="text-[#f43f5e] text-base" />
+            <span>Radio</span>
+            <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-[#f43f5e]/20 text-rose-300 font-bold">
+              {radio.length}
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Quick Access Tiles (Shown on All tab) */}
@@ -645,6 +717,76 @@ const Home = () => {
         </>
       )}
 
+      {/* RADIO TAB CONTENT */}
+      {activeTab === "radio" && (
+        <div className="my-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                <span>Featured Radio Stations</span>
+                {radio.length > 0 && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                    {radio.length}
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                Non-stop radio broadcasts curated by language, genre, and decade
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            {radio.map((station, idx) => {
+              const stationKey = station?.id || station?.title || idx;
+              const isLoadingThis = activeRadioLoading === (station?.id || station?.title);
+              return (
+                <div
+                  key={stationKey}
+                  onClick={() => handlePlayRadio(station)}
+                  className="group relative flex flex-col p-2.5 sm:p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] active:scale-[0.98] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 shadow-lg cursor-pointer select-none"
+                >
+                  <div className="relative w-full aspect-square rounded-xl mb-2.5 sm:mb-3 shadow-md overflow-hidden bg-[#18181f]">
+                    <img
+                      loading="lazy"
+                      alt={station?.title || "radio"}
+                      src={
+                        station?.image?.[2]?.url ||
+                        station?.image?.[1]?.url ||
+                        station?.image?.[0]?.url ||
+                        "/images/vinyl.png"
+                      }
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/vinyl.png";
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute right-2 bottom-2 sm:right-2.5 sm:bottom-2.5 w-8 h-8 sm:w-10 sm:h-10 rounded-full musify-play-btn opacity-90 sm:opacity-0 translate-y-0 sm:translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center shadow-xl">
+                      {isLoadingThis ? (
+                        <AiOutlineLoading3Quarters className="animate-spin text-white text-sm sm:text-base" />
+                      ) : (
+                        <BsFillPlayFill className="text-white text-base sm:text-xl translate-x-0.5" />
+                      )}
+                    </div>
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-rose-500/80 text-white backdrop-blur-md tracking-wider uppercase">
+                      Live
+                    </span>
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <p className="font-bold text-xs sm:text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
+                      {decodeHtml(station?.title)}
+                    </p>
+                    <p className="text-[11px] sm:text-xs truncate text-[#b3b3b3] mt-0.5 group-hover:text-gray-300 transition-colors">
+                      {station?.subtitle || "Radio Station"}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ALL & CHARTS TABS */}
       {(activeTab === "all" || activeTab === "charts") && (
         <div className="my-8 lg:my-14">
@@ -680,7 +822,7 @@ const Home = () => {
         </div>
       )}
 
-      {/* NEW RELEASES & FEATURED PLAYLISTS (Shown on All tab) */}
+      {/* NEW RELEASES & FEATURED PLAYLISTS & RADIO & DISCOVER (Shown on All tab) */}
       {activeTab === "all" && (
         <>
           {/* New Releases */}
@@ -717,6 +859,126 @@ const Home = () => {
               ))
             )}
           </SwiperLayout>
+
+          {/* Featured Radio Stations */}
+          {radio.length > 0 && (
+            <SwiperLayout title="Featured Radio Stations">
+              {radio.map((station, idx) => {
+                const stationKey = station?.id || station?.title || idx;
+                const isLoadingThis = activeRadioLoading === (station?.id || station?.title);
+                return (
+                  <SwiperSlide key={stationKey}>
+                    <div
+                      onClick={() => handlePlayRadio(station)}
+                      className="group relative flex flex-col p-2.5 sm:p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] active:scale-[0.98] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 shadow-lg cursor-pointer h-full select-none"
+                    >
+                      <div className="relative w-full aspect-square rounded-xl mb-2.5 sm:mb-3 shadow-md overflow-hidden bg-[#18181f]">
+                        <img
+                          loading="lazy"
+                          alt={station?.title || "radio"}
+                          src={
+                            station?.image?.[2]?.url ||
+                            station?.image?.[1]?.url ||
+                            station?.image?.[0]?.url ||
+                            "/images/vinyl.png"
+                          }
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/vinyl.png";
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute right-2 bottom-2 sm:right-2.5 sm:bottom-2.5 w-8 h-8 sm:w-10 sm:h-10 rounded-full musify-play-btn opacity-90 sm:opacity-0 translate-y-0 sm:translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center shadow-xl">
+                          {isLoadingThis ? (
+                            <AiOutlineLoading3Quarters className="animate-spin text-white text-sm sm:text-base" />
+                          ) : (
+                            <BsFillPlayFill className="text-white text-base sm:text-xl translate-x-0.5" />
+                          )}
+                        </div>
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-rose-500/80 text-white backdrop-blur-md tracking-wider uppercase">
+                          Radio
+                        </span>
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <p className="font-bold text-xs sm:text-sm text-white truncate w-full group-hover:text-[#f43f5e] transition-colors">
+                          {decodeHtml(station?.title)}
+                        </p>
+                        <p className="text-[11px] sm:text-xs truncate text-[#b3b3b3] mt-0.5 group-hover:text-gray-300 transition-colors">
+                          {station?.subtitle || "Radio Station"}
+                        </p>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                );
+              })}
+            </SwiperLayout>
+          )}
+
+          {/* Explore Moods & Genres */}
+          {discover.length > 0 && (
+            <div className="my-8 lg:my-14">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-white flex items-center gap-2.5">
+                    <span>Explore Moods & Genres</span>
+                    <span className="text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                      Instant Stations
+                    </span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                    Tap any vibe to launch a continuous, curated music station
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                {discover.slice(0, 12).map((item, idx) => {
+                  const itemId = item?.id || item?.title || idx;
+                  const isLoadingThis = activeMoodLoading === (item?.id || item?.title);
+                  return (
+                    <div
+                      key={itemId}
+                      onClick={() => handleExploreMood(item)}
+                      className="group relative p-2.5 sm:p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] active:scale-[0.98] backdrop-blur-md border border-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col cursor-pointer shadow-lg select-none"
+                    >
+                      <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-2.5 shadow-md bg-[#18181f]">
+                        <img
+                          loading="lazy"
+                          alt={item?.title || "mood"}
+                          src={
+                            item?.image?.[2]?.url ||
+                            item?.image?.[1]?.url ||
+                            item?.image?.[0]?.url ||
+                            "/images/vinyl.png"
+                          }
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/vinyl.png";
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {item?.badge && (
+                          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-[#f43f5e] text-white shadow-md">
+                            {item.badge}
+                          </span>
+                        )}
+                        <div className="absolute right-2 bottom-2 sm:right-2.5 sm:bottom-2.5 w-8 h-8 sm:w-10 sm:h-10 rounded-full musify-play-btn opacity-90 sm:opacity-0 translate-y-0 sm:translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center shadow-xl">
+                          {isLoadingThis ? (
+                            <AiOutlineLoading3Quarters className="animate-spin text-white text-sm sm:text-base" />
+                          ) : (
+                            <BsFillPlayFill className="text-white text-base sm:text-xl translate-x-0.5" />
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs sm:text-sm font-bold text-white group-hover:text-[#f43f5e] truncate transition-colors">
+                        {decodeHtml(item?.title)}
+                      </p>
+                      <p className="text-[11px] sm:text-xs text-gray-400 capitalize truncate mt-0.5">
+                        {item?.subType || "Mood"} Station
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </>
       )}
 
