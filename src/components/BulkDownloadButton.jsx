@@ -40,10 +40,34 @@ const BulkDownloadButton = ({ songList }) => {
     if (typeof window === "undefined" || !buttonRef.current) return;
 
     const rect = buttonRef.current.getBoundingClientRect();
-    setMenuPosition({
-      top: Math.max(8, rect.top - 8),
-      right: Math.max(8, window.innerWidth - rect.right),
-    });
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    const spaceAbove = rect.top;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const openUpwards = spaceBelow < 180 && spaceAbove > spaceBelow;
+
+    const right = Math.max(8, viewportWidth - rect.right);
+
+    if (openUpwards) {
+      const bottom = Math.max(8, viewportHeight - rect.top + 8);
+      const maxHeight = Math.max(120, spaceAbove - 16);
+      setMenuPosition({
+        top: undefined,
+        bottom,
+        right,
+        maxHeight,
+      });
+    } else {
+      const top = Math.max(8, rect.bottom + 8);
+      const maxHeight = Math.max(120, spaceBelow - 16);
+      setMenuPosition({
+        top,
+        bottom: undefined,
+        right,
+        maxHeight,
+      });
+    }
   };
 
   useEffect(() => {
@@ -90,7 +114,7 @@ const BulkDownloadButton = ({ songList }) => {
       const folderName = sanitize(downloadTitle) || "download";
       const folder = zip.folder(folderName) || zip;
       const availableSongs = songs.filter(
-        (song) => song?.downloadUrl?.[quality.index]?.url,
+        (song) => song?.downloadUrl?.[quality.index]?.url || song?.downloadUrl?.[quality.index]?.link,
       );
 
       if (!availableSongs.length) {
@@ -100,7 +124,7 @@ const BulkDownloadButton = ({ songList }) => {
 
       for (let i = 0; i < availableSongs.length; i += 1) {
         const song = availableSongs[i];
-        const downloadUrl = song.downloadUrl[quality.index].url;
+        const downloadUrl = song.downloadUrl[quality.index]?.url || song.downloadUrl[quality.index]?.link;
         const songTitle = sanitize(song.name) || `Track_${i + 1}`;
         const filename = `${songTitle}.mp4`;
 
@@ -195,7 +219,7 @@ const BulkDownloadButton = ({ songList }) => {
   }, []);
 
   const availableQualities = QUALITY_OPTIONS.filter((quality) =>
-    songs.some((song) => song?.downloadUrl?.[quality.index]?.url),
+    songs.some((song) => song?.downloadUrl?.[quality.index]?.url || song?.downloadUrl?.[quality.index]?.link),
   );
 
   return (
@@ -213,7 +237,7 @@ const BulkDownloadButton = ({ songList }) => {
             );
             if (
               targetQuality &&
-              songs.some((song) => song?.downloadUrl?.[targetQuality.index]?.url)
+              songs.some((song) => song?.downloadUrl?.[targetQuality.index]?.url || song?.downloadUrl?.[targetQuality.index]?.link)
             ) {
               handleBulkDownload(targetQuality);
               return;
@@ -293,12 +317,13 @@ const BulkDownloadButton = ({ songList }) => {
             <div
               ref={menuRef}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#18181f]/95 border border-white/15 rounded-2xl shadow-2xl backdrop-blur-2xl z-[9999] min-w-[180px] p-2 overflow-hidden animate-fadeIn"
+              className="bg-[#18181f]/95 border border-white/15 rounded-2xl shadow-2xl backdrop-blur-2xl z-[9999] min-w-[180px] p-2 overflow-y-auto hideScrollBar animate-fadeIn"
               style={{
                 position: "fixed",
-                top: `${menuPosition.top}px`,
+                top: menuPosition.top !== undefined ? `${menuPosition.top}px` : "auto",
+                bottom: menuPosition.bottom !== undefined ? `${menuPosition.bottom}px` : "auto",
                 right: `${menuPosition.right}px`,
-                transform: "translateY(-100%)",
+                maxHeight: `${menuPosition.maxHeight}px`,
               }}
             >
               <div className="px-3 py-1.5 text-[11px] text-gray-400 font-bold uppercase tracking-wider border-b border-white/10 mb-1">

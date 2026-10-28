@@ -151,6 +151,26 @@ const playerSlice = createSlice({
         state.currentIndex = Math.max(0, state.currentIndex - 1);
       }
     },
+    updateActiveSong: (state, action) => {
+      const updated = action.payload;
+      if (!updated || typeof updated !== "object") return;
+
+      const updatedId = String(updated.id || "");
+      const currentActiveId = String(state.activeSong?.id || "");
+
+      // Merge into activeSong if it matches or if activeSong has no id yet
+      if (!currentActiveId || !updatedId || currentActiveId === updatedId) {
+        state.activeSong = { ...state.activeSong, ...updated };
+      }
+
+      // Also update in currentSongs if present
+      if (updatedId && Array.isArray(state.currentSongs)) {
+        const idx = state.currentSongs.findIndex((s) => String(s?.id) === updatedId);
+        if (idx !== -1) {
+          state.currentSongs[idx] = { ...state.currentSongs[idx], ...updated };
+        }
+      }
+    },
     addToQueue: (state, action) => {
       const newSong = action.payload.song;
       const newSongId = String(newSong?.id || "");
@@ -176,6 +196,7 @@ export const {
   resetOpenedByClick,
   deleteSong,
   removeFromQueue,
+  updateActiveSong,
   addToQueue
 } = playerSlice.actions;
 

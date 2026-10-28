@@ -1,7 +1,9 @@
 "use client";
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useRef, useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { getSongData } from "@/services/dataAPI";
+import { updateActiveSong } from "@/redux/features/playerSlice";
 
 const Player = ({
   activeSong,
@@ -19,6 +21,7 @@ const Player = ({
   appTime,
 }) => {
   const ref = useRef(null);
+  const dispatch = useDispatch();
   const [resolvedAudioUrl, setResolvedAudioUrl] = useState(null);
 
   // Directly extract audio URL from activeSong if present
@@ -62,6 +65,9 @@ const Player = ({
         .then((fullData) => {
           if (!isCancelled && fullData) {
             const s = Array.isArray(fullData) ? fullData[0] : fullData;
+            if (s && (s.downloadUrl || s.url)) {
+              dispatch(updateActiveSong(s));
+            }
             if (Array.isArray(s?.downloadUrl) && s.downloadUrl.length > 0) {
               for (let i = s.downloadUrl.length - 1; i >= 0; i--) {
                 const entry = s.downloadUrl[i];

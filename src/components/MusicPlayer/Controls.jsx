@@ -111,7 +111,7 @@ const Controls = ({
           !fullScreen ? "hidden sm:block" : "m-2 sm:m-3"
         } cursor-pointer hover:scale-110 transition-transform`}
       />
-      {activeSong?.downloadUrl?.[4]?.url && (
+      {(activeSong?.id || activeSong?.name) && (
         <div className=" hidden sm:block mt-1 ">
           <Downloader
             activeSong={activeSong}
