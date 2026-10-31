@@ -1,13 +1,15 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useSession } from 'next-auth/react';
 import { syncSongHistory } from '@/services/dataAPI';
+import { addHistoryItem } from '@/redux/features/historySlice';
 import decodeHtml from '@/utils/decodeHtml';
 
 const SongsHistory = () => {
   const { activeSong } = useSelector((state) => state.player);
   const { status } = useSession();
+  const dispatch = useDispatch();
   const syncTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -30,6 +32,7 @@ const SongsHistory = () => {
         album: activeSong.album?.name
           ? { name: decodeHtml(activeSong.album.name) }
           : undefined,
+        playedAt: new Date().toISOString(),
       };
 
       // 1. Instant local update for 0ms lag
@@ -37,8 +40,9 @@ const SongsHistory = () => {
         const stored = localStorage.getItem("songHistory");
         const parsed = stored ? JSON.parse(stored) : [];
         const filtered = parsed.filter((s) => String(s?.id) !== cleanSong.id);
-        const updated = [cleanSong, ...filtered].slice(0, 15);
+        const updated = [cleanSong, ...filtered].slice(0, 100);
         localStorage.setItem("songHistory", JSON.stringify(updated));
+        dispatch(addHistoryItem(cleanSong));
         window.dispatchEvent(new Event("songHistoryUpdated"));
       } catch (e) {
         // ignore localStorage errors

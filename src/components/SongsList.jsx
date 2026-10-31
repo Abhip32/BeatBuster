@@ -12,8 +12,9 @@ import {
   deleteSongFromPlaylist,
   getUserPlaylists,
 } from "@/services/playlistApi";
-import { addFavourite, getFavourite } from "@/services/dataAPI";
+import { addFavourite, getFavourite, clearSongHistory } from "@/services/dataAPI";
 import { setFavourites, toggleFavouriteSong, removeFavouriteSong } from "@/redux/features/favouritesSlice";
+import { removeHistoryItem } from "@/redux/features/historySlice";
 import {
   setPlaylists,
   addSongToPlaylistState,
@@ -32,6 +33,8 @@ const SongsList = ({
   playlistID,
   setSongs,
   isFavouritePage,
+  isHistoryPage,
+  onDeleteHistorySong,
   isQueue,
 }) => {
   const isQueueMode = Boolean(isQueue || hidePlays);
@@ -84,6 +87,34 @@ const SongsList = ({
     const minutes = Math.floor(durationInSeconds / 60);
     const seconds = Math.round(durationInSeconds % 60);
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const formatPlayedTime = (dateString) => {
+    if (!dateString) return "Recently";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Recently";
+      const now = new Date();
+      const diffMs = now - date;
+      const diffSec = Math.floor(diffMs / 1000);
+      if (diffSec < 45) return "Just now";
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHr = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHr / 24);
+
+      if (diffMin < 1) return "Just now";
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHr < 24) return `${diffHr}h ago`;
+      if (diffDay === 1) return "Yesterday";
+      if (diffDay < 7) return `${diffDay}d ago`;
+
+      return date.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return "Recently";
+    }
   };
 
   // Fetch playlists and favourites
@@ -211,6 +242,48 @@ const SongsList = ({
     toast.success("Removed from Queue");
   };
 
+  const handleRemoveFromHistory = async (e, song) => {
+    e?.stopPropagation();
+    if (!song) return;
+    const rawSongId = typeof song === "object" ? song?.id : song;
+    const songId = typeof rawSongId === "string" ? rawSongId.trim() : String(rawSongId || "");
+    if (!songId) return;
+
+    setShowMenu(null);
+
+    // Optimistic UI state removal
+    if (setSongs) {
+      setSongs((prev) => prev.filter((s) => String(s?.id || "") !== songId));
+    }
+    if (onDeleteHistorySong) {
+      onDeleteHistorySong(song);
+    }
+
+    // LocalStorage removal
+    try {
+      const stored = localStorage.getItem("songHistory");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const filtered = parsed.filter((s) => String(s?.id || "") !== songId);
+        localStorage.setItem("songHistory", JSON.stringify(filtered));
+      }
+    } catch {}
+
+    // Redux removal
+    dispatch(removeHistoryItem(songId));
+    window.dispatchEvent(new Event("songHistoryUpdated"));
+
+    // Backend sync if authenticated
+    try {
+      if (status === "authenticated") {
+        await clearSongHistory(songId);
+      }
+      toast.success("Removed from history");
+    } catch {
+      toast.error("Could not remove from history");
+    }
+  };
+
   const handleMenuToggle = (e, menuKey) => {
     e?.stopPropagation();
     if (showMenu === menuKey) {
@@ -249,11 +322,19 @@ const SongsList = ({
             <span className="pl-12 sm:pl-14">Title</span>
           </div>
           <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-            {!hidePlays && (
-              <span className="hidden md:block w-20 text-right mr-1">Plays</span>
+            {isHistoryPage ? (
+              <span className="hidden sm:block w-24 text-right pr-2">Played</span>
+            ) : (
+              !hidePlays && (
+                <span className="hidden md:block w-20 text-right mr-1">Plays</span>
+              )
             )}
-            {!isQueueMode && (
-              <span className="w-24 sm:w-28 text-right pr-2">Duration</span>
+            {isHistoryPage ? (
+              <span className="w-24 sm:w-28 text-right pr-3 text-rose-400/80">Remove</span>
+            ) : (
+              !isQueueMode && (
+                <span className="w-24 sm:w-28 text-right pr-2">Duration</span>
+              )
             )}
           </div>
         </div>
@@ -354,13 +435,21 @@ const SongsList = ({
                 </div>
               </div>
 
-              {/* Right Column: Plays count + Heart + (Duration) + (Delete) + Options Menu */}
+              {/* Right Column: Played Time (or Plays count) + Heart + (Duration or Delete) + Options Menu */}
               <div className="flex items-center gap-1 sm:gap-1.5 text-xs text-gray-400 flex-shrink-0 ml-auto">
-                {/* Optional Plays count on full pages */}
-                {!hidePlays && song?.playCount && (
-                  <span className="hidden md:block text-xs text-gray-400 tabular-nums mr-1">
-                    {Number(song.playCount).toLocaleString()}
+                {isHistoryPage ? (
+                  <span
+                    className="hidden sm:block text-[11px] sm:text-xs text-gray-400 tabular-nums w-24 text-right pr-2 truncate flex-shrink-0 font-medium"
+                    title={song?.playedAt ? new Date(song.playedAt).toLocaleString() : undefined}
+                  >
+                    {formatPlayedTime(song?.playedAt)}
                   </span>
+                ) : (
+                  !hidePlays && song?.playCount && (
+                    <span className="hidden md:block text-xs text-gray-400 tabular-nums mr-1">
+                      {Number(song.playCount).toLocaleString()}
+                    </span>
+                  )
                 )}
 
                 {/* Direct Heart Button on row */}
@@ -383,11 +472,23 @@ const SongsList = ({
                   )}
                 </button>
 
-                {/* Duration (Hidden in queue mode to give maximum space for titles & actions) */}
-                {!isQueueMode && (
-                  <span className="font-mono text-[11px] sm:text-xs text-gray-300 tabular-nums w-9 sm:w-11 text-right flex-shrink-0">
-                    {formatDuration(song?.duration)}
-                  </span>
+                {/* In place of duration on history page, show delete button */}
+                {isHistoryPage ? (
+                  <button
+                    type="button"
+                    onClick={(e) => handleRemoveFromHistory(e, song)}
+                    title="Remove from Recently Played"
+                    aria-label="Remove from Recently Played"
+                    className="w-8 h-8 flex items-center justify-center rounded-full cursor-pointer text-gray-400 hover:text-rose-400 hover:bg-rose-500/15 active:scale-90 transition-all outline-none focus:outline-none flex-shrink-0"
+                  >
+                    <MdOutlineDeleteOutline size={18} />
+                  </button>
+                ) : (
+                  !isQueueMode && (
+                    <span className="font-mono text-[11px] sm:text-xs text-gray-300 tabular-nums w-9 sm:w-11 text-right flex-shrink-0">
+                      {formatDuration(song?.duration)}
+                    </span>
+                  )
                 )}
 
                 {/* Direct 1-Click Delete from Queue Button */}
@@ -451,6 +552,31 @@ const SongsList = ({
                         >
                           <MdOutlineDeleteOutline size={16} />
                           <span>Remove from Queue</span>
+                        </button>
+                      )}
+
+                      {/* Played timestamp info (History page) */}
+                      {isHistoryPage && song?.playedAt && (
+                        <div
+                          className="px-3 py-1.5 text-[11px] text-gray-400 border-b border-white/10 flex items-center justify-between mb-1"
+                          title={new Date(song.playedAt).toLocaleString()}
+                        >
+                          <span>Played</span>
+                          <span className="font-semibold text-gray-300">
+                            {formatPlayedTime(song.playedAt)}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Remove from History (History page) */}
+                      {isHistoryPage && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleRemoveFromHistory(e, song)}
+                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-500/20 text-rose-400 flex items-center gap-2 transition-colors font-medium border-b border-white/10 mb-1 cursor-pointer"
+                        >
+                          <MdOutlineDeleteOutline size={16} />
+                          <span>Remove from History</span>
                         </button>
                       )}
 

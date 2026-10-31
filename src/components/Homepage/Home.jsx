@@ -2,6 +2,7 @@
 import { homePageData, getFavourite, getSongData, searchSongs } from "@/services/dataAPI";
 import { setFavourites } from "@/redux/features/favouritesSlice";
 import { setPlaylists } from "@/redux/features/playlistsSlice";
+import { setHistory } from "@/redux/features/historySlice";
 import { getUserPlaylists, getSinglePlaylist } from "@/services/playlistApi";
 import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import React, { useEffect, useState } from "react";
@@ -23,7 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AiFillHeart, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsFillPlayFill } from "react-icons/bs";
 import { FaPlus, FaSpotify } from "react-icons/fa";
-import { MdPlaylistPlay, MdRadio } from "react-icons/md";
+import { MdPlaylistPlay, MdRadio, MdHistory } from "react-icons/md";
 import { IoSparkles } from "react-icons/io5";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -48,6 +49,7 @@ const Home = () => {
   const { data: session, status } = useSession();
   const { activeSong, isPlaying } = useSelector((state) => state.player);
   const { count: likedCount, items: favouriteItems } = useSelector((state) => state.favourites || { count: 0, items: [] });
+  const { count: historyCount, items: historyItems } = useSelector((state) => state.history || { count: 0, items: [] });
   const { playlists: userPlaylists, count: playlistCount, isLoaded: isPlaylistsLoaded } = useSelector((state) => state.playlists || { playlists: [], count: 0, isLoaded: false });
   const rawLanguages = useSelector((state) => state.languages?.languages || state.languages);
   const languages = Array.isArray(rawLanguages) && rawLanguages.length > 0
@@ -89,6 +91,19 @@ const Home = () => {
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  // Hydrate history from localStorage for instant Quick Access tile counts
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("songHistory");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          dispatch(setHistory(parsed));
+        }
+      }
+    } catch (e) {}
+  }, [dispatch]);
 
   // Fetch liked songs when Liked Songs tab is clicked or for Quick Access tile
   useEffect(() => {
@@ -181,6 +196,15 @@ const Home = () => {
   const playlists = Array.isArray(data?.playlists) ? data.playlists : [];
   const discover = Array.isArray(data?.discover) ? data.discover : [];
   const radio = Array.isArray(data?.radio) ? data.radio : [];
+
+  const handlePlayHistory = () => {
+    if (!historyItems || historyItems.length === 0) {
+      toast.error("No recently played songs yet");
+      return;
+    }
+    dispatch(setActiveSong({ song: historyItems[0], data: historyItems, i: 0 }));
+    dispatch(playPause(true));
+  };
 
   const handlePlayRadio = async (station) => {
     if (!station?.title) return;
@@ -301,6 +325,19 @@ const Home = () => {
           )}
         </Link>
 
+        <Link
+          href="/history"
+          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-purple-500/50 cursor-pointer"
+        >
+          <MdHistory className="text-purple-400" />
+          <span>Recently Played</span>
+          {historyCount > 0 && (
+            <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-300 font-bold">
+              {historyCount}
+            </span>
+          )}
+        </Link>
+
         <button
           onClick={() => setActiveTab("playlists")}
           className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
@@ -382,6 +419,38 @@ const Home = () => {
             </div>
           </Link>
 
+          {/* Recently Played Tile */}
+          <Link
+            href="/history"
+            className="group flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 min-h-[58px] sm:min-h-[64px] rounded-xl bg-gradient-to-r from-rose-950/30 via-rose-900/15 to-white/[0.03] hover:from-rose-900/40 hover:to-white/[0.07] backdrop-blur-md border border-[#f43f5e]/30 hover:border-[#f43f5e]/60 transition-all duration-300 shadow-md cursor-pointer min-w-0"
+          >
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-[#f43f5e] via-[#be123c] to-[#4c0519] flex items-center justify-center flex-shrink-0 shadow-md shadow-[#f43f5e]/25 group-hover:scale-105 transition-transform border border-rose-400/20">
+              <MdHistory className="text-white text-lg sm:text-xl drop-shadow" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-2 leading-tight break-words">
+                Recently Played
+              </h3>
+              <p className="text-[10px] sm:text-xs text-rose-300 font-medium truncate mt-0.5">
+                {historyCount > 0 ? `${historyCount} tracks` : "Jump Back In"}
+              </p>
+            </div>
+            {historyItems.length > 0 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handlePlayHistory();
+                }}
+                className="hidden sm:flex w-9 h-9 rounded-full musify-play-btn opacity-0 group-hover:opacity-100 transition-all mr-1.5 items-center justify-center shadow-md flex-shrink-0 cursor-pointer"
+                title="Play recently played"
+              >
+                <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
+              </button>
+            )}
+          </Link>
+
           {/* User Playlist or Create Playlist Tile */}
           {userPlaylists && userPlaylists.length > 0 ? (
             <Link
@@ -422,8 +491,8 @@ const Home = () => {
             </button>
           )}
 
-          {/* First 2 Charts as Quick Access Tiles */}
-          {charts.slice(0, 2).map((chart, idx) => (
+          {/* Top Chart as Quick Access Tile */}
+          {charts.slice(0, 1).map((chart, idx) => (
             <Link
               key={chart?.id || idx}
               href={`/playlist/${chart?.id}`}

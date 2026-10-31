@@ -18,7 +18,7 @@ import {
   sanitize,
 } from "./MusicPlayer/downloadUtils";
 
-const BulkDownloadButton = ({ songList }) => {
+const BulkDownloadButton = ({ songList, className = "" }) => {
   const {
     defaultDownloadQuality = "ask",
     lyricsMode = "synced",
@@ -276,7 +276,7 @@ const BulkDownloadButton = ({ songList }) => {
             : completed
             ? "bg-[#f43f5e]/20 border-[#f43f5e] text-[#f43f5e] shadow-[0_0_20px_rgba(244, 63, 94,0.3)]"
             : "bg-white/[0.08] hover:bg-white/[0.14] border-white/15 hover:border-[#f43f5e]/60 hover:shadow-[0_0_20px_rgba(244, 63, 94,0.2)]"
-        }`}
+        } ${className}`}
       >
         <div
           className={`absolute inset-y-0 left-0 transition-[width,background-color] duration-150 ease-out ${

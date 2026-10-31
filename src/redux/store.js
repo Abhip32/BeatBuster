@@ -9,6 +9,7 @@ import languagesReducer from "./features/languagesSlice";
 import settingsReducer from "./features/settingsSlice";
 import favouritesReducer from "./features/favouritesSlice";
 import playlistsReducer from "./features/playlistsSlice";
+import historyReducer from "./features/historySlice";
 
 const createNoopStorage = () => {
   return {
@@ -57,6 +58,7 @@ export const store = configureStore({
     settings: settingsPersistedReducer,
     favourites: favouritesReducer,
     playlists: playlistsReducer,
+    history: historyReducer,
   },
   middleware: [thunk],
 });

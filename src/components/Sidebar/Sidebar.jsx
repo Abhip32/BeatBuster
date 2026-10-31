@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Languages from "./Languages";
 import Favourites from "./Favourites";
+import HistoryLink from "./HistoryLink";
 import Playlists from "./Playlists";
 import Profile from "./Profile";
 import SettingsLink from "./SettingsLink";
@@ -79,8 +80,9 @@ const Sidebar = ({ showNav, setShowNav }) => {
             </span>
           </button>
         </div>
-        <div className="py-0.5">
+        <div className="py-0.5 space-y-0.5">
           <Favourites setShowNav={setShowNav} />
+          <HistoryLink setShowNav={setShowNav} />
         </div>
         <Playlists setShowNav={setShowNav} />
         <Languages />

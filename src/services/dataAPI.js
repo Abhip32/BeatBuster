@@ -717,16 +717,49 @@ export async function getRecommendedSongs(artistId, songId) {
   }
 }
 
-// get song history
-export async function getSongHistory() {
+// get song history with optional pagination
+export async function getSongHistory(page = 1, limit = 20, all = false) {
   try {
-    const response = await fetch("/api/history");
-    if (!response.ok) return [];
+    const url = all
+      ? "/api/history?all=true"
+      : `/api/history?page=${page}&limit=${limit}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      const empty = [];
+      empty.pagination = { page, limit, total: 0, totalPages: 0, hasMore: false };
+      return empty;
+    }
     const data = await response.json();
-    return Array.isArray(data?.data) ? data.data : [];
+    const songs = Array.isArray(data?.data) ? data.data : [];
+    songs.pagination = data?.pagination || {
+      page: all ? 1 : page,
+      limit: all ? songs.length : limit,
+      total: data?.pagination?.total || songs.length,
+      totalPages: data?.pagination?.totalPages || 1,
+      hasMore: Boolean(data?.pagination?.hasMore),
+    };
+    return songs;
   } catch (error) {
     console.error("getSongHistory error:", error);
-    return [];
+    const empty = [];
+    empty.pagination = { page, limit, total: 0, totalPages: 0, hasMore: false };
+    return empty;
+  }
+}
+
+// clear entire song history or remove a specific song
+export async function clearSongHistory(songId = null) {
+  try {
+    const url = songId ? `/api/history?id=${encodeURIComponent(songId)}` : "/api/history";
+    const response = await fetch(url, {
+      method: "DELETE",
+    });
+    if (!response.ok) return false;
+    const data = await response.json();
+    return Boolean(data?.success);
+  } catch (error) {
+    console.error("clearSongHistory error:", error);
+    return false;
   }
 }
 

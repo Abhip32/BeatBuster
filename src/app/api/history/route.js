@@ -6,7 +6,7 @@ import UserData from "@/models/UserData";
 
 export const dynamic = "force-dynamic";
 
-const MAX_HISTORY_ITEMS = 20;
+const MAX_HISTORY_ITEMS = 300;
 
 // Helper to sanitize and normalize a lightweight song history object
 const normalizeSong = (song) => {
@@ -16,7 +16,7 @@ const normalizeSong = (song) => {
   if (!songId || songId === "undefined" || songId === "null") return null;
 
   if (typeof song !== "object") {
-    return { id: songId };
+    return { id: songId, playedAt: new Date().toISOString() };
   }
 
   return {
@@ -30,10 +30,12 @@ const normalizeSong = (song) => {
       : [],
     duration: Number(song.duration) || 0,
     album: song.album?.name ? { name: song.album.name } : undefined,
+    downloadUrl: Array.isArray(song.downloadUrl) ? song.downloadUrl : undefined,
+    playedAt: song.playedAt || new Date().toISOString(),
   };
 };
 
-// GET: Retrieve user's listening history
+// GET: Retrieve user's listening history with pagination
 export async function GET(req) {
   const token = await getToken({ req, secret: process.env.JWT_SECRET });
   if (!token) {
@@ -68,7 +70,7 @@ export async function GET(req) {
       );
     }
 
-    // Clean and validate existing history
+    // Clean and deduplicate existing history
     const validHistory = [];
     const seen = new Set();
     for (const item of (userData.songHistory || [])) {
@@ -79,10 +81,29 @@ export async function GET(req) {
       }
     }
 
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
+    const all = searchParams.get("all") === "true";
+
+    const total = validHistory.length;
+    const totalPages = Math.ceil(total / limit) || 1;
+    const startIndex = (page - 1) * limit;
+    const paginatedItems = all
+      ? validHistory
+      : validHistory.slice(startIndex, startIndex + limit);
+
     return NextResponse.json({
       success: true,
       message: "Song history retrieved",
-      data: validHistory.slice(0, MAX_HISTORY_ITEMS),
+      data: paginatedItems,
+      pagination: {
+        page: all ? 1 : page,
+        limit: all ? total : limit,
+        total,
+        totalPages,
+        hasMore: !all && startIndex + limit < total,
+      },
     });
   } catch (error) {
     console.error("GET /api/history error:", error);
@@ -146,7 +167,7 @@ export async function POST(req) {
       return String(sid || "").trim() !== cleanSong.id;
     });
 
-    // Unshift the clean song to the front and cap at MAX_HISTORY_ITEMS
+    // Unshift clean song to the front and cap at MAX_HISTORY_ITEMS
     const updated = [cleanSong, ...filtered].slice(0, MAX_HISTORY_ITEMS);
     userData.songHistory = updated;
     userData.markModified("songHistory");
@@ -155,12 +176,78 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       message: "Song history recorded",
-      data: updated,
+      data: updated.slice(0, 20),
+      total: updated.length,
     });
   } catch (error) {
     console.error("POST /api/history error:", error);
     return NextResponse.json(
       { success: false, message: "Failed to save song history", data: null },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Clear listening history or remove a specific song
+export async function DELETE(req) {
+  const token = await getToken({ req, secret: process.env.JWT_SECRET });
+  if (!token) {
+    return NextResponse.json(
+      { success: false, message: "User not logged in" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const conn = await dbConnect();
+    if (!conn) {
+      return NextResponse.json(
+        { success: false, message: "Database offline" },
+        { status: 503 }
+      );
+    }
+
+    const user = await User.findOne({ email: token.email });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    const userData = await UserData.findById(user.userData);
+    if (!userData) {
+      return NextResponse.json(
+        { success: false, message: "User data not found" },
+        { status: 404 }
+      );
+    }
+
+    const { searchParams } = new URL(req.url);
+    const songId = searchParams.get("id");
+
+    if (songId) {
+      const existing = Array.isArray(userData.songHistory) ? userData.songHistory : [];
+      userData.songHistory = existing.filter((item) => {
+        const sid = typeof item === "object" ? item?.id : item;
+        return String(sid || "").trim() !== String(songId).trim();
+      });
+    } else {
+      userData.songHistory = [];
+    }
+
+    userData.markModified("songHistory");
+    await userData.save();
+
+    return NextResponse.json({
+      success: true,
+      message: songId ? "Song removed from history" : "Song history cleared",
+      data: userData.songHistory,
+    });
+  } catch (error) {
+    console.error("DELETE /api/history error:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
       { status: 500 }
     );
   }

@@ -6,7 +6,7 @@ import { BsFillPlayFill } from "react-icons/bs";
 import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import BulkDownloadButton from "./BulkDownloadButton";
 
-const PlayButton = ({ songList }) => {
+const PlayButton = ({ songList, children }) => {
   const dispatch = useDispatch();
   const songs = Array.isArray(songList?.songs) ? songList.songs : [];
 
@@ -34,6 +34,7 @@ const PlayButton = ({ songList }) => {
       </button>
 
       <BulkDownloadButton songList={songList} />
+      {children}
     </div>
   );
 };
