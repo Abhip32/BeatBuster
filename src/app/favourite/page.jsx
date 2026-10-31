@@ -75,7 +75,7 @@ const FavouritePage = () => {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1">
             Playlist
           </span>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight line-clamp-2">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] sm:leading-[1.1] pb-1.5">
             Liked Songs
           </h1>
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-300 mt-3 font-semibold">

@@ -100,7 +100,7 @@ const UserPlaylistPage = ({ params }) => {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1">
             Personal Playlist
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight line-clamp-2">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-[1.15] pb-1.5 line-clamp-2">
             {playlist?.name || "My Playlist"}
           </h1>
           <p className="text-xs sm:text-sm text-gray-400 mt-2 font-medium">

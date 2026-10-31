@@ -58,7 +58,7 @@ const page = async ({ params }) => {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1">
             Playlist
           </span>
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight line-clamp-2">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.15] pb-1.5 line-clamp-2">
             {playlistData?.name || "Featured Playlist"}
           </h1>
           {playlistData?.description && (

@@ -118,7 +118,7 @@ const ArtistPage = ({ params }) => {
             <MdVerified className="text-[#f43f5e] text-base" />
             <span>Verified Artist</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight line-clamp-2">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] pb-1.5 line-clamp-2">
             {artistDetails?.name || "Artist"}
           </h1>
 
