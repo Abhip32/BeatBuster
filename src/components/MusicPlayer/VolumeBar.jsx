@@ -45,8 +45,13 @@ const VolumeBar = ({
   const currentSongs = useSelector((state) => state.player?.currentSongs || []);
 
   const [showMenu, setShowMenu] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [localHubOpen, setLocalHubOpen] = useState(false);
   const [localHubTab, setLocalHubTab] = useState("queue");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const hubOpen = isHubOpen !== undefined ? isHubOpen : localHubOpen;
   const setHubOpen = setIsHubOpen !== undefined ? setIsHubOpen : setLocalHubOpen;
@@ -141,6 +146,9 @@ const VolumeBar = ({
           </button>
 
           {showMenu &&
+            mounted &&
+            typeof document !== "undefined" &&
+            document.body &&
             createPortal(
               <>
                 <div

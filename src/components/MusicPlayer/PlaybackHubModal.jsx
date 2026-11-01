@@ -65,7 +65,12 @@ const PlaybackHubModal = ({
   onCancelTimer,
 }) => {
   const [tab, setTab] = useState(initialTab);
+  const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen && initialTab) {
@@ -136,7 +141,7 @@ const PlaybackHubModal = ({
     }
   }, [activeLineIndex, isUserInteracting, isOpen, tab]);
 
-  if (!isOpen || typeof document === "undefined") return null;
+  if (!isOpen || !mounted || typeof document === "undefined" || !document.body) return null;
 
   // Queue actions
   const handleClear = (e) => {
@@ -538,7 +543,8 @@ const PlaybackHubModal = ({
           </div>
         )}
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 

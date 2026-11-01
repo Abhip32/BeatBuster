@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { IoClose } from "react-icons/io5";
 import { BsKeyboard } from "react-icons/bs";
@@ -17,7 +17,13 @@ const SHORTCUTS = [
 ];
 
 const ShortcutsModal = ({ isOpen, onClose }) => {
-  if (!isOpen || typeof document === "undefined") return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted || typeof document === "undefined" || !document.body) return null;
 
   return createPortal(
     <>
