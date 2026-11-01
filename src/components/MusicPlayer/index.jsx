@@ -28,6 +28,7 @@ import FavouriteButton from "./FavouriteButton";
 import { toast } from "react-hot-toast";
 import getPixels from "get-pixels";
 import { extractColors } from "extract-colors";
+import ShortcutsModal from "./ShortcutsModal";
 
 const MusicPlayer = () => {
   const {
@@ -65,8 +66,8 @@ const MusicPlayer = () => {
   const { status } = useSession();
   const router = useRouter();
   const [bgColor, setBgColor] = useState();
-  const [showLyrics, setShowLyrics] = useState(false);
-  const [showQueue, setShowQueue] = useState(false);
+  const [isHubOpen, setIsHubOpen] = useState(false);
+  const [hubTab, setHubTab] = useState("queue");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [sleepTimerMode, setSleepTimerMode] = useState(null);
   const [sleepTimerRemaining, setSleepTimerRemaining] = useState(0);
@@ -352,19 +353,27 @@ const MusicPlayer = () => {
         return;
       }
 
-      // 'L' or 'l': Toggle Lyrics
+      // 'L' or 'l': Toggle Lyrics Tab in Hub
       if (event.key === "l" || event.key === "L") {
         event.preventDefault();
-        setShowLyrics((prev) => !prev);
-        setShowQueue(false);
+        if (isHubOpen && hubTab === "lyrics") {
+          setIsHubOpen(false);
+        } else {
+          setHubTab("lyrics");
+          setIsHubOpen(true);
+        }
         return;
       }
 
-      // 'Q' or 'q': Toggle Queue
+      // 'Q' or 'q': Toggle Queue Tab in Hub
       if (event.key === "q" || event.key === "Q") {
         event.preventDefault();
-        setShowQueue((prev) => !prev);
-        setShowLyrics(false);
+        if (isHubOpen && hubTab === "queue") {
+          setIsHubOpen(false);
+        } else {
+          setHubTab("queue");
+          setIsHubOpen(true);
+        }
         return;
       }
 
@@ -390,6 +399,8 @@ const MusicPlayer = () => {
       handleSetVolume,
       volume,
       fullScreen,
+      isHubOpen,
+      hubTab,
       dispatch,
     ]
   );
@@ -553,7 +564,7 @@ const MusicPlayer = () => {
           </div>
 
           {/* Left: Track (album art + title + artist) */}
-          <div className="flex-1 min-w-0 sm:basis-0 flex items-center justify-start">
+          <div className="flex-1 sm:flex-initial sm:w-[26%] md:w-[28%] max-w-[280px] min-w-0 flex items-center justify-start">
             <Track
               isPlaying={isPlaying}
               isActive={isActive}
@@ -563,7 +574,7 @@ const MusicPlayer = () => {
           </div>
 
           {/* Center: Desktop/Tablet Controls & Seekbar */}
-          <div className="hidden sm:flex flex-initial w-full max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-3xl flex-col items-center justify-center px-2 sm:px-4">
+          <div className="hidden sm:flex flex-1 min-w-0 max-w-[680px] flex-col items-center justify-center px-1 sm:px-3">
             <Controls
               isPlaying={isPlaying}
               isActive={isActive}
@@ -592,8 +603,8 @@ const MusicPlayer = () => {
             />
           </div>
 
-          {/* Right: Desktop/Tablet VolumeBar */}
-          <div className="hidden sm:flex flex-1 basis-0 min-w-0 items-center justify-end">
+          {/* Right: Desktop/Tablet Hub & VolumeBar */}
+          <div className="hidden sm:flex flex-1 sm:flex-initial sm:w-[26%] md:w-[28%] max-w-[280px] min-w-0 items-center justify-end">
             <VolumeBar
               activeSong={activeSong}
               bgColor={bgColor}
@@ -605,16 +616,14 @@ const MusicPlayer = () => {
               setVolume={handleSetVolume}
               appTime={appTime}
               setSeekTime={handleSeek}
-              showLyrics={showLyrics}
-              setShowLyrics={setShowLyrics}
-              showQueue={showQueue}
-              setShowQueue={setShowQueue}
+              isHubOpen={isHubOpen}
+              setIsHubOpen={setIsHubOpen}
+              hubTab={hubTab}
+              setHubTab={setHubTab}
               sleepTimerMode={sleepTimerMode}
               sleepTimerRemaining={sleepTimerRemaining}
               onSetTimer={handleSetTimer}
               onCancelTimer={handleCancelTimer}
-              showShortcuts={showShortcuts}
-              setShowShortcuts={setShowShortcuts}
             />
           </div>
 
@@ -693,6 +702,12 @@ const MusicPlayer = () => {
         onLoadedData={(event) => setDuration(event.target.duration)}
         appTime={appTime}
         setSeekTime={handleSeek}
+      />
+
+      {/* Floating Keyboard Shortcuts Guide (Triggered via '?') */}
+      <ShortcutsModal
+        isOpen={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
       />
     </div>
   );

@@ -388,10 +388,11 @@ const Home = () => {
       </div>
 
       {/* Spotify Category Tabs */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto py-1.5 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
+          type="button"
           onClick={() => setActiveTab("all")}
-          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer outline-none focus:outline-none ring-0 border ${
             activeTab === "all"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -403,7 +404,7 @@ const Home = () => {
         <button
           type="button"
           onClick={() => setShowAiDj(true)}
-          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-purple-300 hover:text-white border-purple-500/30 hover:border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer"
+          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-purple-300 hover:text-white border-purple-500/30 hover:border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.2)] cursor-pointer outline-none focus:outline-none ring-0"
         >
           <IoSparkles className="text-purple-400 text-sm animate-pulse" />
           <span>AI DJ</span>
@@ -411,7 +412,7 @@ const Home = () => {
 
         <Link
           href="/favourite"
-          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-[#f43f5e]/50 cursor-pointer"
+          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-[#f43f5e]/50 cursor-pointer outline-none focus:outline-none ring-0"
         >
           <AiFillHeart className="text-[#f43f5e]" />
           <span>Liked Songs</span>
@@ -424,7 +425,7 @@ const Home = () => {
 
         <Link
           href="/history"
-          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-purple-500/50 cursor-pointer"
+          className="whitespace-nowrap flex-shrink-0 glass-pill px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 text-gray-300 hover:text-white hover:border-purple-500/50 cursor-pointer outline-none focus:outline-none ring-0"
         >
           <MdHistory className="text-purple-400" />
           <span>Recently Played</span>
@@ -436,8 +437,9 @@ const Home = () => {
         </Link>
 
         <button
+          type="button"
           onClick={() => setActiveTab("playlists")}
-          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer outline-none focus:outline-none ring-0 border ${
             activeTab === "playlists"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -453,8 +455,9 @@ const Home = () => {
         </button>
 
         <button
+          type="button"
           onClick={() => setActiveTab("trending")}
-          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer outline-none focus:outline-none ring-0 border ${
             activeTab === "trending"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -464,8 +467,9 @@ const Home = () => {
         </button>
 
         <button
+          type="button"
           onClick={() => setActiveTab("charts")}
-          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+          className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer outline-none focus:outline-none ring-0 border ${
             activeTab === "charts"
               ? "glass-pill-active"
               : "glass-pill text-gray-300 hover:text-white"
@@ -476,8 +480,9 @@ const Home = () => {
 
         {radio.length > 0 && (
           <button
+            type="button"
             onClick={() => setActiveTab("radio")}
-            className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`whitespace-nowrap flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer outline-none focus:outline-none ring-0 border ${
               activeTab === "radio"
                 ? "glass-pill-active"
                 : "glass-pill text-gray-300 hover:text-white"
