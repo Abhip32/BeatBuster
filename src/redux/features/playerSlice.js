@@ -172,16 +172,65 @@ const playerSlice = createSlice({
       }
     },
     addToQueue: (state, action) => {
-      const newSong = action.payload.song;
-      const newSongId = String(newSong?.id || "");
-      const isSongInQueue = Boolean(
-        newSongId && state.currentSongs.some(song => String(song?.id) === newSongId)
+      const newSong = action.payload?.song || action.payload;
+      if (!newSong || !newSong.id) return;
+      const newSongId = String(newSong.id);
+
+      if (state.currentSongs.length === 0) {
+        state.currentSongs = [newSong];
+        state.activeSong = newSong;
+        state.currentIndex = 0;
+        state.isActive = true;
+        state.isPlaying = true;
+        return;
+      }
+
+      const isSongInQueue = state.currentSongs.some(
+        (song) => String(song?.id) === newSongId
       );
-      
+
       if (!isSongInQueue) {
         state.currentSongs = [...state.currentSongs, newSong];
       }
-      state.fullScreen = true;
+    },
+    playNext: (state, action) => {
+      const newSong = action.payload?.song || action.payload;
+      if (!newSong || !newSong.id) return;
+      const newSongId = String(newSong.id);
+
+      if (state.currentSongs.length === 0) {
+        state.currentSongs = [newSong];
+        state.activeSong = newSong;
+        state.currentIndex = 0;
+        state.isActive = true;
+        state.isPlaying = true;
+        return;
+      }
+
+      // Filter out existing occurrence of this song (except active)
+      const filtered = state.currentSongs.filter(
+        (s, idx) => idx === state.currentIndex || String(s?.id) !== newSongId
+      );
+      const currentIdx = filtered.findIndex(
+        (s) => String(s?.id) === String(state.activeSong?.id)
+      );
+      const insertAt = currentIdx !== -1 ? currentIdx + 1 : state.currentIndex + 1;
+      filtered.splice(insertAt, 0, newSong);
+
+      state.currentSongs = filtered;
+      state.currentIndex = currentIdx !== -1 ? currentIdx : state.currentIndex;
+    },
+    clearQueue: (state) => {
+      if (state.activeSong && state.activeSong.id) {
+        state.currentSongs = [state.activeSong];
+        state.currentIndex = 0;
+      } else {
+        state.currentSongs = [];
+        state.currentIndex = 0;
+        state.activeSong = {};
+        state.isActive = false;
+        state.isPlaying = false;
+      }
     },
     addMultipleToQueue: (state, action) => {
       const newSongs = action.payload;
@@ -211,6 +260,8 @@ export const {
   removeFromQueue,
   updateActiveSong,
   addToQueue,
+  playNext,
+  clearQueue,
   addMultipleToQueue
 } = playerSlice.actions;
 

@@ -4,7 +4,8 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import SongsList from "../SongsList";
-import { setAutoAdd } from "@/redux/features/playerSlice";
+import { setAutoAdd, clearQueue } from "@/redux/features/playerSlice";
+import { toast } from "react-hot-toast";
 import { IoMusicalNotesOutline } from "react-icons/io5";
 
 // Helper to parse standard LRC string into an array of { id, time, text }
@@ -275,6 +276,26 @@ const Lyrics = ({
                 />
                 <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#f43f5e]" />
               </label>
+            </div>
+
+            {/* Queue Counter & Clear Action */}
+            <div className="flex items-center justify-between px-1.5 py-1 mb-1.5 flex-shrink-0 text-xs">
+              <span className="font-semibold text-gray-300">
+                {currentSongs?.length || 0} {currentSongs?.length === 1 ? "track" : "tracks"} in queue
+              </span>
+              {currentSongs?.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    dispatch(clearQueue());
+                    toast.success("Queue cleared");
+                  }}
+                  className="px-2.5 py-0.5 rounded-full text-xs font-semibold text-rose-400 hover:text-white hover:bg-rose-500/20 border border-rose-500/30 transition-all cursor-pointer"
+                  title="Clear all queued songs except currently playing"
+                >
+                  Clear Queue
+                </button>
+              )}
             </div>
             {currentSongs?.length > 0 ? (
               <div className="text-white mt-1 w-full flex-1 min-h-0 overflow-y-auto hideScrollBar">

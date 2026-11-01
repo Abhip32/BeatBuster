@@ -6,10 +6,13 @@ import PlayPause from "../PlayPause";
 import {
   playPause,
   setActiveSong,
+  addToQueue,
   addMultipleToQueue
 } from "../../redux/features/playerSlice";
 import { getRecommendedSongs, getSongData } from "@/services/dataAPI";
 import decodeHtml from "@/utils/decodeHtml";
+import { MdQueueMusic } from "react-icons/md";
+import { toast } from "react-hot-toast";
 
 const SongCard = ({ song, isPlaying, activeSong }) => {
   const [loading, setLoading] = useState(false);
@@ -82,6 +85,26 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
     }
   };
 
+  const handleAddToQueueClick = async (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (!song) return;
+
+    const title = decodeHtml(song?.name || song?.title || "Track");
+    toast.success(`Added "${title}" to queue`);
+
+    try {
+      let songData = song;
+      if (!Array.isArray(song?.downloadUrl) || song.downloadUrl.length === 0) {
+        const Data = await getSongData(song?.id);
+        songData = Array.isArray(Data) ? Data[0] : Data || song;
+      }
+      dispatch(addToQueue(songData));
+    } catch (err) {
+      console.error("Quick add to queue error:", err);
+    }
+  };
+
   const artistDisplay =
     (Array.isArray(song?.artists?.primary) &&
       song.artists.primary.length > 0 &&
@@ -138,15 +161,25 @@ const SongCard = ({ song, isPlaying, activeSong }) => {
             />
           </div>
 
-          {/* Floating Spotify Play/Pause Button */}
+          {/* Floating Action Controls */}
           {isSong && (
             <div
-              className={`absolute right-2.5 bottom-2.5 transition-all duration-300 z-10 ${
+              className={`absolute right-2.5 bottom-2.5 transition-all duration-300 z-10 flex items-center gap-1.5 ${
                 isCurrentActive
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0"
               }`}
             >
+              <button
+                type="button"
+                onClick={handleAddToQueueClick}
+                title="Add to queue"
+                aria-label="Add to queue"
+                className="w-8 h-8 rounded-full bg-black/75 hover:bg-[#f43f5e] text-white flex items-center justify-center backdrop-blur-md border border-white/20 hover:border-transparent transition-all hover:scale-110 active:scale-95 shadow-md cursor-pointer"
+              >
+                <MdQueueMusic size={17} />
+              </button>
+
               <PlayPause
                 isPlaying={isPlaying}
                 activeSong={activeSong}

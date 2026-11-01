@@ -1,6 +1,13 @@
 "use client";
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { playPause, setActiveSong, removeFromQueue } from "@/redux/features/playerSlice";
+import { useRouter } from "next/navigation";
+import {
+  playPause,
+  setActiveSong,
+  removeFromQueue,
+  addToQueue,
+  playNext,
+} from "@/redux/features/playerSlice";
 import { BsPlayFill, BsPauseFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import SongListSkeleton from "./SongListSkeleton";
@@ -12,7 +19,7 @@ import {
   deleteSongFromPlaylist,
   getUserPlaylists,
 } from "@/services/playlistApi";
-import { addFavourite, getFavourite, clearSongHistory } from "@/services/dataAPI";
+import { addFavourite, getFavourite, clearSongHistory, getSongData } from "@/services/dataAPI";
 import { setFavourites, toggleFavouriteSong, removeFavouriteSong } from "@/redux/features/favouritesSlice";
 import { removeHistoryItem } from "@/redux/features/historySlice";
 import {
@@ -21,7 +28,14 @@ import {
   removeSongFromPlaylistState,
 } from "@/redux/features/playlistsSlice";
 import { toast } from "react-hot-toast";
-import { MdOutlineDeleteOutline } from "react-icons/md";
+import {
+  MdOutlineDeleteOutline,
+  MdQueueMusic,
+  MdPlaylistPlay,
+  MdOutlineShare,
+  MdPersonOutline,
+  MdAlbum,
+} from "react-icons/md";
 import { useSession } from "next-auth/react";
 import decodeHtml from "@/utils/decodeHtml";
 
@@ -47,6 +61,7 @@ const SongsList = ({
   const [visibleCount, setVisibleCount] = useState(25);
   const sentinelRef = useRef(null);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // Deduplicate songs by ID to prevent repeated tracks
   const uniqueSongs = useMemo(() => {
@@ -232,6 +247,64 @@ const SongsList = ({
       }
     } catch {
       toast.error("An error occurred");
+    }
+  };
+
+  const resolveSongData = async (song) => {
+    if (Array.isArray(song?.downloadUrl) && song.downloadUrl.length > 0) {
+      return song;
+    }
+    if (!song?.id) return song;
+    try {
+      const fetched = await getSongData(song.id);
+      const full = Array.isArray(fetched) ? fetched[0] : fetched;
+      return full ? { ...song, ...full } : song;
+    } catch {
+      return song;
+    }
+  };
+
+  const handleAddToQueue = async (e, song) => {
+    e?.stopPropagation();
+    setShowMenu(null);
+    if (!song) return;
+    const title = decodeHtml(song.name || song.title || "Track");
+    toast.success(`Added "${title}" to queue`);
+    const enriched = await resolveSongData(song);
+    dispatch(addToQueue(enriched));
+  };
+
+  const handlePlayNext = async (e, song) => {
+    e?.stopPropagation();
+    setShowMenu(null);
+    if (!song) return;
+    const title = decodeHtml(song.name || song.title || "Track");
+    toast.success(`Will play next: "${title}"`);
+    const enriched = await resolveSongData(song);
+    dispatch(playNext(enriched));
+  };
+
+  const handleShareSong = (e, song) => {
+    e?.stopPropagation();
+    setShowMenu(null);
+    const title = decodeHtml(song?.name || song?.title || "Song");
+    const artist = decodeHtml(
+      (Array.isArray(song?.artists?.primary) && song.artists.primary.map((a) => a?.name).join(", ")) ||
+      (typeof song?.artists === "string" ? song.artists : "") ||
+      "Musify"
+    );
+    const shareUrl =
+      typeof window !== "undefined"
+        ? song?.album?.id
+          ? `${window.location.origin}/album/${song.album.id}`
+          : `${window.location.origin}/search/${encodeURIComponent(title)}`
+        : "";
+
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(`${title} - ${artist} on Musify: ${shareUrl}`);
+      toast.success("Track link copied to clipboard");
+    } else {
+      toast.success(`${title} - ${artist}`);
     }
   };
 
@@ -528,7 +601,7 @@ const SongsList = ({
                       <button
                         type="button"
                         onClick={(e) => handleToggleFavourite(e, song)}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium border-b border-white/10 mb-1"
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium text-gray-200 hover:text-white"
                       >
                         {isFav ? (
                           <>
@@ -542,6 +615,29 @@ const SongsList = ({
                           </>
                         )}
                       </button>
+
+                      {/* Queue Actions (when browsing, not inside queue itself) */}
+                      {!isQueueMode && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={(e) => handlePlayNext(e, song)}
+                            className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium text-gray-200 hover:text-white"
+                          >
+                            <MdPlaylistPlay size={17} className="text-[#f43f5e]" />
+                            <span>Play Next</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => handleAddToQueue(e, song)}
+                            className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium text-gray-200 hover:text-white border-b border-white/10 pb-2 mb-1"
+                          >
+                            <MdQueueMusic size={17} className="text-[#f43f5e]" />
+                            <span>Add to Queue</span>
+                          </button>
+                        </>
+                      )}
 
                       {/* Remove from Queue (Queue mode) */}
                       {isQueueMode && (
@@ -579,6 +675,55 @@ const SongsList = ({
                           <span>Remove from History</span>
                         </button>
                       )}
+
+                      {/* Context Navigation: Go to Artist */}
+                      {(() => {
+                        const artistId =
+                          song?.artists?.primary?.[0]?.id ||
+                          song?.primaryArtistsId ||
+                          (Array.isArray(song?.artists) && song.artists[0]?.id);
+                        if (!artistId) return null;
+                        return (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowMenu(null);
+                              router.push(`/artist/${artistId}`);
+                            }}
+                            className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium text-gray-300 hover:text-white"
+                          >
+                            <MdPersonOutline size={16} className="text-gray-400" />
+                            <span className="truncate">Go to Artist</span>
+                          </button>
+                        );
+                      })()}
+
+                      {/* Context Navigation: Go to Album */}
+                      {song?.album?.id && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowMenu(null);
+                            router.push(`/album/${song.album.id}`);
+                          }}
+                          className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium text-gray-300 hover:text-white"
+                        >
+                          <MdAlbum size={16} className="text-gray-400" />
+                          <span className="truncate">Go to Album</span>
+                        </button>
+                      )}
+
+                      {/* Share Track */}
+                      <button
+                        type="button"
+                        onClick={(e) => handleShareSong(e, song)}
+                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 flex items-center gap-2 transition-colors font-medium text-gray-300 hover:text-white border-b border-white/10 pb-2 mb-1"
+                      >
+                        <MdOutlineShare size={16} className="text-gray-400" />
+                        <span>Share Track</span>
+                      </button>
 
                       {isUserPlaylist ? (
                         <button

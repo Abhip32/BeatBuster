@@ -4,8 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   playPause,
   setActiveSong,
+  addToQueue,
 } from "@/redux/features/playerSlice";
 import { BiHeadphone } from "react-icons/bi";
+import { MdQueueMusic } from "react-icons/md";
+import { toast } from "react-hot-toast";
 import decodeHtml from "@/utils/decodeHtml";
 
 const ListenAgainCard = ({ song, index, SongData }) => {
@@ -79,6 +82,21 @@ const ListenAgainCard = ({ song, index, SongData }) => {
           </p>
         </div>
       </div>
+
+      {/* Quick Add to Queue Button on hover */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          dispatch(addToQueue(song));
+          toast.success(`Added "${decodeHtml(song?.name || song?.title || "Track")}" to queue`);
+        }}
+        title="Add to queue"
+        aria-label="Add to queue"
+        className="w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 hover:bg-white/10 text-gray-300 hover:text-[#f43f5e] flex items-center justify-center transition-all active:scale-95 cursor-pointer flex-shrink-0 ml-1.5"
+      >
+        <MdQueueMusic size={18} />
+      </button>
     </div>
   );
 };
