@@ -53,6 +53,23 @@ export async function deletePlaylist(id) {
     }
 }
 
+// bulk delete playlists
+export async function bulkDeletePlaylists(playlistIds) {
+    try {
+        const response = await fetch(`/api/userPlaylists`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ playlistIds }),
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log('Bulk delete playlists error', error);
+    }
+}
+
 // add song to playlist
 export async function addSongToPlaylist(playlistID, song) {
     try {

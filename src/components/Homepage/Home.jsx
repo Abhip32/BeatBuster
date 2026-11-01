@@ -1,9 +1,9 @@
 "use client";
 import { homePageData, getFavourite, getSongData, searchSongs } from "@/services/dataAPI";
 import { setFavourites } from "@/redux/features/favouritesSlice";
-import { setPlaylists } from "@/redux/features/playlistsSlice";
+import { setPlaylists, removePlaylist, removeMultiplePlaylists } from "@/redux/features/playlistsSlice";
 import { setHistory } from "@/redux/features/historySlice";
-import { getUserPlaylists, getSinglePlaylist } from "@/services/playlistApi";
+import { getUserPlaylists, getSinglePlaylist, deletePlaylist, bulkDeletePlaylists } from "@/services/playlistApi";
 import { playPause, setActiveSong } from "@/redux/features/playerSlice";
 import React, { useEffect, useState } from "react";
 import { SwiperSlide } from "swiper/react";
@@ -22,9 +22,9 @@ import PlayButton from "@/components/PlayButton";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { AiFillHeart, AiOutlineLoading3Quarters } from "react-icons/ai";
-import { BsFillPlayFill } from "react-icons/bs";
+import { BsFillPlayFill, BsCheckLg } from "react-icons/bs";
 import { FaPlus, FaSpotify } from "react-icons/fa";
-import { MdPlaylistPlay, MdRadio, MdHistory } from "react-icons/md";
+import { MdPlaylistPlay, MdRadio, MdHistory, MdOutlineDeleteOutline } from "react-icons/md";
 import { IoSparkles } from "react-icons/io5";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -44,6 +44,10 @@ const Home = () => {
   const [showAiDj, setShowAiDj] = useState(false);
   const [activeMoodLoading, setActiveMoodLoading] = useState(null);
   const [activeRadioLoading, setActiveRadioLoading] = useState(null);
+  const [isBulkDeleteMode, setIsBulkDeleteMode] = useState(false);
+  const [selectedPlaylists, setSelectedPlaylists] = useState(new Set());
+  const [isDeletingPlaylists, setIsDeletingPlaylists] = useState(false);
+  const [deletingSingleId, setDeletingSingleId] = useState(null);
 
   const dispatch = useDispatch();
   const { data: session, status } = useSession();
@@ -264,6 +268,99 @@ const Home = () => {
     }
     setInitialModalTab(tab);
     setShowCreatePlaylist(true);
+  };
+
+  // Quick delete single playlist
+  const handleDeleteSinglePlaylist = async (pl, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!pl?._id) return;
+    const name = pl.name || "this playlist";
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${name}"? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setDeletingSingleId(pl._id);
+    try {
+      const res = await deletePlaylist(pl._id);
+      if (res?.success === true) {
+        dispatch(removePlaylist(pl._id));
+        setSelectedPlaylists((prev) => {
+          const next = new Set(prev);
+          next.delete(pl._id);
+          return next;
+        });
+        toast.success(`Deleted playlist "${name}"`);
+      } else {
+        toast.error(res?.message || "Could not delete playlist");
+      }
+    } catch (err) {
+      console.error("handleDeleteSinglePlaylist error:", err);
+      toast.error("Failed to delete playlist");
+    } finally {
+      setDeletingSingleId(null);
+    }
+  };
+
+  // Toggle selection for bulk delete
+  const toggleSelectPlaylist = (id, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setSelectedPlaylists((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Select all / Deselect all
+  const handleSelectAllPlaylists = () => {
+    if (selectedPlaylists.size === userPlaylists.length && userPlaylists.length > 0) {
+      setSelectedPlaylists(new Set());
+    } else {
+      setSelectedPlaylists(new Set(userPlaylists.map((p) => p._id)));
+    }
+  };
+
+  // Confirm and perform bulk delete
+  const handleConfirmBulkDelete = async () => {
+    const idsToDelete = Array.from(selectedPlaylists);
+    if (idsToDelete.length === 0) {
+      toast.error("Please select at least one playlist to delete");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${idsToDelete.length} selected playlist(s)? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setIsDeletingPlaylists(true);
+    try {
+      const res = await bulkDeletePlaylists(idsToDelete);
+      if (res?.success === true) {
+        dispatch(removeMultiplePlaylists(idsToDelete));
+        toast.success(`Deleted ${idsToDelete.length} playlist(s)`);
+        setSelectedPlaylists(new Set());
+        setIsBulkDeleteMode(false);
+      } else {
+        toast.error(res?.message || "Could not delete selected playlists");
+      }
+    } catch (err) {
+      console.error("handleConfirmBulkDelete error:", err);
+      toast.error("Failed to delete selected playlists");
+    } finally {
+      setIsDeletingPlaylists(false);
+    }
   };
 
   if (loading && !data) {
@@ -521,180 +618,177 @@ const Home = () => {
         </div>
       )}
 
-      {/* YOUR PLAYLISTS SECTION ON ALL TAB */}
-      {activeTab === "all" && userPlaylists && userPlaylists.length > 0 && (
-        <div className="mb-10">
-          <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 mb-3">
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-white">
-                Your Playlists
-              </h2>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                {userPlaylists.length}
-              </span>
-            </div>
-            <div className="w-full sm:w-auto flex items-center gap-2 flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => handleOpenCreatePlaylist("spotify")}
-                className="text-xs font-semibold text-[#1ed760] hover:text-[#1db954] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
-                title="Import from Spotify"
-              >
-                <FaSpotify size={12} className="text-[#1ed760]" />
-                <span>Import</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleOpenCreatePlaylist("create")}
-                className="text-xs font-semibold text-[#f43f5e] hover:text-[#fb7185] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
-              >
-                <FaPlus size={10} />
-                <span>New</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("playlists")}
-                className="ml-auto sm:ml-2 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer flex-shrink-0"
-              >
-                Show all
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto pb-4 pt-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
-            {userPlaylists.map((pl) => {
-              const trackCount = Array.isArray(pl.songs) ? pl.songs.length : 0;
-              return (
-                <div
-                  key={pl._id}
-                  className="w-[145px] sm:w-[170px] md:w-[190px] flex-shrink-0 group relative p-2.5 sm:p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col"
-                >
-                  <Link
-                    href={`/myPlaylists/${pl._id}`}
-                    className="relative aspect-square w-full rounded-xl bg-gradient-to-br from-rose-950/60 via-[#18181b] to-black flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow-lg"
-                  >
-                    <MdPlaylistPlay
-                      size={42}
-                      className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
-                    />
-                    {trackCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handlePlayUserPlaylist(pl);
-                        }}
-                        className="absolute bottom-2 right-2 w-9 h-9 rounded-full musify-play-btn opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center shadow-xl cursor-pointer"
-                        title="Play playlist"
-                      >
-                        <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
-                      </button>
-                    )}
-                  </Link>
-                  <div className="mt-2.5 min-w-0">
-                    <Link
-                      href={`/myPlaylists/${pl._id}`}
-                      className="text-xs sm:text-sm font-bold text-white hover:text-[#f43f5e] transition-colors truncate block"
-                    >
-                      {pl.name}
-                    </Link>
-                    <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 font-medium truncate">
-                      {trackCount} {trackCount === 1 ? "track" : "tracks"}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Trailing "Create New" card */}
-            <button
-              type="button"
-              onClick={() => handleOpenCreatePlaylist("create")}
-              className="w-[145px] sm:w-[170px] md:w-[190px] flex-shrink-0 p-3 rounded-2xl bg-white/[0.02] hover:bg-white/[0.06] border border-dashed border-white/20 hover:border-rose-500/50 transition-all duration-300 flex flex-col items-center justify-center text-center group cursor-pointer"
-            >
-              <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <FaPlus size={16} />
-              </div>
-              <span className="text-xs sm:text-sm font-bold text-white group-hover:text-rose-300 transition-colors">
-                New Playlist
-              </span>
-              <span className="text-[11px] text-gray-400 mt-0.5">Create mix</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* PLAYLISTS TAB CONTENT */}
       {activeTab === "playlists" && (
         <div className="my-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                <span>Your Playlists</span>
-                {userPlaylists.length > 0 && (
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
-                    {userPlaylists.length}
+          {/* Header */}
+          {isBulkDeleteMode ? (
+            <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mb-6 p-4 rounded-2xl bg-gradient-to-r from-rose-950/40 via-white/[0.04] to-transparent border border-rose-500/20 backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleSelectAllPlaylists}
+                  className="text-xs sm:text-sm font-semibold text-white hover:text-rose-300 transition-colors flex items-center gap-2 cursor-pointer"
+                >
+                  <div
+                    className={`w-5 h-5 rounded-md flex items-center justify-center transition-all ${
+                      selectedPlaylists.size === userPlaylists.length && userPlaylists.length > 0
+                        ? "bg-rose-500 text-white shadow-md shadow-rose-500/40"
+                        : "border border-white/30 bg-white/5"
+                    }`}
+                  >
+                    <BsCheckLg size={11} className={selectedPlaylists.size === userPlaylists.length && userPlaylists.length > 0 ? "opacity-100" : "opacity-0"} />
+                  </div>
+                  <span>
+                    {selectedPlaylists.size === userPlaylists.length
+                      ? "Deselect All"
+                      : "Select All"}
                   </span>
+                </button>
+                <span className="text-xs font-bold text-rose-300 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30">
+                  {selectedPlaylists.size} selected
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={handleConfirmBulkDelete}
+                  disabled={selectedPlaylists.size === 0 || isDeletingPlaylists}
+                  className="text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(244,63,94,0.35)] flex items-center gap-2 cursor-pointer"
+                >
+                  {isDeletingPlaylists ? (
+                    <AiOutlineLoading3Quarters className="animate-spin text-sm" />
+                  ) : (
+                    <MdOutlineDeleteOutline size={16} />
+                  )}
+                  <span>Delete Selected ({selectedPlaylists.size})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBulkDeleteMode(false);
+                    setSelectedPlaylists(new Set());
+                  }}
+                  className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white px-4 py-2 rounded-full border border-white/10 hover:bg-white/[0.08] transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mb-6">
+              <div>
+                <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                  <span>Your Playlists</span>
+                  {userPlaylists.length > 0 && (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">
+                      {userPlaylists.length}
+                    </span>
+                  )}
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                  Custom collections and mixes crafted by you
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                {userPlaylists.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsBulkDeleteMode(true);
+                      setSelectedPlaylists(new Set());
+                    }}
+                    className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition-all px-3.5 py-2 rounded-full shadow-sm flex items-center gap-2 cursor-pointer"
+                    title="Select multiple playlists to delete"
+                  >
+                    <MdOutlineDeleteOutline size={16} className="text-rose-400" />
+                    <span>Bulk Delete</span>
+                  </button>
                 )}
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                Custom collections and mixes crafted by you
-              </p>
+                <button
+                  type="button"
+                  onClick={() => handleOpenCreatePlaylist("spotify")}
+                  className="text-xs sm:text-sm font-semibold text-[#1ed760] bg-[#1db954]/10 hover:bg-[#1db954]/20 border border-[#1db954]/30 transition-all px-4 py-2 rounded-full shadow-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <FaSpotify size={14} className="text-[#1ed760]" />
+                  <span>Import Spotify</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenCreatePlaylist("create")}
+                  className="text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 transition-all px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(244,63,94,0.35)] flex items-center gap-2 cursor-pointer"
+                >
+                  <FaPlus size={12} />
+                  <span>Create Playlist</span>
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => handleOpenCreatePlaylist("spotify")}
-                className="text-xs sm:text-sm font-semibold text-[#1ed760] bg-[#1db954]/10 hover:bg-[#1db954]/20 border border-[#1db954]/30 transition-all px-4 py-2 rounded-full shadow-sm flex items-center gap-2 cursor-pointer"
-              >
-                <FaSpotify size={14} className="text-[#1ed760]" />
-                <span>Import Spotify</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleOpenCreatePlaylist("create")}
-                className="text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 transition-all px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(244,63,94,0.35)] flex items-center gap-2 cursor-pointer"
-              >
-                <FaPlus size={12} />
-                <span>Create Playlist</span>
-              </button>
-            </div>
-          </div>
+          )}
 
           {userPlaylists && userPlaylists.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {/* Card to create new playlist */}
-              <button
-                type="button"
-                onClick={handleOpenCreatePlaylist}
-                className="group p-3 rounded-2xl bg-white/[0.02] hover:bg-white/[0.06] border border-dashed border-white/20 hover:border-rose-500/50 transition-all duration-300 flex flex-col items-center justify-center text-center aspect-square cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-rose-500/20 transition-all">
-                  <FaPlus className="text-rose-400 text-lg" />
-                </div>
-                <span className="text-sm font-bold text-white group-hover:text-rose-300 transition-colors">
-                  New Playlist
-                </span>
-                <span className="text-xs text-gray-400 mt-1">Create mix</span>
-              </button>
-
               {userPlaylists.map((pl) => {
                 const trackCount = Array.isArray(pl.songs) ? pl.songs.length : 0;
+                const isSelected = selectedPlaylists.has(pl._id);
                 return (
                   <div
                     key={pl._id}
-                    className="group relative p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/15 transition-all duration-300 flex flex-col"
+                    onClick={isBulkDeleteMode ? (e) => toggleSelectPlaylist(pl._id, e) : undefined}
+                    className={`group relative p-3 rounded-2xl border transition-all duration-300 flex flex-col ${
+                      isBulkDeleteMode && isSelected
+                        ? "bg-rose-950/30 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.25)]"
+                        : "bg-white/[0.03] hover:bg-white/[0.08] border-white/[0.06] hover:border-white/15"
+                    } ${isBulkDeleteMode ? "cursor-pointer" : ""}`}
                   >
-                    <Link
-                      href={`/myPlaylists/${pl._id}`}
-                      className="relative aspect-square w-full rounded-xl bg-gradient-to-br from-rose-950/60 via-[#18181b] to-black flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow-lg"
-                    >
-                      <MdPlaylistPlay
-                        size={48}
-                        className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
-                      />
-                      {trackCount > 0 && (
+                    <div className="relative aspect-square w-full rounded-xl bg-gradient-to-br from-rose-950/60 via-[#18181b] to-black flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow-lg">
+                      {isBulkDeleteMode ? (
+                        <div
+                          onClick={(e) => toggleSelectPlaylist(pl._id, e)}
+                          className={`absolute top-2.5 left-2.5 w-6 h-6 rounded-lg flex items-center justify-center transition-all z-20 cursor-pointer ${
+                            isSelected
+                              ? "bg-rose-500 text-white shadow-md shadow-rose-500/50"
+                              : "bg-black/70 border border-white/40 text-transparent hover:border-white"
+                          }`}
+                        >
+                          <BsCheckLg size={12} className={isSelected ? "opacity-100" : "opacity-0"} />
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteSinglePlaylist(pl, e)}
+                          disabled={deletingSingleId === pl._id}
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 hover:bg-rose-600 text-gray-300 hover:text-white border border-white/20 transition-all duration-200 flex items-center justify-center shadow-lg opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer z-10 hover:scale-105 active:scale-95"
+                          title={`Delete "${pl.name}"`}
+                        >
+                          {deletingSingleId === pl._id ? (
+                            <AiOutlineLoading3Quarters className="animate-spin text-xs text-white" />
+                          ) : (
+                            <MdOutlineDeleteOutline size={16} />
+                          )}
+                        </button>
+                      )}
+
+                      {isBulkDeleteMode ? (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <MdPlaylistPlay
+                            size={48}
+                            className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <Link
+                          href={`/myPlaylists/${pl._id}`}
+                          className="w-full h-full flex items-center justify-center"
+                        >
+                          <MdPlaylistPlay
+                            size={48}
+                            className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </Link>
+                      )}
+
+                      {!isBulkDeleteMode && trackCount > 0 && (
                         <button
                           type="button"
                           onClick={(e) => {
@@ -708,14 +802,21 @@ const Home = () => {
                           <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
                         </button>
                       )}
-                    </Link>
+                    </div>
+
                     <div className="mt-3 min-w-0">
-                      <Link
-                        href={`/myPlaylists/${pl._id}`}
-                        className="text-sm font-bold text-white hover:text-[#f43f5e] transition-colors truncate block"
-                      >
-                        {pl.name}
-                      </Link>
+                      {isBulkDeleteMode ? (
+                        <span className="text-sm font-bold text-white truncate block">
+                          {pl.name}
+                        </span>
+                      ) : (
+                        <Link
+                          href={`/myPlaylists/${pl._id}`}
+                          className="text-sm font-bold text-white hover:text-[#f43f5e] transition-colors truncate block"
+                        >
+                          {pl.name}
+                        </Link>
+                      )}
                       <p className="text-xs text-gray-400 mt-0.5 font-medium">
                         {trackCount} {trackCount === 1 ? "track" : "tracks"}
                       </p>
@@ -751,9 +852,6 @@ const Home = () => {
       {/* ALL & TRENDING TABS */}
       {(activeTab === "all" || activeTab === "trending") && (
         <>
-          {/* Listen Again (Only on All tab) */}
-          {activeTab === "all" && <ListenAgain />}
-
           {/* Trending Songs (Hindi & English) */}
           <SwiperLayout title="Trending Songs">
             {loading ? (
@@ -934,6 +1032,223 @@ const Home = () => {
               ))
             )}
           </SwiperLayout>
+
+          {/* Jump Back In (Listening History - moved down homepage) */}
+          <ListenAgain />
+
+          {/* YOUR PLAYLISTS SECTION ON ALL TAB (Moved down homepage) */}
+          {userPlaylists && userPlaylists.length > 0 && (
+            <div className="my-8 lg:my-12">
+              <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                    Your Playlists
+                  </h2>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                    {userPlaylists.length}
+                  </span>
+                </div>
+
+                {isBulkDeleteMode ? (
+                  <div className="w-full sm:w-auto flex items-center gap-2 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleSelectAllPlaylists}
+                      className="text-xs font-semibold text-gray-300 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
+                    >
+                      <div
+                        className={`w-4 h-4 rounded flex items-center justify-center transition-all ${
+                          selectedPlaylists.size === userPlaylists.length && userPlaylists.length > 0
+                            ? "bg-rose-500 text-white"
+                            : "border border-white/30 bg-white/5"
+                        }`}
+                      >
+                        <BsCheckLg
+                          size={9}
+                          className={
+                            selectedPlaylists.size === userPlaylists.length && userPlaylists.length > 0
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }
+                        />
+                      </div>
+                      <span>
+                        {selectedPlaylists.size === userPlaylists.length
+                          ? "Deselect All"
+                          : "Select All"}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleConfirmBulkDelete}
+                      disabled={selectedPlaylists.size === 0 || isDeletingPlaylists}
+                      className="text-xs font-semibold text-white bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {isDeletingPlaylists ? (
+                        <AiOutlineLoading3Quarters className="animate-spin text-xs" />
+                      ) : (
+                        <MdOutlineDeleteOutline size={14} />
+                      )}
+                      <span>Delete ({selectedPlaylists.size})</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsBulkDeleteMode(false);
+                        setSelectedPlaylists(new Set());
+                      }}
+                      className="text-xs font-semibold text-gray-300 hover:text-white px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/[0.08] transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-full sm:w-auto flex items-center gap-2 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsBulkDeleteMode(true);
+                        setSelectedPlaylists(new Set());
+                      }}
+                      className="text-xs font-semibold text-gray-300 hover:text-rose-300 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
+                      title="Bulk delete playlists"
+                    >
+                      <MdOutlineDeleteOutline size={14} className="text-rose-400" />
+                      <span>Bulk Delete</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCreatePlaylist("spotify")}
+                      className="text-xs font-semibold text-[#1ed760] hover:text-[#1db954] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
+                      title="Import from Spotify"
+                    >
+                      <FaSpotify size={12} className="text-[#1ed760]" />
+                      <span>Import</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCreatePlaylist("create")}
+                      className="text-xs font-semibold text-[#f43f5e] hover:text-[#fb7185] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 cursor-pointer"
+                    >
+                      <FaPlus size={10} />
+                      <span>New</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("playlists")}
+                      className="ml-auto sm:ml-2 text-xs font-semibold text-gray-400 hover:text-white transition-colors cursor-pointer flex-shrink-0"
+                    >
+                      Show all
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto pb-4 pt-1 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+                {userPlaylists.map((pl) => {
+                  const trackCount = Array.isArray(pl.songs) ? pl.songs.length : 0;
+                  const isSelected = selectedPlaylists.has(pl._id);
+                  return (
+                    <div
+                      key={pl._id}
+                      onClick={isBulkDeleteMode ? (e) => toggleSelectPlaylist(pl._id, e) : undefined}
+                      className={`w-[145px] sm:w-[170px] md:w-[190px] flex-shrink-0 group relative p-2.5 sm:p-3 rounded-2xl border transition-all duration-300 flex flex-col ${
+                        isBulkDeleteMode && isSelected
+                          ? "bg-rose-950/30 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.25)]"
+                          : "bg-white/[0.03] hover:bg-white/[0.08] border-white/[0.06] hover:border-white/15"
+                      } ${isBulkDeleteMode ? "cursor-pointer" : ""}`}
+                    >
+                      <div className="relative aspect-square w-full rounded-xl bg-gradient-to-br from-rose-950/60 via-[#18181b] to-black flex items-center justify-center overflow-hidden border border-white/10 group-hover:border-[#f43f5e]/40 transition-colors shadow-lg">
+                        {isBulkDeleteMode ? (
+                          <div
+                            onClick={(e) => toggleSelectPlaylist(pl._id, e)}
+                            className={`absolute top-2 left-2 w-6 h-6 rounded-lg flex items-center justify-center transition-all z-20 cursor-pointer ${
+                              isSelected
+                                ? "bg-rose-500 text-white shadow-md shadow-rose-500/50"
+                                : "bg-black/70 border border-white/40 text-transparent hover:border-white"
+                            }`}
+                          >
+                            <BsCheckLg
+                              size={12}
+                              className={isSelected ? "opacity-100" : "opacity-0"}
+                            />
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteSinglePlaylist(pl, e)}
+                            disabled={deletingSingleId === pl._id}
+                            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 hover:bg-rose-600 text-gray-300 hover:text-white border border-white/20 transition-all duration-200 flex items-center justify-center shadow-lg opacity-90 sm:opacity-0 group-hover:opacity-100 cursor-pointer z-10 hover:scale-105 active:scale-95"
+                            title={`Delete "${pl.name}"`}
+                          >
+                            {deletingSingleId === pl._id ? (
+                              <AiOutlineLoading3Quarters className="animate-spin text-xs text-white" />
+                            ) : (
+                              <MdOutlineDeleteOutline size={16} />
+                            )}
+                          </button>
+                        )}
+
+                        {isBulkDeleteMode ? (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <MdPlaylistPlay
+                              size={42}
+                              className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </div>
+                        ) : (
+                          <Link
+                            href={`/myPlaylists/${pl._id}`}
+                            className="w-full h-full flex items-center justify-center"
+                          >
+                            <MdPlaylistPlay
+                              size={42}
+                              className="text-[#f43f5e] group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </Link>
+                        )}
+
+                        {!isBulkDeleteMode && trackCount > 0 && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handlePlayUserPlaylist(pl);
+                            }}
+                            className="absolute bottom-2 right-2 w-9 h-9 rounded-full musify-play-btn opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center shadow-xl cursor-pointer"
+                            title="Play playlist"
+                          >
+                            <BsFillPlayFill className="text-white text-lg translate-x-0.5" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="mt-2.5 min-w-0">
+                        {isBulkDeleteMode ? (
+                          <span className="text-xs sm:text-sm font-bold text-white truncate block">
+                            {pl.name}
+                          </span>
+                        ) : (
+                          <Link
+                            href={`/myPlaylists/${pl._id}`}
+                            className="text-xs sm:text-sm font-bold text-white hover:text-[#f43f5e] transition-colors truncate block"
+                          >
+                            {pl.name}
+                          </Link>
+                        )}
+                        <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 font-medium truncate">
+                          {trackCount} {trackCount === 1 ? "track" : "tracks"}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Featured Radio Stations */}
           {radio.length > 0 && (

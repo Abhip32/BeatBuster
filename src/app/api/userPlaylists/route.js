@@ -58,10 +58,25 @@ export async function POST(req) {
   }
 }
 
-// delete a playlist
+// delete a playlist (supports single or bulk delete)
 export async function DELETE(req) {
-  const { playlistId } = await req.json();
   try {
+    const body = await req.json();
+    const playlistId = body?.playlistId;
+    const rawIds = Array.isArray(body?.playlistIds)
+      ? body.playlistIds
+      : playlistId
+      ? [playlistId]
+      : [];
+    const playlistIds = rawIds.filter((id) => id && typeof id === "string");
+
+    if (playlistIds.length === 0) {
+      return NextResponse.json(
+        { success: false, message: "No playlist ID provided", data: null },
+        { status: 400 }
+      );
+    }
+
     const conn = await dbConnect();
     if (!conn) {
       return NextResponse.json(
@@ -80,42 +95,49 @@ export async function DELETE(req) {
         { status: 401 }
       );
     }
-    const playlist = await Playlist.findById(playlistId);
-    if (!playlist) {
+
+    // Only match playlists belonging to this user
+    const userPlaylistsToDelete = await Playlist.find({
+      _id: { $in: playlistIds },
+      user: user._id,
+    }).select("_id");
+
+    const validIds = userPlaylistsToDelete.map((p) => p._id.toString());
+
+    if (validIds.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          message: "Playlist not found",
+          message: "No matching playlists found to delete",
           data: null,
         },
         { status: 404 }
       );
     }
-    if (playlist.user.toString() !== user._id.toString()) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "You are not authorized to delete this playlist",
-          data: null,
-        },
-        { status: 401 }
-      );
-    }
-    await Playlist.deleteOne({ _id: playlistId });
+
+    await Playlist.deleteMany({ _id: { $in: validIds } });
+
     const userData = await UserData.findById(user.userData);
-    if (userData) {
+    if (userData && Array.isArray(userData.playlists)) {
+      const validSet = new Set(validIds);
       userData.playlists = userData.playlists.filter(
-        (p) => p.toString() !== playlistId
+        (p) => !validSet.has(p.toString())
       );
       await userData.save();
     }
+
     return NextResponse.json({
       success: true,
-      message: "Playlist deleted",
+      message:
+        validIds.length === 1
+          ? "Playlist deleted"
+          : `${validIds.length} playlists deleted`,
+      deletedCount: validIds.length,
+      deletedIds: validIds,
       data: null,
     });
   } catch (e) {
-    console.error(e);
+    console.error("Delete playlist error:", e);
     return NextResponse.json(
       {
         success: false,

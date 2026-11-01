@@ -52,6 +52,14 @@ const playlistsSlice = createSlice({
       );
       state.count = state.playlists.length;
     },
+    removeMultiplePlaylists: (state, action) => {
+      const ids = new Set((action.payload || []).map((id) => String(id)));
+      if (ids.size === 0) return;
+      state.playlists = state.playlists.filter(
+        (p) => !ids.has(String(p._id || p.id))
+      );
+      state.count = state.playlists.length;
+    },
     addSongToPlaylistState: (state, action) => {
       const { playlistId, song } = action.payload || {};
       if (!playlistId || !song) return;
@@ -89,6 +97,7 @@ export const {
   setPlaylists,
   addPlaylist,
   removePlaylist,
+  removeMultiplePlaylists,
   addSongToPlaylistState,
   removeSongFromPlaylistState,
 } = playlistsSlice.actions;
