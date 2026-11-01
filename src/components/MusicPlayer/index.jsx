@@ -66,6 +66,53 @@ const MusicPlayer = () => {
   const router = useRouter();
   const [bgColor, setBgColor] = useState();
   const [showLyrics, setShowLyrics] = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [sleepTimerMode, setSleepTimerMode] = useState(null);
+  const [sleepTimerRemaining, setSleepTimerRemaining] = useState(0);
+
+  const handleSetTimer = (mode, seconds) => {
+    if (!mode) {
+      setSleepTimerMode(null);
+      setSleepTimerRemaining(0);
+      toast("Sleep timer turned off", { icon: "⏰" });
+      return;
+    }
+    setSleepTimerMode(mode);
+    setSleepTimerRemaining(seconds || 0);
+    if (mode === "endOfTrack") {
+      toast.success("Sleep timer set: Pauses at end of song 🌙");
+    } else {
+      const mins = Math.round((seconds || 0) / 60);
+      toast.success(`Sleep timer set: ${mins} minutes 🌙`);
+    }
+  };
+
+  const handleCancelTimer = () => {
+    setSleepTimerMode(null);
+    setSleepTimerRemaining(0);
+    toast("Sleep timer turned off", { icon: "⏰" });
+  };
+
+  // Sleep timer interval countdown
+  useEffect(() => {
+    if (!sleepTimerMode || sleepTimerMode === "endOfTrack") return;
+    if (sleepTimerRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setSleepTimerRemaining((prev) => {
+        if (prev <= 1) {
+          dispatch(playPause(false));
+          setSleepTimerMode(null);
+          toast("⏰ Sleep timer ended. Playback paused.", { icon: "🌙" });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sleepTimerMode, sleepTimerRemaining, dispatch]);
 
   // Restore persisted volume, repeat, shuffle from localStorage
   useEffect(() => {
@@ -200,14 +247,9 @@ const MusicPlayer = () => {
     [isActive, isPlaying, dispatch]
   );
 
-  // Hotkey for play pause
+  // Global Desktop Media Hotkeys
   const handleKeyPress = useCallback(
     (event) => {
-      // Check if the pressed key is the spacebar (keyCode 32, key " ", or code "Space")
-      if (event.keyCode !== 32 && event.key !== " " && event.code !== "Space") {
-        return;
-      }
-
       // Ignore if typing in any text input, textarea, select, contentEditable element, or Redux isTyping
       const target = event.target;
       const tagName = target?.tagName?.toLowerCase();
@@ -232,10 +274,88 @@ const MusicPlayer = () => {
         return;
       }
 
-      event.preventDefault();
-      handlePlayPause();
+      // Space: Play / Pause
+      if (event.keyCode === 32 || event.key === " " || event.code === "Space") {
+        event.preventDefault();
+        handlePlayPause();
+        return;
+      }
+
+      // Shift + Right Arrow: Next Track
+      if (event.shiftKey && (event.key === "ArrowRight" || event.code === "ArrowRight")) {
+        event.preventDefault();
+        handleNextSong();
+        return;
+      }
+
+      // Shift + Left Arrow: Previous Track
+      if (event.shiftKey && (event.key === "ArrowLeft" || event.code === "ArrowLeft")) {
+        event.preventDefault();
+        handlePrevSong();
+        return;
+      }
+
+      // Arrow Up: Volume Up 5%
+      if (!event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
+        event.preventDefault();
+        handleSetVolume(Math.min(1, Math.round((volume + 0.05) * 100) / 100));
+        return;
+      }
+
+      // Arrow Down: Volume Down 5%
+      if (!event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
+        event.preventDefault();
+        handleSetVolume(Math.max(0, Math.round((volume - 0.05) * 100) / 100));
+        return;
+      }
+
+      // 'M' or 'm': Toggle Mute
+      if (event.key === "m" || event.key === "M") {
+        event.preventDefault();
+        handleSetVolume(volume > 0 ? 0 : 0.8);
+        return;
+      }
+
+      // 'L' or 'l': Toggle Lyrics
+      if (event.key === "l" || event.key === "L") {
+        event.preventDefault();
+        setShowLyrics((prev) => !prev);
+        setShowQueue(false);
+        return;
+      }
+
+      // 'Q' or 'q': Toggle Queue
+      if (event.key === "q" || event.key === "Q") {
+        event.preventDefault();
+        setShowQueue((prev) => !prev);
+        setShowLyrics(false);
+        return;
+      }
+
+      // 'F' or 'f': Toggle Fullscreen
+      if (event.key === "f" || event.key === "F") {
+        event.preventDefault();
+        dispatch(setFullScreen(!fullScreen));
+        return;
+      }
+
+      // '?': Toggle Shortcuts Help Modal
+      if (event.key === "?") {
+        event.preventDefault();
+        setShowShortcuts((prev) => !prev);
+        return;
+      }
     },
-    [isTyping, handlePlayPause]
+    [
+      isTyping,
+      handlePlayPause,
+      handleNextSong,
+      handlePrevSong,
+      handleSetVolume,
+      volume,
+      fullScreen,
+      dispatch,
+    ]
   );
 
   useEffect(() => {
@@ -263,6 +383,14 @@ const MusicPlayer = () => {
 
   const handleNextSong = (e) => {
     e?.stopPropagation();
+    // Check if sleep timer is set to end of current track
+    if (sleepTimerMode === "endOfTrack") {
+      dispatch(playPause(false));
+      setSleepTimerMode(null);
+      toast("⏰ Sleep timer ended. Playback paused.", { icon: "🌙" });
+      return;
+    }
+
     dispatch(playPause(false));
 
     if (!shuffle) {
@@ -473,6 +601,14 @@ const MusicPlayer = () => {
               setSeekTime={handleSeek}
               showLyrics={showLyrics}
               setShowLyrics={setShowLyrics}
+              showQueue={showQueue}
+              setShowQueue={setShowQueue}
+              sleepTimerMode={sleepTimerMode}
+              sleepTimerRemaining={sleepTimerRemaining}
+              onSetTimer={handleSetTimer}
+              onCancelTimer={handleCancelTimer}
+              showShortcuts={showShortcuts}
+              setShowShortcuts={setShowShortcuts}
             />
           </div>
 
