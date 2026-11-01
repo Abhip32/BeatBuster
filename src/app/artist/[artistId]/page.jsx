@@ -92,10 +92,10 @@ const ArtistPage = ({ params }) => {
   const albumsList = Array.isArray(artistAlbums) ? artistAlbums : [];
 
   return (
-    <div className="w-11/12 max-w-7xl mx-auto mt-8 mb-20">
+    <div className="w-11/12 max-w-7xl mx-auto mt-8 mb-20 animate-fade-in">
       {/* Spotify Artist Banner */}
-      <div className="relative rounded-3xl p-6 sm:p-8 lg:p-10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-2xl flex flex-col md:flex-row items-center md:items-end gap-6 lg:gap-10">
-        <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 flex-shrink-0 rounded-full overflow-hidden shadow-2xl bg-[#18181f] border-2 border-white/10">
+      <div className="relative rounded-3xl p-5 sm:p-8 lg:p-10 bg-gradient-to-b from-rose-950/40 via-white/[0.03] to-transparent backdrop-blur-2xl border border-rose-500/15 shadow-2xl flex flex-col md:flex-row items-center md:items-end gap-5 sm:gap-7 lg:gap-10">
+        <div className="relative w-36 h-36 sm:w-52 sm:h-52 lg:w-60 lg:h-60 flex-shrink-0 rounded-full overflow-hidden shadow-2xl bg-[#18181f] border border-rose-400/20 shadow-[0_12px_36px_rgba(244,63,94,0.3)] group">
           {loading ? (
             <div className="w-full h-full animate-pulse bg-white/10" />
           ) : coverUrl ? (
@@ -104,7 +104,7 @@ const ArtistPage = ({ params }) => {
               alt={artistDetails?.name || "artist"}
               width={256}
               height={256}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-white/5 text-gray-500 font-bold text-3xl">
@@ -113,16 +113,16 @@ const ArtistPage = ({ params }) => {
           )}
         </div>
 
-        <div className="flex flex-col text-center md:text-left text-white min-w-0 flex-1">
-          <div className="flex items-center justify-center md:justify-start gap-1.5 text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1">
+        <div className="flex flex-col text-center md:text-left text-white min-w-0 flex-1 w-full md:w-auto">
+          <span className="text-[11px] sm:text-xs uppercase font-extrabold tracking-widest text-[#f43f5e] mb-1.5 flex items-center justify-center md:justify-start gap-2">
             <MdVerified className="text-[#f43f5e] text-base" />
             <span>Verified Artist</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] pb-1.5 line-clamp-2">
+          </span>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] sm:leading-[1.1] pb-1.5">
             {artistDetails?.name || "Artist"}
           </h1>
 
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-300 mt-3 font-semibold">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-300 mt-2.5 font-semibold">
             <span>
               {Number(
                 artistDetails?.fanCount || artistDetails?.followerCount || 100000
@@ -145,9 +145,21 @@ const ArtistPage = ({ params }) => {
 
       {/* Top Songs */}
       <div className="mt-10">
-        <h2 className="text-2xl font-bold tracking-tight text-white mb-2">
-          Popular Tracks
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-white">
+              Popular Tracks
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5 font-medium">
+              Top streamed tracks by {artistDetails?.name || "this artist"}
+            </p>
+          </div>
+          {songsList.length > 0 && (
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30">
+              {songsList.length} {songsList.length === 1 ? "track" : "tracks"}
+            </span>
+          )}
+        </div>
         {loading ? (
           <SongListSkeleton />
         ) : (
