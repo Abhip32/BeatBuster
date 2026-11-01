@@ -21,6 +21,7 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { BsFillPlayFill } from "react-icons/bs";
 import { toast } from "react-hot-toast";
 import decodeHtml from "@/utils/decodeHtml";
+import { parseLrc, cleanPlainLyrics } from "@/utils/lyricsParser";
 
 const TIMER_OPTIONS = [
   { label: "15 minutes", minutes: 15, mode: "15m" },
@@ -29,27 +30,6 @@ const TIMER_OPTIONS = [
   { label: "1 hour", minutes: 60, mode: "60m" },
   { label: "End of this song", minutes: null, mode: "endOfTrack" },
 ];
-
-const parseLrc = (lrcString) => {
-  if (!lrcString || typeof lrcString !== "string") return [];
-  const lines = lrcString.split("\n");
-  const result = [];
-  const regex = /\[(\d{2}):(\d{2}(?:\.\d{1,3})?)\](.*)/;
-
-  for (let i = 0; i < lines.length; i++) {
-    const match = regex.exec(lines[i].trim());
-    if (match) {
-      const minutes = parseInt(match[1], 10);
-      const seconds = parseFloat(match[2]);
-      const text = match[3].trim();
-      const time = minutes * 60 + seconds;
-      if (text) {
-        result.push({ id: i, time, text });
-      }
-    }
-  }
-  return result.sort((a, b) => a.time - b.time);
-};
 
 const PlaybackHubModal = ({
   isOpen,
@@ -105,10 +85,15 @@ const PlaybackHubModal = ({
 
   const parsedLyrics = useMemo(() => {
     if (lyricsData?.syncedLyrics) {
-      return parseLrc(lyricsData.syncedLyrics);
+      const parsed = parseLrc(lyricsData.syncedLyrics);
+      if (parsed.length > 0) return parsed;
+    }
+    if (lyricsData?.plainLyrics) {
+      const parsed = parseLrc(lyricsData.plainLyrics);
+      if (parsed.length > 0) return parsed;
     }
     return [];
-  }, [lyricsData?.syncedLyrics]);
+  }, [lyricsData?.syncedLyrics, lyricsData?.plainLyrics]);
 
   const activeLineIndex = useMemo(() => {
     if (!parsedLyrics.length) return -1;
@@ -448,7 +433,7 @@ const PlaybackHubModal = ({
             ) : lyricsData?.plainLyrics ? (
               <div className="py-4">
                 <p className="text-xs sm:text-sm text-gray-200 leading-relaxed whitespace-pre-line font-medium">
-                  {lyricsData.plainLyrics}
+                  {cleanPlainLyrics(lyricsData.plainLyrics)}
                 </p>
               </div>
             ) : (

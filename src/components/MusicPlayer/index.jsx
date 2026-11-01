@@ -478,8 +478,8 @@ const MusicPlayer = () => {
           : "w-full h-20 px-3 sm:px-6 lg:px-8 justify-center overflow-visible border-t border-white/[0.08] shadow-[0_-8px_32px_rgba(0,0,0,0.5)]"
       }`}
       onClick={() => {
-        if (showLyrics) {
-          setShowLyrics(false);
+        if (isHubOpen) {
+          setIsHubOpen(false);
         }
         if (!fullScreen && activeSong?.id) {
           dispatch(setFullScreen(true));

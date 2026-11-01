@@ -7,28 +7,7 @@ import SongsList from "../SongsList";
 import { setAutoAdd, clearQueue } from "@/redux/features/playerSlice";
 import { toast } from "react-hot-toast";
 import { IoMusicalNotesOutline } from "react-icons/io5";
-
-// Helper to parse standard LRC string into an array of { id, time, text }
-const parseLrc = (lrcString) => {
-  if (!lrcString || typeof lrcString !== "string") return [];
-  const lines = lrcString.split("\n");
-  const result = [];
-  const regex = /\[(\d{2}):(\d{2}(?:\.\d{1,3})?)\](.*)/;
-
-  for (let i = 0; i < lines.length; i++) {
-    const match = regex.exec(lines[i].trim());
-    if (match) {
-      const minutes = parseInt(match[1], 10);
-      const seconds = parseFloat(match[2]);
-      const text = match[3].trim();
-      const time = minutes * 60 + seconds;
-      if (text) {
-        result.push({ id: i, time, text });
-      }
-    }
-  }
-  return result.sort((a, b) => a.time - b.time);
-};
+import { parseLrc, cleanPlainLyrics } from "@/utils/lyricsParser";
 
 const Lyrics = ({
   activeSong,
@@ -82,10 +61,15 @@ const Lyrics = ({
   // Parse synchronized lyrics if available
   const parsedLyrics = useMemo(() => {
     if (lyricsData?.syncedLyrics) {
-      return parseLrc(lyricsData.syncedLyrics);
+      const parsed = parseLrc(lyricsData.syncedLyrics);
+      if (parsed.length > 0) return parsed;
+    }
+    if (lyricsData?.plainLyrics) {
+      const parsed = parseLrc(lyricsData.plainLyrics);
+      if (parsed.length > 0) return parsed;
     }
     return [];
-  }, [lyricsData?.syncedLyrics]);
+  }, [lyricsData?.syncedLyrics, lyricsData?.plainLyrics]);
 
   // Determine current active lyric line index based on playback time
   const activeLineIndex = useMemo(() => {
@@ -229,7 +213,7 @@ const Lyrics = ({
                     "{lyricsData.snippet}"
                   </p>
                 )}
-                {lyricsData.plainLyrics}
+                {cleanPlainLyrics(lyricsData.plainLyrics)}
               </div>
               {lyricsData.copyright && (
                 <p className="text-[11px] text-gray-500 mt-8 text-center border-t border-white/[0.06] pt-3">
