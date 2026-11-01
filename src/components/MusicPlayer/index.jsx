@@ -247,6 +247,42 @@ const MusicPlayer = () => {
     [isActive, isPlaying, dispatch]
   );
 
+  const handleNextSong = useCallback(
+    (e) => {
+      e?.stopPropagation();
+      // Check if sleep timer is set to end of current track
+      if (sleepTimerMode === "endOfTrack") {
+        dispatch(playPause(false));
+        setSleepTimerMode(null);
+        toast("⏰ Sleep timer ended. Playback paused.", { icon: "🌙" });
+        return;
+      }
+
+      dispatch(playPause(false));
+
+      if (!shuffle) {
+        dispatch(nextSong((currentIndex + 1) % currentSongs.length));
+      } else {
+        dispatch(nextSong(Math.floor(Math.random() * currentSongs.length)));
+      }
+    },
+    [sleepTimerMode, shuffle, currentIndex, currentSongs?.length, dispatch]
+  );
+
+  const handlePrevSong = useCallback(
+    (e) => {
+      e?.stopPropagation();
+      if (currentIndex === 0) {
+        dispatch(prevSong(currentSongs.length - 1));
+      } else if (shuffle) {
+        dispatch(prevSong(Math.floor(Math.random() * currentSongs.length)));
+      } else {
+        dispatch(prevSong(currentIndex - 1));
+      }
+    },
+    [currentIndex, currentSongs?.length, shuffle, dispatch]
+  );
+
   // Global Desktop Media Hotkeys
   const handleKeyPress = useCallback(
     (event) => {
@@ -381,37 +417,7 @@ const MusicPlayer = () => {
     }
   }, [autoAdd, activeSong?.id, currentIndex, currentSongs?.length, dispatch]);
 
-  const handleNextSong = (e) => {
-    e?.stopPropagation();
-    // Check if sleep timer is set to end of current track
-    if (sleepTimerMode === "endOfTrack") {
-      dispatch(playPause(false));
-      setSleepTimerMode(null);
-      toast("⏰ Sleep timer ended. Playback paused.", { icon: "🌙" });
-      return;
-    }
-
-    dispatch(playPause(false));
-
-    if (!shuffle) {
-      dispatch(nextSong((currentIndex + 1) % currentSongs.length));
-    } else {
-      dispatch(nextSong(Math.floor(Math.random() * currentSongs.length)));
-    }
-  };
-
-  const handlePrevSong = (e) => {
-    e?.stopPropagation();
-    if (currentIndex === 0) {
-      dispatch(prevSong(currentSongs.length - 1));
-    } else if (shuffle) {
-      dispatch(prevSong(Math.floor(Math.random() * currentSongs.length)));
-    } else {
-      dispatch(prevSong(currentIndex - 1));
-    }
-  };
-
-    const handleAddToFavourite = async (favsong) => {
+  const handleAddToFavourite = async (favsong) => {
     if (!favsong) return;
 
     if (status === "unauthenticated") {
