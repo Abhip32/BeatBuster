@@ -9,6 +9,7 @@ import {
 } from "@/redux/features/settingsSlice";
 import ToggleSwitch from "@/components/Settings/ToggleSwitch";
 import CustomSelect from "@/components/Settings/CustomSelect";
+import BackButton from "@/components/BackButton";
 
 const QUALITY_OPTIONS = [
   { value: "ask", label: "Always ask" },
@@ -59,7 +60,11 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="w-11/12 max-w-3xl mt-10 sm:mt-14 mx-auto text-white min-h-screen pb-32">
+    <div className="w-11/12 max-w-3xl mt-6 sm:mt-10 mx-auto text-white min-h-screen pb-32 animate-fade-in">
+      <div className="mb-4">
+        <BackButton />
+      </div>
+
       {/* Page Title */}
       <div className="mb-8 flex items-center justify-between pb-3 border-b border-white/10">
         <div>

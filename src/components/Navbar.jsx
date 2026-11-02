@@ -3,13 +3,15 @@ import React from "react";
 import Searchbar from "./Searchbar";
 import UpdatesBell from "./UpdatesBell";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setProgress } from "@/redux/features/loadingBarSlice";
 import { MdOutlineMenu } from "react-icons/md";
-import { IoClose, IoSettingsOutline } from "react-icons/io5";
+import { IoClose, IoSettingsOutline, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import Sidebar from "./Sidebar/Sidebar";
 
 const Navbar = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const [showNav, setShowNav] = React.useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = React.useState(false);
@@ -17,8 +19,8 @@ const Navbar = () => {
   return (
     <>
       <header className="sticky top-0 z-40 h-[70px] bg-[#101014]/80 backdrop-blur-xl border-b border-white/[0.07] px-4 lg:px-8 flex items-center justify-between transition-all">
-        {/* Left: Sidebar toggle & Logo */}
-        <div className="flex items-center gap-3">
+        {/* Left: Sidebar toggle, History Navigation & Logo */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => setShowNav(true)}
@@ -27,6 +29,28 @@ const Navbar = () => {
           >
             <MdOutlineMenu className="text-2xl lg:text-3xl" />
           </button>
+
+          {/* History Back & Forward Buttons (Desktop & Tablet) */}
+          <div className="hidden sm:flex items-center gap-1.5 mr-0.5">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              title="Go back"
+              aria-label="Go back"
+              className="w-8 h-8 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
+            >
+              <IoChevronBack size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => router.forward()}
+              title="Go forward"
+              aria-label="Go forward"
+              className="w-8 h-8 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 text-gray-300 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
+            >
+              <IoChevronForward size={16} />
+            </button>
+          </div>
 
           <Link
             href="/"

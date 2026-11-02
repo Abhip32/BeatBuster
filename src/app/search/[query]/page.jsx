@@ -15,6 +15,7 @@ import SwiperLayout from "@/components/Homepage/Swiper";
 import { SwiperSlide } from "swiper/react";
 import { useQuery } from "@tanstack/react-query";
 import SearchSkeleton from "@/components/Skeletons/SearchSkeleton";
+import BackButton from "@/components/BackButton";
 import decodeHtml from "@/utils/decodeHtml";
 
 const SearchResultsPage = ({ params }) => {
@@ -156,7 +157,11 @@ const SearchResultsPage = ({ params }) => {
   };
 
   return (
-    <div className="w-11/12 max-w-7xl mx-auto mt-6 mb-24">
+    <div className="w-11/12 max-w-7xl mx-auto mt-6 mb-24 animate-fade-in">
+      <div className="mb-4">
+        <BackButton />
+      </div>
+
       {/* Search Header Banner */}
       <div className="mb-6">
         <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
