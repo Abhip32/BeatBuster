@@ -61,24 +61,23 @@ const SettingsPage = () => {
 
   return (
     <div className="w-11/12 max-w-3xl mt-6 sm:mt-10 mx-auto text-white min-h-screen pb-32 animate-fade-in">
-      <div className="mb-4">
-        <BackButton />
-      </div>
-
       {/* Page Title */}
       <div className="mb-8 flex items-center justify-between pb-3 border-b border-white/10">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
-            Preferences
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1">
-            Settings
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Configure Spotify-style audio quality, downloads, and lyrics
-          </p>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <BackButton iconOnly />
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
+              Preferences
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white mt-0.5">
+              Settings
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400 mt-0.5">
+              Configure Spotify-style audio quality, downloads, and lyrics
+            </p>
+          </div>
         </div>
-        <div className="w-10 h-10 rounded-full bg-[#f43f5e] flex items-center justify-center shadow-[0_0_15px_rgba(244, 63, 94,0.35)]">
+        <div className="w-10 h-10 rounded-full bg-[#f43f5e] flex items-center justify-center shadow-[0_0_15px_rgba(244, 63, 94,0.35)] flex-shrink-0">
           <img src="/images/logo.png" alt="Musify" className="w-8 h-8 rounded-full object-cover" />
         </div>
       </div>

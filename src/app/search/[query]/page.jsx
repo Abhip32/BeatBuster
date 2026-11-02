@@ -158,18 +158,17 @@ const SearchResultsPage = ({ params }) => {
 
   return (
     <div className="w-11/12 max-w-7xl mx-auto mt-6 mb-24 animate-fade-in">
-      <div className="mb-4">
-        <BackButton />
-      </div>
-
       {/* Search Header Banner */}
-      <div className="mb-6">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
-          Search Results
-        </span>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mt-1">
-          &ldquo;{decodedTitle}&rdquo;
-        </h1>
+      <div className="mb-6 flex items-center gap-3 sm:gap-4">
+        <BackButton iconOnly />
+        <div>
+          <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
+            Search Results
+          </span>
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mt-0.5">
+            &ldquo;{decodedTitle}&rdquo;
+          </h1>
+        </div>
       </div>
 
       {/* Filter Category Pills */}

@@ -3,7 +3,12 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { IoArrowBack } from "react-icons/io5";
 
-const BackButton = ({ className = "", fallbackHref = "/", label = "Back" }) => {
+const BackButton = ({
+  className = "",
+  fallbackHref = "/",
+  iconOnly = false,
+  label = "Back",
+}) => {
   const router = useRouter();
 
   const handleBack = () => {
@@ -13,6 +18,23 @@ const BackButton = ({ className = "", fallbackHref = "/", label = "Back" }) => {
       router.push(fallbackHref);
     }
   };
+
+  if (iconOnly) {
+    return (
+      <button
+        type="button"
+        onClick={handleBack}
+        title="Go back"
+        aria-label="Go back"
+        className={`group w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md border border-white/15 hover:border-white/35 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md ${className}`}
+      >
+        <IoArrowBack
+          size={17}
+          className="group-hover:-translate-x-0.5 transition-transform text-white group-hover:text-rose-400"
+        />
+      </button>
+    );
+  }
 
   return (
     <button
