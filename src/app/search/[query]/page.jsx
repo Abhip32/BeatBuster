@@ -15,7 +15,6 @@ import SwiperLayout from "@/components/Homepage/Swiper";
 import { SwiperSlide } from "swiper/react";
 import { useQuery } from "@tanstack/react-query";
 import SearchSkeleton from "@/components/Skeletons/SearchSkeleton";
-import BackButton from "@/components/BackButton";
 import decodeHtml from "@/utils/decodeHtml";
 
 const SearchResultsPage = ({ params }) => {
@@ -157,18 +156,15 @@ const SearchResultsPage = ({ params }) => {
   };
 
   return (
-    <div className="w-11/12 max-w-7xl mx-auto mt-6 mb-24 animate-fade-in">
+    <div className="w-11/12 max-w-7xl mx-auto mt-6 mb-24">
       {/* Search Header Banner */}
-      <div className="mb-6 flex items-center gap-3 sm:gap-4">
-        <BackButton iconOnly />
-        <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
-            Search Results
-          </span>
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mt-0.5">
-            &ldquo;{decodedTitle}&rdquo;
-          </h1>
-        </div>
+      <div className="mb-6">
+        <span className="text-xs font-bold uppercase tracking-widest text-[#f43f5e]">
+          Search Results
+        </span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mt-1">
+          &ldquo;{decodedTitle}&rdquo;
+        </h1>
       </div>
 
       {/* Filter Category Pills */}

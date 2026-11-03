@@ -26,10 +26,10 @@ const BackButton = ({
         onClick={handleBack}
         title="Go back"
         aria-label="Go back"
-        className={`group w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md border border-white/15 hover:border-white/35 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-md ${className}`}
+        className={`group w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/[0.08] hover:bg-white/[0.18] active:bg-white/[0.25] backdrop-blur-md border border-white/15 hover:border-white/30 text-white flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-lg ${className}`}
       >
         <IoArrowBack
-          size={17}
+          size={18}
           className="group-hover:-translate-x-0.5 transition-transform text-white group-hover:text-rose-400"
         />
       </button>
